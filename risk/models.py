@@ -13,3 +13,12 @@ class Earthquake(models.Model):
 
     def __str__(self):
         return f"{self.date} {self.time} - {self.city} - {self.level}"
+
+class AccidentDensity(models.Model):
+    latitude_range = models.DecimalField(max_digits=8, decimal_places=5)
+    longitude_range = models.DecimalField(max_digits=8, decimal_places=5)
+    fatality = models.IntegerField()
+    injure = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.latitude_range} {self.longitude_range}"
