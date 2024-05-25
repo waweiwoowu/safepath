@@ -41,3 +41,13 @@ class CarAccidentDensity(models.Model):
 
     def __str__(self):
         return f"({self.latitude_range}, {self.longitude_range}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injure}"
+
+class UserInfo(models.Model):
+    username = models.CharField(max_length=50)
+    fullname = models.CharField(max_length=50)
+    email = models.CharField(max_length=50)
+    password = models.CharField(max_length=50)
+    verification_code = models.CharField(max_length=50, null=True)
+
+    class Meta:
+        db_table = "user_info"
