@@ -10,7 +10,7 @@ from selenium.common.exceptions import StaleElementReferenceException, NoSuchEle
 import threading
 
 from django.core.management.base import BaseCommand
-from risk.models import Earthquake
+from models import Earthquake
 
 class Command(BaseCommand):
     help = 'Scrape earthquake data and store it in the database'
