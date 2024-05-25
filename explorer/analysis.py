@@ -1,4 +1,4 @@
-from models import TEST
+from models import CarAccident
 import math
 
 DEGREE_DIFFERENCE = 0.01
@@ -27,4 +27,4 @@ if __name__ == "__main__":
     coord = Coordinate(25.2525, 123.456)
     print(coord.latitude_rounding)
     print(coord.longitude_rounding)
-    print(TEST)
+    print(CarAccident)
