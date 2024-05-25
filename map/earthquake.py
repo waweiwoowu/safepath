@@ -12,6 +12,7 @@ import threading
 from django.core.management.base import BaseCommand
 from models import Earthquake
 
+
 class Command(BaseCommand):
     help = 'Scrape earthquake data and store it in the database'
 
