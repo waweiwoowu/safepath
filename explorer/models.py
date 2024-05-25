@@ -41,3 +41,5 @@ class CarAccidentDensity(models.Model):
 
     def __str__(self):
         return f"({self.latitude_range}, {self.longitude_range}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injure}"
+
+TEST = "test"
