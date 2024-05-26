@@ -64,3 +64,11 @@ def verify(request):
             return redirect('signin')
         except:
             return HttpResponse("Failed")
+
+def home(request):
+    if request.method == 'POST':
+        start = request.POST.get('start', '')
+        destination = request.POST.get('destination', '')
+        return render(request, 'home.html', {'start': start, 'destination': destination})
+    else:
+        return render(request, 'home.html', {})

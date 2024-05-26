@@ -163,13 +163,13 @@ body{
 		</div>
 		<br>
 		<div class="login">
-			<form action = "hello", method = "post">
+			<form action="/explorer/home/" method="post">
 				{% csrf_token %}
 				<input type="text" placeholder="username" name="username"><br>
 				<input type="password" placeholder="password" name="password"><br>
 				<input type="submit" value="Login">
 			</form>
-			<a href="/explorer/signup">Sign Up</a>
+			<a href="/explorer/signup/">Sign Up</a>
 		</div>
 
   <script src='http://codepen.io/assets/libs/fullpage/jquery.js'></script>
