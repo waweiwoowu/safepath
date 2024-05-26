@@ -2,7 +2,9 @@ import sqlite3
 import pandas as pd
 
 # 讀取 CSV 檔案
-df = pd.read_csv(".\\data\\accidents\\accident.csv")
+starting_year = 110
+year = 113
+df = pd.read_csv(f".\\data\\accidents\\{year}年度A2交通事故資料_{month}.csv")
 
 # 連接到 SQLite 資料庫
 conn = sqlite3.connect(r'..\db.sqlite3')
