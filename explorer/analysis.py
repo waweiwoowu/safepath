@@ -1,6 +1,5 @@
 import math
-from models import UserInfo
-
+from explorer.models import CarAccident, TEST
 
 DEGREE_DIFFERENCE = 0.01
 
@@ -23,10 +22,12 @@ class Coordinate:
     def is_existing(self):
         pass
 
+    
 
 if __name__ == "__main__":
     coord = Coordinate(25.2525, 123.456)
     print(coord.latitude_rounding)
     print(coord.longitude_rounding)
-    earthquake = UserInfo()
-    print(earthquake)
+    print(TEST)
+    earthquakes = CarAccident
+    print(earthquakes)

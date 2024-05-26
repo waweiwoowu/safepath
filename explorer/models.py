@@ -1,6 +1,8 @@
 from django.db import models
 
 
+TEST = "test"
+
 class Earthquake(models.Model):
     date = models.DateField()
     time = models.TimeField()
