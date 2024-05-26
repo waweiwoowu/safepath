@@ -8,9 +8,9 @@ class Earthquake(models.Model):
     longitude = models.DecimalField(max_digits=8, decimal_places=5)
     magnitude = models.DecimalField(max_digits=5, decimal_places=2)
     depth = models.DecimalField(max_digits=5, decimal_places=2)
-    
+
     class Meta:
-        db_table = "earthquake"
+        db_table = "risk_earthquake"
 
     def __str__(self):
         return f"{self.date} {self.time} - ({self.latitude}, {self.longitude}) - {self.magnitude}"
@@ -19,9 +19,9 @@ class Intensity(models.Model):
     earthquake = models.ForeignKey("Earthquake", on_delete=models.CASCADE, db_constraint=False)
     intensity = models.TextField(max_length=3)
     administrative_area_level_1 = models.TextField(max_length=10)
-    
+
     class Meta:
-        db_table = "earthquake_intensity"
+        db_table = "risk_earthquake_intensity"
 
     def __str__(self):
         return f"{self.administrative_area_level_1} - {self.intensity}"
@@ -35,9 +35,9 @@ class CarAccident(models.Model):
     injure = models.IntegerField()
     administrative_area_level_1 = models.TextField(max_length=10)
     administrative_area_level_2 = models.TextField(max_length=10)
-    
+
     class Meta:
-        db_table = "car_accident"
+        db_table = "risk_car_accident"
 
     def __str__(self):
         return f"({self.latitude}, {self.longitude}) Fatality: {self.fatality}, Injure: {self.injure}"
@@ -47,9 +47,9 @@ class Density(models.Model):
     longitude_range = models.DecimalField(max_digits=8, decimal_places=5)
     total_fatality = models.IntegerField()
     total_injure = models.IntegerField()
-    
+
     class Meta:
-        db_table = "car_accident_density"
+        db_table = "risk_car_accident_density"
 
     def __str__(self):
         return f"({self.latitude_range}, {self.longitude_range}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injure}"
