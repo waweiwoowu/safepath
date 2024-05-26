@@ -1,6 +1,30 @@
+import os
+import sys
+import django
 import math
-from models import UserInfo
+from pathlib import Path
+from asgiref.sync import sync_to_async
+import asyncio
+import nest_asyncio
 
+# Apply nest_asyncio to allow nested event loops
+nest_asyncio.apply()
+
+# Construct the project path relative to this script
+current_dir = Path(__file__).resolve().parent
+project_path = current_dir.parent
+
+# Add the project path to the Python path
+sys.path.append(str(project_path))
+
+# Set the DJANGO_SETTINGS_MODULE environment variable
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'safepath.settings')
+
+# Initialize Django
+django.setup()
+
+# Now import the Django models
+from explorer.models import Earthquake, TEST
 
 DEGREE_DIFFERENCE = 0.01
 
@@ -23,10 +47,18 @@ class Coordinate:
     def is_existing(self):
         pass
 
+# Define an async function to fetch Earthquake data
+async def fetch_earthquakes():
+    earthquakes = await sync_to_async(lambda: list(Earthquake.objects.all()))()
+    return earthquakes
 
-if __name__ == "__main__":
+async def main():
     coord = Coordinate(25.2525, 123.456)
     print(coord.latitude_rounding)
     print(coord.longitude_rounding)
-    earthquake = UserInfo()
-    print(earthquake)
+    print(TEST)
+    earthquakes = await fetch_earthquakes()
+    print(earthquakes)
+
+if __name__ == "__main__":
+    asyncio.run(main())
