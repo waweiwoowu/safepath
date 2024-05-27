@@ -44,9 +44,9 @@ class CarAccident(models.Model):
     def __str__(self):
         return f"({self.latitude}, {self.longitude}) Fatality: {self.fatality}, Injure: {self.injury}"
 
-class Density(models.Model):
-    latitude_range = models.DecimalField(max_digits=8, decimal_places=5)
-    longitude_range = models.DecimalField(max_digits=8, decimal_places=5)
+class CarAccidentDensity(models.Model):
+    latitude = models.DecimalField(max_digits=8, decimal_places=5)
+    longitude = models.DecimalField(max_digits=8, decimal_places=5)
     total_fatality = models.IntegerField()
     total_injure = models.IntegerField()
 
