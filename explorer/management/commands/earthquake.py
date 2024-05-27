@@ -47,9 +47,9 @@ class Command(BaseCommand):
             self.driver.maximize_window()
             self.until_location()
             self.driver.find_element(By.ID, "Search").click()
+            self.driver.find_element(By.CSS_SELECTOR, "div.datepicker-months th.prev").click()
             year = self.driver.find_element(By.CSS_SELECTOR, "div.datepicker-months th.datepicker-switch").text
-
-            if year == "2024":
+            if year == "2023":
                 month = self.driver.find_elements(By.CSS_SELECTOR, "div.datepicker-months span.month")
                 for i in range(len(month)):
                     if i != 0:
