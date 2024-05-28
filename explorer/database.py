@@ -1,12 +1,10 @@
 import os
 import sys
 import django
-import math
 from pathlib import Path
 from asgiref.sync import sync_to_async
 import asyncio
 import nest_asyncio
-import json
 import aiofiles  # Asynchronous file I/O
 
 # Apply nest_asyncio to allow nested event loops
@@ -20,48 +18,14 @@ sys.path.append(str(project_path))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'safepath.settings')
 # Initialize Django
 django.setup()
+
 # Now import the Django models
 from explorer.models import CarAccident, CarAccidentDensity
+from maps import Coordinate
+import json
 
 
-DEGREE_DIFFERENCE = 0.001
 BATCH_SIZE = 100  # Define batch size for fetching records
-
-def rounding(degree, difference=DEGREE_DIFFERENCE):
-    power = math.log10(difference)
-    if power > 0:
-        return round(float(degree) / difference) * difference
-    else:
-        decimal_place = math.ceil(abs(power))
-        return round(round(float(degree) / difference) * difference, decimal_place)
-
-class InvalidCoordinateError(Exception):
-    def __init__(self, message="Invalid coordinate. Must provide either a single iterable or separate latitude and longitude values."):
-        self.message = message
-        super().__init__(self.message)
-
-class Coordinate:
-    def __init__(self, *coordinate) -> None:
-        """This class is mainly used to determine the round of the coordinate in specific degree difference
-        Both Coordinate(25.2525, 123.456) and Coordinate((25.2525, 123.456)) are available"""
-        if len(coordinate) == 1:
-            if len(coordinate[0]) != 2:
-                raise InvalidCoordinateError("Invalid coordinate format. Must provide latitude and longitude values.")
-            self.latitude = coordinate[0][0]
-            self.longitude = coordinate[0][1]
-        elif len(coordinate) == 2:
-            self.latitude = coordinate[0]
-            self.longitude = coordinate[1]
-        else:
-            raise InvalidCoordinateError()
-            
-        if abs(self.latitude) > 90:
-            raise InvalidCoordinateError("Invalid latitude value. Must between -90 and 90 degrees.")
-        if abs(self.longitude) > 180:
-            raise InvalidCoordinateError("Invalid latitude value. Must between -180 and 180 degrees.")
-        
-        self.latitude_rounding = rounding(self.latitude)
-        self.longitude_rounding = rounding(self.longitude)
 
 class CarAccidentModel:
     # Define an async function to fetch Model data
@@ -122,10 +86,7 @@ async def create_car_accident_density_data(count=1000):
             await file.write(json.dumps(tracking))
 
 async def main():
-    coord = Coordinate(25.2525, 123.456)
-    print(coord.latitude_rounding)
-    print(coord.longitude_rounding)
-    # await create_car_accident_density_data(10000)
+    await create_car_accident_density_data(10000)
 
 if __name__ == "__main__":
     asyncio.run(main())
