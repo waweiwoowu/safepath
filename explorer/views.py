@@ -3,23 +3,28 @@ from django.http import HttpResponse
 from .models import UserInfo
 from django.core.mail import send_mail
 import random
+from .gmaps import Direction
 
 def signin(request):
     if request.method == "GET":
         return render(request, "signin.html", {})
     else:
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        if not username or not password:
+            return render(request, "signin.html", {"error": "Username and password are required."})
+
         try:
             user = UserInfo.objects.get(username=username)
         except UserInfo.DoesNotExist:
             # Username does not exist
-            return render(request, "signin.html")
+            return render(request, "signin.html", {"error": "Invalid username or password."})
 
         if user.password == password:
             return render(request, "home.html", {"username": username})
         else:
-            return render(request, "signin.html")
+            return render(request, "signin.html", {"error": "Invalid username or password."})
 
 def signup(request):
     if request.method == "GET":
@@ -64,3 +69,13 @@ def verify(request):
             return redirect('signin')
         except:
             return HttpResponse("Failed")
+
+def home(request):
+    if request.method == 'POST':
+        start = request.POST.get('start', '')
+        destination = request.POST.get('destination', '')
+        direction = Direction(origin=start, destination=destination)
+        coordinates = direction.coordinates
+        return render(request, 'home.html', {'start': start, 'destination': destination, 'coordinates': coordinates})
+    else:
+        return render(request, 'home.html', {})

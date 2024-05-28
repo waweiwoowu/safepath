@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^signin/', views.signin, name="signin"),
     url(r'^signup/', views.signup, name="signup"),
     url(r'^verify/', views.verify, name="verify"),
+    url(r'^home/', views.home, name='home'),
 ]
