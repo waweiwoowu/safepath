@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from .models import UserInfo
 from django.core.mail import send_mail
 import random
+from .gmaps import Direction
 
 def signin(request):
     if request.method == "GET":
@@ -69,6 +70,8 @@ def home(request):
     if request.method == 'POST':
         start = request.POST.get('start', '')
         destination = request.POST.get('destination', '')
-        return render(request, 'home.html', {'start': start, 'destination': destination})
+        direction = Direction(origin=start, destination=destination)
+        coordinates = direction.coordinates
+        return render(request, 'home.html', {'start': start, 'destination': destination, 'coordinates': coordinates})
     else:
         return render(request, 'home.html', {})

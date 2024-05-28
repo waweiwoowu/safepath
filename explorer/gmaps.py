@@ -1,5 +1,5 @@
 import googlemaps
-from constants import API_KEY, TestData
+from .constants import API_KEY, TestData
 
 
 class GoogleMap():
@@ -58,4 +58,3 @@ if __name__ == "__main__":
     direction = Direction()
     print(direction.overivew_coordinates)
     print(direction.coordinates)
-    

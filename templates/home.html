@@ -26,6 +26,12 @@
     {% if destination %}
         <p>Destination: {{ destination }}</p>
     {% endif %}
+    <br>
+    {% if start and destination %}
+        {% if coordinates %}
+            <p>Coordinates: {{ coordinates }}</p>
+        {% endif %}
+    {% endif %}
     <div class="container">
         <div class="left">
             <iframe src="https://www.google.com/maps" id="map_iframe"></iframe>
