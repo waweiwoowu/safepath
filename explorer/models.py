@@ -1,6 +1,8 @@
 from django.db import models
 
 
+TEST = "test"
+
 class Earthquake(models.Model):
     date = models.DateField()
     time = models.TimeField()
@@ -32,7 +34,7 @@ class CarAccident(models.Model):
     latitude = models.DecimalField(max_digits=8, decimal_places=5)
     longitude = models.DecimalField(max_digits=8, decimal_places=5)
     fatality = models.IntegerField()
-    injure = models.IntegerField()
+    injury = models.IntegerField()
     administrative_area_level_1 = models.TextField(max_length=10)
     administrative_area_level_2 = models.TextField(max_length=10)
 
@@ -40,11 +42,11 @@ class CarAccident(models.Model):
         db_table = "risk_car_accident"
 
     def __str__(self):
-        return f"({self.latitude}, {self.longitude}) Fatality: {self.fatality}, Injure: {self.injure}"
+        return f"({self.latitude}, {self.longitude}) Fatality: {self.fatality}, Injure: {self.injury}"
 
-class Density(models.Model):
-    latitude_range = models.DecimalField(max_digits=8, decimal_places=5)
-    longitude_range = models.DecimalField(max_digits=8, decimal_places=5)
+class CarAccidentDensity(models.Model):
+    latitude = models.DecimalField(max_digits=8, decimal_places=5)
+    longitude = models.DecimalField(max_digits=8, decimal_places=5)
     total_fatality = models.IntegerField()
     total_injure = models.IntegerField()
 

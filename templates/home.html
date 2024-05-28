@@ -10,6 +10,7 @@
 </head>
 <body>
     <div class="top-bar">
+<<<<<<< HEAD
         <form action = "", method = "post">
             {% csrf_token %}
             <label for="start">Start:</label>
@@ -32,6 +33,14 @@
             <p>Coordinates: {{ coordinates }}</p>
         {% endif %}
     {% endif %}
+=======
+        <label for="start">Start:</label>
+        <input type="text" id="start" name="start">
+        <label for="destination">Destination:</label>
+        <input type="text" id="destination" name="destination">
+        <button type="button">OK</button>
+    </div>
+>>>>>>> main
     <div class="container">
         <div class="left">
             <iframe src="https://www.google.com/maps" id="map_iframe"></iframe>
@@ -42,4 +51,14 @@
         </div>
     </div>
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+{% comment %} <html>
+   <body>
+        <h1>Hi {{username}} </h1>
+   </body>
+</html> {% endcomment %}
+
+>>>>>>> main

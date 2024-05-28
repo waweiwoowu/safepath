@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Project</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% ./.. 'static/css/map.css' %}">
+
+</head>
+<body>
+    <div class="top-bar">
+        <label for="start">Start:</label>
+        <input type="text" id="start" name="start">
+        <label for="destination">Destination:</label>
+        <input type="text" id="destination" name="destination">
+        <button type="button">OK</button>
+    </div>
+    <div class="container">
+        <div class="left">
+            <iframe src="https://www.google.com/maps" id="map_iframe"></iframe>
+        </div>
+        <div class="right">
+            <input type="text" id="risk_t" name="risk_t" placeholder="Risk_T">
+            <input type="text" id="risk_e" name="risk_e" placeholder="Risk_E">
+        </div>
+    </div>
+</body>
+</html>
