@@ -39,17 +39,17 @@ class CarAccidentModel:
 
 class CarAccidentDensityModel:
     async def create_or_update(self, latitude, longitude, fatality, injury):
-        is_existing = await sync_to_async(lambda: CarAccidentDensity.objects.filter(latitude=latitude, longitude=longitude).exists())()
-        if not is_existing:
-            await sync_to_async(lambda: CarAccidentDensity.objects.create(
-                latitude=latitude, longitude=longitude, total_fatality=fatality, total_injure=injury))()
-        else:
-            instance = await sync_to_async(lambda: CarAccidentDensity.objects.get(latitude=latitude, longitude=longitude))()
-            instance.total_fatality += fatality
-            instance.total_injure += injury
-            await sync_to_async(lambda: instance.save())()
+        obj, created = await sync_to_async(lambda: CarAccidentDensity.objects.get_or_create(
+            latitude=latitude, longitude=longitude,
+            defaults={'total_fatality': fatality, 'total_injure': injury}
+        ))()
+        
+        if not created:
+            obj.total_fatality += fatality
+            obj.total_injure += injury
+            await sync_to_async(lambda: obj.save())()
 
-async def create_car_accident_density_data(count=1000):
+async def create_car_accident_density_data(count=100):
     file_path = r".\data\tracking.json"
     
     async with aiofiles.open(file_path, mode='r') as file:
@@ -60,7 +60,7 @@ async def create_car_accident_density_data(count=1000):
     processed_count = 0
 
     while processed_count < count:
-        data = await accident.fetch_start_from(last_id, BATCH_SIZE)
+        data = await accident.fetch_start_from(last_id + 1, BATCH_SIZE)
         if not data:
             break
         
@@ -69,24 +69,26 @@ async def create_car_accident_density_data(count=1000):
         for element in data:
             coord = Coordinate(element.latitude, element.longitude)
             tasks.append(density_model.create_or_update(
-                latitude=coord.latitude_rounding, 
-                longitude=coord.longitude_rounding, 
+                latitude=coord.latitude_grid, 
+                longitude=coord.longitude_grid, 
                 fatality=element.fatality, 
                 injury=element.injury
             ))
             last_id = element.id
+            print(element.id)
             processed_count += 1
             if processed_count >= count:
                 break
-
+            
         await asyncio.gather(*tasks)
-        
+        print("finish tasks")
         tracking["car_accident_density"]["car_accident_fetching_last_id"] = last_id
         async with aiofiles.open(file_path, mode='w') as file:
             await file.write(json.dumps(tracking))
+        print("finish writing")
 
 async def main():
-    await create_car_accident_density_data(10000)
+    await create_car_accident_density_data(25000)
 
 if __name__ == "__main__":
     asyncio.run(main())
