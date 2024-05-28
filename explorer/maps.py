@@ -1,9 +1,11 @@
 import googlemaps
 import math
+import asyncio
 from constants import API_KEY, TestData
+from database import CarAccidentDensityModel
 
 
-DEGREE_DIFFERENCE = 0.00001
+DEGREE_DIFFERENCE = 0.001
 
 def rounding(degree, difference=DEGREE_DIFFERENCE):
     power = math.log10(difference)
@@ -40,6 +42,16 @@ class Coordinate:
 
         self.latitude_grid = rounding(self.latitude)
         self.longitude_grid = rounding(self.longitude)
+        
+        self.fatality = self.casualty[0]
+        self.injury = self.casualty[1]
+    
+    @property
+    async def casualty(self):
+        if not self.data:
+            density = CarAccidentDensityModel()
+            self.data = await density.fetch(self.latitude_grid, self.longitude_grid)
+        return self.data
 
 class Coordinates():
     def __init__(self, coordinates):
@@ -94,8 +106,11 @@ class Direction(GoogleMap):
             route_coordinates += [(point['lat'], point['lng']) for point in decoded_polyline]
         return route_coordinates
 
+    @property
+    def fatality(self):
+        
 
-if __name__ == "__main__":
+async def main():
     # geocode = Geocode()
     # print(geocode.data)
     # print(geocode.city)
@@ -112,5 +127,13 @@ if __name__ == "__main__":
     # print(coord.longitude_grid)
     
     coords = Coordinates(direction.coordinates)
-    # print(coords.grid)
-    print(f"{DEGREE_DIFFERENCE}: {len(coords.grid)}")
+    print(coords.grid)
+
+    direction = Direction()
+    data = await get_density((25.0017, 121.5806))
+    print(data)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+

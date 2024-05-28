@@ -38,6 +38,10 @@ class CarAccidentModel:
         return last_instance.id
 
 class CarAccidentDensityModel:
+    async def fetch(self, latitude, longitude):
+        fetch_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=latitude, longitude=longitude)))()
+        return (fetch_data[0].total_fatality, fetch_data[0].total_injure)
+    
     async def create_or_update(self, latitude, longitude, fatality, injury):
         obj, created = await sync_to_async(lambda: CarAccidentDensity.objects.get_or_create(
             latitude=latitude, longitude=longitude,
@@ -81,14 +85,15 @@ async def create_car_accident_density_data(count=100):
                 break
             
         await asyncio.gather(*tasks)
-        print("finish tasks")
+
         tracking["car_accident_density"]["car_accident_fetching_last_id"] = last_id
         async with aiofiles.open(file_path, mode='w') as file:
             await file.write(json.dumps(tracking))
-        print("finish writing")
+
 
 async def main():
     await create_car_accident_density_data(25000)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

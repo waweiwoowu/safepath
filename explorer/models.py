@@ -54,7 +54,7 @@ class CarAccidentDensity(models.Model):
         db_table = "risk_car_accident_density"
 
     def __str__(self):
-        return f"({self.latitude_range}, {self.longitude_range}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injure}"
+        return f"({self.latitude}, {self.longitude}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injure}"
 
 class UserInfo(models.Model):
     username = models.CharField(max_length=50)
