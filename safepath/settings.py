@@ -16,27 +16,21 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-<<<<<<< HEAD
 STATIC_URL = '/static/'
 
-=======
 # Test: static path
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 
 # Uncomment the next lines if you have additional static files directories
->>>>>>> main
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-<<<<<<< HEAD
 STATIC_ROOT = BASE_DIR / "staticfiles"
-=======
 # Static files will be collected here for production
 STATIC_ROOT = BASE_DIR / "staticfiles"
 # Test: static path
->>>>>>> main
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
