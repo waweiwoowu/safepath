@@ -48,13 +48,13 @@ class CarAccidentDensity(models.Model):
     latitude = models.DecimalField(max_digits=8, decimal_places=5)
     longitude = models.DecimalField(max_digits=8, decimal_places=5)
     total_fatality = models.IntegerField()
-    total_injure = models.IntegerField()
+    total_injury = models.IntegerField()
 
     class Meta:
         db_table = "risk_car_accident_density"
 
     def __str__(self):
-        return f"({self.latitude_range}, {self.longitude_range}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injure}"
+        return f"({self.latitude}, {self.longitude}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injure}"
 
 class UserInfo(models.Model):
     username = models.CharField(max_length=50)

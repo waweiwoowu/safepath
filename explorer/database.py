@@ -21,9 +21,78 @@ django.setup()
 
 # Now import the Django models
 from explorer.models import CarAccident, CarAccidentDensity
-from maps import Coordinate
 import json
+import math
 
+
+DEGREE_DIFFERENCE = 0.001
+
+def rounding(degree, difference=DEGREE_DIFFERENCE):
+    power = math.log10(difference)
+    if power > 0:
+        return round(float(degree) / difference) * difference
+    else:
+        decimal_place = math.ceil(abs(power))
+        return round(round(float(degree) / difference) * difference, decimal_place)
+
+class InvalidCoordinateError(Exception):
+    def __init__(self, message="Invalid coordinate. Must provide either a single iterable or separate latitude and longitude values."):
+        self.message = message
+        super().__init__(self.message)
+
+def casualty(latitude_grid, longitude_grid):
+    density = CarAccidentDensityModel()
+    data = sync_to_async(lambda: density.fetch(latitude_grid, longitude_grid))()
+    # print(data.fatality)
+    return (data.fatality, data.injury)
+
+class Coordinate:
+    def __init__(self, *coordinate) -> None:
+        """This class is mainly used to determine the round of the coordinate in specific degree difference
+        Both Coordinate(25.2525, 123.456) and Coordinate((25.2525, 123.456)) are available"""
+        if len(coordinate) == 1:
+            if len(coordinate[0]) != 2:
+                raise InvalidCoordinateError("Invalid coordinate format. Must provide latitude and longitude values.")
+            self.latitude = coordinate[0][0]
+            self.longitude = coordinate[0][1]
+        elif len(coordinate) == 2:
+            self.latitude = coordinate[0]
+            self.longitude = coordinate[1]
+        else:
+            raise InvalidCoordinateError()
+
+        if abs(self.latitude) > 90:
+            raise InvalidCoordinateError("Invalid latitude value. Must between -90 and 90 degrees.")
+        if abs(self.longitude) > 180:
+            raise InvalidCoordinateError("Invalid latitude value. Must between -180 and 180 degrees.")
+
+        self.latitude_grid = rounding(self.latitude)
+        self.longitude_grid = rounding(self.longitude)
+        self.fetch_data = None
+    
+    @property
+    async def casualty(self):
+        if not self.fetch_data:
+            self.fetch_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=self.latitude_grid, longitude=self.longitude_grid)))()
+        return (self.fetch_data[0].total_fatality, self.fetch_data[0].total_injury)
+    
+    @property
+    async def fatality(self):
+        if not self.fetch_data:
+            self.fetch_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=self.latitude_grid, longitude=self.longitude_grid)))()
+        if len(self.fetch_data) == 0:
+            return 0
+        else:
+            return self.fetch_data[0].total_fatality
+    
+    @property
+    async def injury(self):
+        if not self.fetch_data:
+            self.fetch_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=self.latitude_grid, longitude=self.longitude_grid)))()
+        if len(self.fetch_data) == 0:
+            return 0
+        else:
+            return self.fetch_data[0].total_injury
 
 BATCH_SIZE = 100  # Define batch size for fetching records
 
@@ -38,15 +107,19 @@ class CarAccidentModel:
         return last_instance.id
 
 class CarAccidentDensityModel:
+    async def fetch(self, latitude, longitude):
+        fetch_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=latitude, longitude=longitude)))()
+        return (fetch_data[0].total_fatality, fetch_data[0].total_injury)
+    
     async def create_or_update(self, latitude, longitude, fatality, injury):
         obj, created = await sync_to_async(lambda: CarAccidentDensity.objects.get_or_create(
             latitude=latitude, longitude=longitude,
-            defaults={'total_fatality': fatality, 'total_injure': injury}
+            defaults={'total_fatality': fatality, 'total_injury': injury}
         ))()
         
         if not created:
             obj.total_fatality += fatality
-            obj.total_injure += injury
+            obj.total_injury += injury
             await sync_to_async(lambda: obj.save())()
 
 async def create_car_accident_density_data(count=100):
@@ -81,14 +154,15 @@ async def create_car_accident_density_data(count=100):
                 break
             
         await asyncio.gather(*tasks)
-        print("finish tasks")
+
         tracking["car_accident_density"]["car_accident_fetching_last_id"] = last_id
         async with aiofiles.open(file_path, mode='w') as file:
             await file.write(json.dumps(tracking))
-        print("finish writing")
+
 
 async def main():
     await create_car_accident_density_data(25000)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
