@@ -48,7 +48,7 @@ class CarAccidentDensity(models.Model):
     latitude = models.DecimalField(max_digits=8, decimal_places=5)
     longitude = models.DecimalField(max_digits=8, decimal_places=5)
     total_fatality = models.IntegerField()
-    total_injure = models.IntegerField()
+    total_injury = models.IntegerField()
 
     class Meta:
         db_table = "risk_car_accident_density"
