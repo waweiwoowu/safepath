@@ -81,8 +81,9 @@ async def home(request):
         # or Direction(start, destination) if you need to pass arguments
         # direction = Direction(origin=start, destination=destination)
 
-        coordinates = await sync_to_async(direction.coordinates)
-        coordinates = await direction.fatality
+        coordinates = direction.coordinates
+        fatality = await direction.fatality
+        injury = await direction.injury
 
         return render(request, 'home.html', {
             'start': start,
