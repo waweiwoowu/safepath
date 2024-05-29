@@ -82,8 +82,8 @@ async def home(request):
         # direction = Direction(origin=start, destination=destination)
 
         coordinates = direction.coordinates
-        fatality = await direction.fatality
-        injury = await direction.injury
+        # fatality = await direction.fatality
+        # injury = await direction.injury
 
         return render(request, 'home.html', {
             'start': start,
