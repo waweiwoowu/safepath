@@ -82,6 +82,7 @@ async def home(request):
         # direction = Direction(origin=start, destination=destination)
 
         coordinates = direction.coordinates
+        # test
         fatality = await direction.car_accident.fatality
         injury = await direction.car_accident.injury
 
