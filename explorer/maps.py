@@ -1,7 +1,36 @@
 import googlemaps
 import asyncio
-from .constants import API_KEY, TestData
-from .database import Coordinate
+import json
+import test_data
+from database import Coordinate
+
+
+__all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
+
+
+def _get_google_maps_api_paths():
+    filepath = r".\data\keys\keys.json"
+    with open(filepath) as file:
+        data = json.load(file)
+    paths = data["GOOGLE_MAPS_API_KEY"]["path"]
+    return paths
+
+def _get_google_maps_api_key():
+    paths = _get_google_maps_api_paths()
+    file_name = "\\safepath.json"
+    for path in paths:
+        try:
+            with open(path+file_name) as file:
+                data = json.load(file)
+            key = data["GOOGLE_MAPS_API_KEY"]
+            if key == "YOUR_API_KEY":
+                continue
+            return key
+        except:
+            continue
+    return None
+
+GOOGLE_MAPS_API_KEY = _get_google_maps_api_key()
 
 
 class Coordinates():
@@ -13,17 +42,17 @@ class Coordinates():
             self.grid.append((coord.latitude_grid, coord.longitude_grid))
         self.grid = list(set(self.grid))
 
-class GoogleMap():
-    gmaps = googlemaps.Client(key=API_KEY)
+class _GoogleMap():
+    gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
-class Direction(GoogleMap):
+class Direction(_GoogleMap):
     def __init__(self, origin=None, destination=None):
-        if not origin or not destination:
-            self.data = TestData.DIRECTIONS[0]
-        else:
+        if origin and destination and GOOGLE_MAPS_API_KEY:
             self.data = self.gmaps.directions(origin, destination, )[0]
-        self.car_accident = CarAccidentData(self.coordinates)
-        self.earthquake = DirectionEarthquakeData(self.coordinates)
+        else:
+            self.data = test_data.DIRECTIONS[0]
+        self.car_accident = _DirectionCarAccidentData(self.coordinates)
+        self.earthquake = _DirectionEarthquakeData(self.coordinates)
 
     @property
     def overivew_coordinates(self):
@@ -47,7 +76,7 @@ class Direction(GoogleMap):
             route_instructions.append(step['html_instructions'])
         return route_instructions
 
-class CarAccidentData():
+class _DirectionCarAccidentData():
     def __init__(self, coordinates):
         self.coordinates = coordinates
 
@@ -67,7 +96,7 @@ class CarAccidentData():
             injury += await coord.injury
         return injury
 
-class DirectionEarthquakeData():
+class _DirectionEarthquakeData():
     def __init__(self, coordinates):
         self.data = []
         for coord in coordinates:
@@ -78,10 +107,10 @@ class DirectionEarthquakeData():
         pass
 
 
-class Geocode(GoogleMap):
+class Geocode(_GoogleMap):
     def __init__(self, address=None):
         if not address:
-            self.data = TestData.GEOCODE[0]
+            self.data = test_data.GEOCODE[0]
         else:
             self.data = self.gmaps.geocode(address)[0]
         self.postal_code = self.data["address_components"][-1]["long_name"]
@@ -96,7 +125,7 @@ class Geocode(GoogleMap):
         self.lng = self.data["geometry"]["location"]["lng"]
         return (self.lat, self.lng)
 
-async def main():
+async def _main():
     # geocode = Geocode()
     # print(geocode.data)
     # print(geocode.city)
@@ -124,5 +153,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
-
+    asyncio.run(_main())
