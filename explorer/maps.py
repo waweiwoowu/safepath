@@ -1,7 +1,7 @@
 import googlemaps
 import asyncio
-from constants import API_KEY, TestData
-from database import Coordinate
+from .constants import API_KEY, TestData
+from .database import Coordinate
 
 
 class Coordinates():
