@@ -1,7 +1,7 @@
 import googlemaps
 import asyncio
-from constants import API_KEY, TestData
-from database import Coordinate
+from .constants import API_KEY, TestData
+from .database import Coordinate
 
 
 class Coordinates():
@@ -21,7 +21,8 @@ class Direction(GoogleMap):
         if not origin or not destination:
             self.data = TestData.DIRECTIONS[0]
         else:
-            self.data = self.gmaps.directions(origin, destination)[0]
+            self.data = self.gmaps.directions(origin, destination, )[0]
+        self.earthquake = DirectionEarthquakeData(self.coordinates)
 
     @property
     def overivew_coordinates(self):
@@ -39,13 +40,20 @@ class Direction(GoogleMap):
         return route_coordinates
 
     @property
+    def instructions(self):
+        route_instructions = []
+        for step in self.data['legs'][0]['steps']:
+            route_instructions.append(step['html_instructions'])
+        return route_instructions
+
+    @property
     async def fatality(self):
         fatality = 0
         for coordinate in self.coordinates:
             coord = Coordinate(coordinate)
             fatality += await coord.fatality
         return fatality
-    
+
     @property
     async def injury(self):
         injury = 0
@@ -53,6 +61,17 @@ class Direction(GoogleMap):
             coord = Coordinate(coordinate)
             injury += await coord.injury
         return injury
+
+class DirectionEarthquakeData():
+    def __init__(self, coordinates):
+        self.data = []
+        for coord in coordinates:
+            self.data.append(Coordinate(coord))
+
+    @property
+    def magnitude(self):
+        pass
+
 
 class Geocode(GoogleMap):
     def __init__(self, address=None):
@@ -80,7 +99,7 @@ async def main():
     # print(geocode.address)
     # print(geocode.location)
 
-    direction = Direction()
+    # direction = Direction()
     # print(direction.overivew_coordinates)
     # print(len(direction.coordinates))
 
@@ -89,12 +108,14 @@ async def main():
     # print(coord.longitude_grid)
     # print(await coord.fatality)
     # print(await coord.injure)
-    
+
     # coords = Coordinates(direction.coordinates)
     # print(coords.grid)
-    
-    print(await direction.fatality)
-    print(await direction.injury)
+
+    direction = Direction()
+    # print(await direction.fatality)
+    # print(await direction.injury)
+    direction.earthquake
 
 
 if __name__ == "__main__":
