@@ -20,7 +20,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'safepath.settings')
 django.setup()
 
 # Now import the Django models
-from explorer.models import CarAccident, CarAccidentDensity
+from explorer.models import CarAccident, CarAccidentDensity, Earthquake
 import json
 import math
 
@@ -68,31 +68,86 @@ class Coordinate:
 
         self.latitude_grid = rounding(self.latitude)
         self.longitude_grid = rounding(self.longitude)
-        self.fetch_data = None
+        self.car_accident_data = None
+        self.earthquake = EarthquakeData(self.latitude, self.longitude)
     
     @property
     async def casualty(self):
-        if not self.fetch_data:
-            self.fetch_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=self.latitude_grid, longitude=self.longitude_grid)))()
-        return (self.fetch_data[0].total_fatality, self.fetch_data[0].total_injury)
+        if not self.car_accident_data:
+            self.car_accident_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=self.latitude_grid, longitude=self.longitude_grid)))()
+        return (self.car_accident_data[0].total_fatality, self.car_accident_data[0].total_injury)
     
     @property
     async def fatality(self):
-        if not self.fetch_data:
-            self.fetch_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=self.latitude_grid, longitude=self.longitude_grid)))()
-        if len(self.fetch_data) == 0:
+        if not self.car_accident_data:
+            self.car_accident_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=self.latitude_grid, longitude=self.longitude_grid)))()
+        if len(self.car_accident_data) == 0:
             return 0
         else:
-            return self.fetch_data[0].total_fatality
+            return self.car_accident_data[0].total_fatality
     
     @property
     async def injury(self):
-        if not self.fetch_data:
-            self.fetch_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=self.latitude_grid, longitude=self.longitude_grid)))()
-        if len(self.fetch_data) == 0:
+        if not self.car_accident_data:
+            self.car_accident_data = await sync_to_async(lambda: list(CarAccidentDensity.objects.filter(latitude=self.latitude_grid, longitude=self.longitude_grid)))()
+        if len(self.car_accident_data) == 0:
             return 0
         else:
-            return self.fetch_data[0].total_injury
+            return self.car_accident_data[0].total_injury
+
+class EarthquakeData():
+    def __init__(self, latitude, longitude):
+        self.latitude = rounding(latitude, 0.01)
+        self.longitude = rounding(longitude, 0.01)
+        self.data = None
+
+    @property
+    async def date(self):
+        dates = []
+        if not self.data:
+            self.data = await sync_to_async(lambda: list(Earthquake.objects.filter(latitude=self.latitude, longitude=self.longitude)))()
+        if len(self.data) == 0:
+            return None
+        else:
+            for data in self.data:
+                dates.append(data.date)
+            return dates
+    
+    @property
+    async def time(self):
+        times = []
+        if not self.data:
+            self.data = await sync_to_async(lambda: list(Earthquake.objects.filter(latitude=self.latitude, longitude=self.longitude)))()
+        if len(self.data) == 0:
+            return None
+        else:
+            for data in self.data:
+                times.append(data.time)
+            return times
+
+    @property
+    async def magnitude(self):
+        magnitudes = []
+        if not self.data:
+            self.data = await sync_to_async(lambda: list(Earthquake.objects.filter(latitude=self.latitude, longitude=self.longitude)))()
+        if len(self.data) == 0:
+            return None
+        else:
+            for data in self.data:
+                magnitudes.append(data.magnitude)
+            return magnitudes
+    
+    @property
+    async def depth(self):
+        depths = []
+        if not self.data:
+            self.data = await sync_to_async(lambda: list(Earthquake.objects.filter(latitude=self.latitude, longitude=self.longitude)))()
+        if len(self.data) == 0:
+            return None
+        else:
+            for data in self.data:
+                depths.append(data.depth)
+            return depths
 
 BATCH_SIZE = 100  # Define batch size for fetching records
 
@@ -121,6 +176,7 @@ class CarAccidentDensityModel:
             obj.total_fatality += fatality
             obj.total_injury += injury
             await sync_to_async(lambda: obj.save())()
+
 
 async def create_car_accident_density_data(count=100):
     file_path = r".\data\tracking.json"
@@ -161,8 +217,16 @@ async def create_car_accident_density_data(count=100):
 
 
 async def main():
-    await create_car_accident_density_data(25000)
-
+    # await create_car_accident_density_data(25000)
+    coord = Coordinate(23.6, 120.68)
+    print(coord.earthquake.data)
+    print(coord.earthquake.latitude)
+    print(coord.earthquake.longitude)
+    print(await coord.earthquake.date)
+    print(await coord.earthquake.time)
+    print(await coord.earthquake.magnitude)
+    print(await coord.earthquake.depth)
+    print(coord.earthquake.data)
 
 if __name__ == "__main__":
     asyncio.run(main())

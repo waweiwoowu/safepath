@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import UserInfo
 from django.core.mail import send_mail
+from asgiref.sync import sync_to_async
 import random
-from .gmaps import Direction
+from .maps import Direction
 
 def signin(request):
     if request.method == "GET":
@@ -70,12 +71,25 @@ def verify(request):
         except:
             return HttpResponse("Failed")
 
-def home(request):
+async def home(request):
     if request.method == 'POST':
         start = request.POST.get('start', '')
         destination = request.POST.get('destination', '')
-        direction = Direction(origin=start, destination=destination)
-        coordinates = direction.coordinates
-        return render(request, 'home.html', {'start': start, 'destination': destination, 'coordinates': coordinates})
+
+        # Assuming `Direction` class methods are synchronous
+        direction = Direction()
+        # or Direction(start, destination) if you need to pass arguments
+        # direction = Direction(origin=start, destination=destination)
+
+        coordinates = await sync_to_async(direction.coordinates)
+        coordinates = await direction.fatality
+
+        return render(request, 'home.html', {
+            'start': start,
+            'destination': destination,
+            'coordinates': coordinates
+        })
     else:
         return render(request, 'home.html', {})
+
+
