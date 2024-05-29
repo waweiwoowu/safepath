@@ -124,22 +124,37 @@ class Command(BaseCommand):
         for masonry in masonrys:
             city = masonry.text.split("地區")[0]
             level = masonry.text.split("震度")[1].split("級")[0].strip(" ")
-            # if "強" in level:
-            #     level = masonry.text.split("震度")[1].split("強")[0].strip(" ")
-            # elif "弱" in level:
-            #     level = masonry.text.split("震度")[1].split("弱")[0].strip(" ")
-            # else:
-            #     level = masonry.text.split("震度")[1].split("級")[0].strip(" ")
-
             with self.lock:
-                if not Earthquake.objects.filter(date=ddate, time=time).exists():
+                eq = Earthquake.objects.filter(date=ddate, time=time).exists()
+                if eq:
+                    self.stdout.write("b")
+                    earthquake = Earthquake.objects.get(date=ddate, time=time)
+                    self.stdout.write("b1")
+                    ein_city = Intensity.objects.filter(administrative_area_level_1 = city).exists()
+                    ein_level = Intensity.objects.filter(intensity = level).exists()
+                    self.stdout.write("b2")
+                    if not ein_city or ein_level:
+                        self.stdout.write("已抓取地震震度及區域")
+                        Intensity.objects.create(
+                            earthquake=earthquake, intensity = level, administrative_area_level_1 = city
+                        )
+                        self.stdout.write("地震震度及區域已存入")
+
+                else:
+                    self.stdout.write("c")
                     earthquake = Earthquake.objects.create(
                         date=ddate, time=time, latitude=latitude, longitude=longitude,
                         magnitude=scale_value, depth=depth
                     )
-                    Intensity.objects.create(
-                        earthquake=earthquake, intensity = level, administrative_area_level_1 = city
-                    )
+                    self.stdout.write("c1")
+                    ein = Intensity.objects.filter(administrative_area_level_1 = city).exists()
+                    self.stdout.write("c2")
+                    if not ein:
+                        self.stdout.write("已抓取地震震度及區域--n")
+                        Intensity.objects.create(
+                            earthquake=earthquake, intensity = level, administrative_area_level_1 = city
+                        )
+                        self.stdout.write("已抓取地震震度及區域--n")
 
 
     def handle(self, *args, **kwargs):
