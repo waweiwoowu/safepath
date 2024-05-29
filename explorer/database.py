@@ -25,7 +25,7 @@ import json
 import math
 
 
-DEGREE_DIFFERENCE = 0.001
+DEGREE_DIFFERENCE = 0.0001
 
 def rounding(degree, difference=DEGREE_DIFFERENCE):
     power = math.log10(difference)
@@ -217,16 +217,16 @@ async def create_car_accident_density_data(count=100):
 
 
 async def main():
-    # await create_car_accident_density_data(25000)
-    coord = Coordinate(23.6, 120.68)
-    print(coord.earthquake.data)
-    print(coord.earthquake.latitude)
-    print(coord.earthquake.longitude)
-    print(await coord.earthquake.date)
-    print(await coord.earthquake.time)
-    print(await coord.earthquake.magnitude)
-    print(await coord.earthquake.depth)
-    print(coord.earthquake.data)
+    await create_car_accident_density_data(25000)
+    # coord = Coordinate(23.6, 120.68)
+    # print(coord.earthquake.data)
+    # print(coord.earthquake.latitude)
+    # print(coord.earthquake.longitude)
+    # print(await coord.earthquake.date)
+    # print(await coord.earthquake.time)
+    # print(await coord.earthquake.magnitude)
+    # print(await coord.earthquake.depth)
+    # print(coord.earthquake.data)
 
 if __name__ == "__main__":
     asyncio.run(main())

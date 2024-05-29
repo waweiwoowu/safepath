@@ -22,6 +22,7 @@ class Direction(GoogleMap):
             self.data = TestData.DIRECTIONS[0]
         else:
             self.data = self.gmaps.directions(origin, destination, )[0]
+        self.car_accident = CarAccidentData(self.coordinates)
         self.earthquake = DirectionEarthquakeData(self.coordinates)
 
     @property
@@ -45,6 +46,10 @@ class Direction(GoogleMap):
         for step in self.data['legs'][0]['steps']:
             route_instructions.append(step['html_instructions'])
         return route_instructions
+
+class CarAccidentData():
+    def __init__(self, coordinates):
+        self.coordinates = coordinates
 
     @property
     async def fatality(self):
@@ -113,9 +118,9 @@ async def main():
     # print(coords.grid)
 
     direction = Direction()
-    # print(await direction.fatality)
-    # print(await direction.injury)
-    direction.earthquake
+    print(await direction.car_accident.fatality)
+    print(await direction.car_accident.injury)
+    # direction.earthquake
 
 
 if __name__ == "__main__":
