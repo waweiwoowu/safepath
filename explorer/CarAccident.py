@@ -6,6 +6,17 @@ class CarAccident:
         self.year = year
         self.month = month
         if month:
+            self.data = GetMonthData(self.year, self.month)
+        else:
+            self.data = []
+            for i in range(1, 13):
+                self.data.append(GetMonthData(self.year, i))
+
+class GetMonthData():
+    def __init__(self, year, month):
+        pass
+    
+        if:
             self.datas = pd.read_csv(f".\\data\\accidents\\{year}\\{year}年度A2交通事故資料_{month}.csv")
         else:
             self.datas = pd.read_csv(f".\\data\\accidents\\{year}\\{year}年度A1交通事故資料.csv")
