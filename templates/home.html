@@ -6,35 +6,24 @@
     <title>Map Project</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}">
+    <script src="{% static 'js/map.js' %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3iE9-Jl6tavqWHRUJyqR4VOIM52GPAIc&callback=initMap" async defer></script>
 
 </head>
 <body>
     <div class="top-bar">
-        <form action = "", method = "post">
+        <form action="" method="post">
             {% csrf_token %}
             <label for="start">Start:</label>
-            <input type="text" id="start" name="start">
+            <input type="text" id="start" name="start" required>
             <label for="destination">Destination:</label>
-            <input type="text" id="destination" name="destination">
+            <input type="text" id="destination" name="destination" required>
             <button type="submit">OK</button>
         </form>
     </div>
-    <br>
-    {% if start %}
-        <p>Start: {{ start }}</p>
-    {% endif %}
-    {% if destination %}
-        <p>Destination: {{ destination }}</p>
-    {% endif %}
-    <br>
-    {% if start and destination %}
-        {% if coordinates %}
-            <p>Coordinates: {{ coordinates }}</p>
-        {% endif %}
-    {% endif %}
     <div class="container">
         <div class="left">
-            <iframe src="https://www.google.com/maps" id="map_iframe"></iframe>
+            <div id="map" style="height: 100%; width: 100%;"></div>
         </div>
         <div class="right">
             <input type="text" id="risk_t" name="risk_t" placeholder="Risk_T">
