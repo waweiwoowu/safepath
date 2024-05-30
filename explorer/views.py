@@ -94,3 +94,27 @@ async def home(request):
         return render(request, 'home.html', {})
 
 
+
+
+# from django.http import JsonResponse
+# import json
+
+# def home(request):
+#     if request.method == 'POST' and request.is_ajax():
+#         data = json.loads(request.body)
+#         start = data.get('start')
+#         destination = data.get('destination')
+
+#         # Do whatever processing you need with start and destination here
+#         # For example, you can pass them to Direction class and get coordinates
+
+#         coordinates = []  # Assuming you get coordinates somehow
+#         return JsonResponse({
+#             'start': start,
+#             'destination': destination,
+#             'coordinates': coordinates
+#         })
+#     else:
+#         return render(request, 'home.html', {})
+
+
