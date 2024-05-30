@@ -29,7 +29,7 @@ body {
     align-items: center;
     padding: 20px;
 }
-.left iframe {
+.left div#map {
     width: 100%;
     height: 100%;
     border: none;

@@ -23,9 +23,9 @@ def signin(request):
             return render(request, "signin.html", {"error": "Invalid username or password."})
 
         if user.password == password:
-            return render(request, "home.html", {"username": username})
+            return redirect('/explorer/home/')
         else:
-            return render(request, "signin.html", {"error": "Invalid username or password."})
+            return redirect('/explorer/signin/')
 
 def signup(request):
     if request.method == "GET":
@@ -82,9 +82,8 @@ async def home(request):
         # direction = Direction(origin=start, destination=destination)
 
         coordinates = direction.coordinates
-        # test
-        fatality = await direction.car_accident.fatality
-        injury = await direction.car_accident.injury
+        # fatality = await direction.car_accident.fatality
+        # injury = await direction.car_accident.injury
 
         return render(request, 'home.html', {
             'start': start,
