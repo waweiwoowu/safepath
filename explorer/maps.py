@@ -43,7 +43,8 @@ class Coordinates():
         self.grid = list(set(self.grid))
 
 class _GoogleMap():
-    gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
+    if GOOGLE_MAPS_API_KEY:
+        gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 class Direction(_GoogleMap):
     def __init__(self, origin=None, destination=None):
