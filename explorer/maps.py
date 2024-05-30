@@ -8,6 +8,13 @@ from explorer._database import Coordinate
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
 
 
+"""
+Please replace 'YOUR_API_KEY' with your Google Maps API key from the json file in '.\data\keys\safepath.json'
+In order to prevent your GOOGLE_MAPS_API_KEY from being stolen on GitHub
+You may copy and paste the file to any location outside of the project on your local device
+And then add the file location to the list of the json file in '.\data\keys\paths.json'
+"""
+
 def _get_google_maps_api_paths():
     filepath = r".\data\keys\paths.json"
     with open(filepath) as file:
@@ -47,6 +54,18 @@ class _GoogleMap():
         gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 class Direction(_GoogleMap):
+    """
+    This class uses googlemaps.directions and returns data with a list of dictionaries
+    Please check constants.py for more information
+    
+    Direction(origin, destination) would determine the direction from origin to destination 
+    Note that this method would spend the quotas of the Directions API you use
+    
+    If you want to determine direction without spending the quotas
+    Please use Direction() without arguments
+    This is a default object which returns the direction from '台北101' to '台北市立動物園'
+    Please check constants.py for more information
+    """
     def __init__(self, origin=None, destination=None):
         if origin and destination and GOOGLE_MAPS_API_KEY:
             self.data = self.gmaps.directions(origin, destination, )[0]
@@ -146,7 +165,8 @@ async def _main():
 
     # coords = Coordinates(direction.coordinates)
     # print(coords.grid)
-
+    
+    print(GOOGLE_MAPS_API_KEY)
     direction = Direction()
     print(await direction.car_accident.fatality)
     print(await direction.car_accident.injury)
