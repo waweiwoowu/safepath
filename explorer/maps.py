@@ -9,10 +9,10 @@ __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
 
 
 def _get_google_maps_api_paths():
-    filepath = r".\data\keys\keys.json"
+    filepath = r".\data\keys\paths.json"
     with open(filepath) as file:
         data = json.load(file)
-    paths = data["GOOGLE_MAPS_API_KEY"]["path"]
+    paths = data["GOOGLE_MAPS_API_KEY"]
     return paths
 
 def _get_google_maps_api_key():
