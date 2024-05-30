@@ -23,10 +23,12 @@ def _get_google_maps_api_paths():
         paths = data["GOOGLE_MAPS_API_KEY"]
         return paths
     except:
-        return None
+        return
 
 def _get_google_maps_api_key():
     paths = _get_google_maps_api_paths()
+    if not paths:
+        return
     file_name = "\\safepath.json"
     for path in paths:
         try:
@@ -38,7 +40,7 @@ def _get_google_maps_api_key():
             return key
         except:
             continue
-    return None
+    return
 
 GOOGLE_MAPS_API_KEY = _get_google_maps_api_key()
 
