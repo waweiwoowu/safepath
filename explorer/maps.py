@@ -1,8 +1,8 @@
 import googlemaps
 import asyncio
 import json
-import test_data
-from explorer._database import Coordinate
+from test_data import *
+from _database import Coordinate
 
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
@@ -57,10 +57,10 @@ class Direction(_GoogleMap):
     """
     This class uses googlemaps.directions and returns data with a list of dictionaries
     Please check constants.py for more information
-    
-    Direction(origin, destination) would determine the direction from origin to destination 
+
+    Direction(origin, destination) would determine the direction from origin to destination
     Note that this method would spend the quotas of the Directions API you use
-    
+
     If you want to determine direction without spending the quotas
     Please use Direction() without arguments
     This is a default object which returns the direction from '台北101' to '台北市立動物園'
@@ -70,7 +70,7 @@ class Direction(_GoogleMap):
         if origin and destination and GOOGLE_MAPS_API_KEY:
             self.data = self.gmaps.directions(origin, destination, )[0]
         else:
-            self.data = test_data.DIRECTIONS[0]
+            self.data = DIRECTIONS[0]
         self.car_accident = _DirectionCarAccidentData(self.coordinates)
         self.earthquake = _DirectionEarthquakeData(self.coordinates)
 
@@ -130,7 +130,7 @@ class _DirectionEarthquakeData():
 class Geocode(_GoogleMap):
     def __init__(self, address=None):
         if not address:
-            self.data = test_data.GEOCODE[0]
+            self.data = GEOCODE[0]
         else:
             self.data = self.gmaps.geocode(address)[0]
         self.postal_code = self.data["address_components"][-1]["long_name"]
@@ -165,7 +165,7 @@ async def _main():
 
     # coords = Coordinates(direction.coordinates)
     # print(coords.grid)
-    
+
     print(GOOGLE_MAPS_API_KEY)
     direction = Direction()
     print(await direction.car_accident.fatality)
