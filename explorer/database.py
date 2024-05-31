@@ -8,9 +8,9 @@ class InvalidCarAccidentError(Exception):
         self.message = message
         super().__init__(self.message)
 
-class CarAccident:
+class CarAccidentTest:
     """This class is used to read data from car accident csv files."""
-    def __init__(self, year, month=None, rank=2):        
+    def __init__(self, year, month=None, rank=2):
         self.year = year
         self.month = month
         self.rank = rank
@@ -18,8 +18,9 @@ class CarAccident:
         self.df = pd.DataFrame()
         self._read_csv_file()
         self.get = GetCarAccidentData(self.df)
-    
+
     def _is_arg_valid(self):
+
         path = r".\data\tracking.json"
         with open(path) as file:
             data = json.load(file)
@@ -30,7 +31,7 @@ class CarAccident:
         if self.month:
             if type(self.month) != int or (self.month < 1 or self.month > 12):
                 raise InvalidCarAccidentError("Invalid mouth. Must be an integer between 1 and 12 (including).")
-    
+
     def _read_csv_file(self):
         dtype_mapping = {
             '發生日期': str,
@@ -63,7 +64,7 @@ class CarAccident:
         else:
             raise InvalidCarAccidentError("Invalid rank. Must be either 1, '1', 'A1', 'a1', or 2, '2', 'A2', 'a2'.")
 
-class GetCarAccidentData(CarAccident):
+class GetCarAccidentData():
     def __init__(self, df):
         self.df = df
         self._dates = [datetime.strptime(str(int(d)), '%Y%m%d').strftime('%Y-%m-%d') for d in self.df['發生日期']]
@@ -120,31 +121,31 @@ class GetCarAccidentData(CarAccident):
         self._injuries = self._newdata.iloc[:, 5]
         self._administrative_area_level_1s = self._newdata.iloc[:, 6]
         self._administrative_area_level_2s = self._newdata.iloc[:, 7]
-       
+
     def date(self, id=None):
         if id:
             return self._dates[id-1]
         else:
             return self._dates
-    
+
     def time(self, id=None):
         if id:
             return self._times[id-1]
         else:
             return self._times
-    
-    def latitude(self, id=None):  
+
+    def latitude(self, id=None):
         if id:
             return self._latitudes[id - 1]
         else:
             return self._latitudes
-        
-    def longitude(self, id=None):       
+
+    def longitude(self, id=None):
         if id:
             return self._longitudes[id-1]
         else:
             return self._longitudes
-        
+
     def fatality(self, id=None):
         if id:
             return self._fatalities[id-1]
@@ -156,7 +157,7 @@ class GetCarAccidentData(CarAccident):
             return self._injuries[id-1]
         else:
             return self._injuries
-        
+
     def administrative_area_level_1(self, id=None):
         if id:
             return self._administrative_area_level_1s[id-1]
@@ -168,10 +169,10 @@ class GetCarAccidentData(CarAccident):
             return self._administrative_area_level_2s[id-1]
         else:
             return self._administrative_area_level_2s
-        
+
 
 if __name__ == "__main__":
-    accident = CarAccident(year=111, month=1, rank="A2")
+    accident = CarAccident(year=111, month=12, rank=2)
     # print(accident.get.date())
     # print(accident.get.time())
     # print(accident.get.latitude())
