@@ -61,7 +61,7 @@ class _GoogleMap():
     if GOOGLE_MAPS_API_KEY:
         gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
-class Direction(_GoogleMap):
+class Direction():
     """Get directions between an origin point and a destination point.
 
     This class uses googlemaps.directions and returns data with a list of
@@ -87,7 +87,7 @@ class Direction(_GoogleMap):
     """
     def __init__(self, origin=None, destination=None):
         if origin and destination and GOOGLE_MAPS_API_KEY:
-            self.data = self.gmaps.directions(origin, destination, )[0]
+            self.data = _GoogleMap().gmaps.directions(origin, destination, )[0]
         else:
             self.data = test_data.DIRECTIONS[0]
         self.car_accident = _DirectionCarAccidentData(self.coordinates)
@@ -146,12 +146,12 @@ class _DirectionEarthquakeData():
         pass
 
 
-class Geocode(_GoogleMap):
+class Geocode():
     def __init__(self, address=None):
         if not address:
             self.data = test_data.GEOCODE[0]
         else:
-            self.data = self.gmaps.geocode(address)[0]
+            self.data = _GoogleMap().gmaps.geocode(address)[0]
         self.postal_code = self.data["address_components"][-1]["long_name"]
         self.country = self.data["address_components"][-2]["long_name"]
         self.city = self.data["address_components"][-3]["long_name"]
@@ -165,7 +165,7 @@ class Geocode(_GoogleMap):
         return (self.lat, self.lng)
 
 async def _main():
-    # geocode = Geocode()
+    # geocode = Geocode("蘭嶼")
     # print(geocode.data)
     # print(geocode.city)
     # print(geocode.district)
@@ -185,7 +185,7 @@ async def _main():
     # coords = Coordinates(direction.coordinates)
     # print(coords.grid)
 
-    print(GOOGLE_MAPS_API_KEY)
+    # print(GOOGLE_MAPS_API_KEY)
     direction = Direction()
     print(await direction.car_accident.fatality)
     print(await direction.car_accident.injury)
