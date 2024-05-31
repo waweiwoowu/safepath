@@ -1,5 +1,7 @@
 {
     "python.pythonPath": "Scripts\\python.exe",
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.analysis.extraPaths": ["${workspaceFolder}"],
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
     "python.linting.pylintArgs": [

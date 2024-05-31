@@ -1,9 +1,14 @@
 import googlemaps
 import asyncio
 import json
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # runserver
 from explorer.test_data import *
 from explorer._database import Coordinate
+
 # run python file
 # import test_data
 # from _database import Coordinate
@@ -89,7 +94,7 @@ class Direction():
         if origin and destination and GOOGLE_MAPS_API_KEY:
             self.data = _GoogleMap().gmaps.directions(origin, destination, )[0]
         else:
-            self.data = test_data.DIRECTIONS[0]
+            self.data = DIRECTIONS[0]
         self.car_accident = _DirectionCarAccidentData(self.coordinates)
         self.earthquake = _DirectionEarthquakeData(self.coordinates)
 
@@ -149,7 +154,7 @@ class _DirectionEarthquakeData():
 class Geocode():
     def __init__(self, address=None):
         if not address:
-            self.data = test_data.GEOCODE[0]
+            self.data = GEOCODE[0]
         else:
             self.data = _GoogleMap().gmaps.geocode(address)[0]
         self.postal_code = self.data["address_components"][-1]["long_name"]
