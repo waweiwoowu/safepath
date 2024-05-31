@@ -1,22 +1,34 @@
 import googlemaps
 import asyncio
 import json
-import test_data
+from explorer.test_data import *
 from explorer._database import Coordinate
 
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
 
 
+"""
+Please replace 'YOUR_API_KEY' with your Google Maps API key from the json file in '.\data\keys\safepath.json'
+In order to prevent your GOOGLE_MAPS_API_KEY from being stolen on GitHub
+You may copy and paste the file to any location outside of the project on your local device
+And then add the file location to the list of the json file in '.\data\keys\paths.json'
+"""
+
 def _get_google_maps_api_paths():
-    filepath = r".\data\keys\paths.json"
-    with open(filepath) as file:
-        data = json.load(file)
-    paths = data["GOOGLE_MAPS_API_KEY"]
-    return paths
+    filepath = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
+    try:
+        with open(filepath) as file:
+            data = json.load(file)
+        paths = data["GOOGLE_MAPS_API_KEY"]
+        return paths
+    except:
+        return
 
 def _get_google_maps_api_key():
     paths = _get_google_maps_api_paths()
+    if not paths:
+        return
     file_name = "\\safepath.json"
     for path in paths:
         try:
@@ -28,7 +40,7 @@ def _get_google_maps_api_key():
             return key
         except:
             continue
-    return None
+    return
 
 GOOGLE_MAPS_API_KEY = _get_google_maps_api_key()
 
@@ -47,6 +59,29 @@ class _GoogleMap():
         gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 class Direction(_GoogleMap):
+    """Get directions between an origin point and a destination point.
+
+    This class uses googlemaps.directions and returns data with a list of
+        dictionaries. Please check 'constants.py' for more information.
+
+    :param origin: The address or latitude/longitude value from which you wish
+        to calculate directions.
+    :type origin: string, dict, list, or tuple
+
+    :param destination: The address or latitude/longitude value from which
+        you wish to calculate directions. You can use a place_id as destination
+        by putting 'place_id:' as a prefix in the passing parameter.
+    :type destination: string, dict, list, or tuple
+
+    Direction(origin, destination) would determine the direction from origin to
+        destination. Note that this method would spend the quotas of
+        the Directions API you use.
+
+    If you want to determine direction without spending the quotas, please
+        use Direction() without arguments. This is a default object which
+        returns the direction from '台北101' to '台北市立動物園'. Please
+        check 'constants.py' for more information.
+    """
     def __init__(self, origin=None, destination=None):
         if origin and destination and GOOGLE_MAPS_API_KEY:
             self.data = self.gmaps.directions(origin, destination, )[0]
@@ -147,6 +182,7 @@ async def _main():
     # coords = Coordinates(direction.coordinates)
     # print(coords.grid)
 
+    print(GOOGLE_MAPS_API_KEY)
     direction = Direction()
     print(await direction.car_accident.fatality)
     print(await direction.car_accident.injury)
