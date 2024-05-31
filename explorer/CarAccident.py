@@ -5,7 +5,6 @@ class CarAccident:
     def __init__(self, year, rank, month=None):
         self.year = year
         self.month = month
-<<<<<<< HEAD
         self.rank = rank
         self.datas = pd.DataFrame()  # 初始化空的 DataFrame
 
@@ -31,24 +30,6 @@ class CarAccident:
             else:
                 self.datas = pd.read_csv(f"./data/accidents/{year}/{year}年度A2交通事故資料_{month}.csv")
                 self.datas = self.datas[:-2]
-
-=======
-        if month:
-            self.data = GetMonthData(self.year, self.month)
-        else:
-            self.data = []
-            for i in range(1, 13):
-                self.data.append(GetMonthData(self.year, i))
-
-class GetMonthData():
-    def __init__(self, year, month):
-        pass
-    
-        if:
-            self.datas = pd.read_csv(f".\\data\\accidents\\{year}\\{year}年度A2交通事故資料_{month}.csv")
-        else:
-            self.datas = pd.read_csv(f".\\data\\accidents\\{year}\\{year}年度A1交通事故資料.csv")
->>>>>>> origin/database
         
         self.dates = [datetime.strptime(str(int(d)), '%Y%m%d').strftime('%Y-%m-%d') for d in self.datas['發生日期']]
         self.times = [datetime.strptime(str(int(t)).zfill(6), '%H%M%S').strftime('%H:%M:%S') for t in self.datas['發生時間']]
@@ -157,11 +138,11 @@ class GetMonthData():
 if __name__ == "__main__":
     accident = CarAccident(year=111,month=3, rank="A1")
     
-    # print(accident.get_date(10))
-    # print(accident.get_time(10))
-    # print(accident.get_latitude(10))
-    # print(accident.get_longitude(10))
-    # print(accident.get_fatality(10))
-    # print(accident.get_injury(10))
-    # print(accident.get_administrative_area_level_1(10))
-    # print(accident.get_administrative_area_level_2(10))
+    print(accident.get_date(10))
+    print(accident.get_time(10))
+    print(accident.get_latitude(10))
+    print(accident.get_longitude(10))
+    print(accident.get_fatality(10))
+    print(accident.get_injury(10))
+    print(accident.get_administrative_area_level_1(10))
+    print(accident.get_administrative_area_level_2(10))
