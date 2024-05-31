@@ -1,9 +1,12 @@
 import googlemaps
 import asyncio
 import json
+# runserver
 from explorer.test_data import *
 from explorer._database import Coordinate
-
+# run python file
+# import test_data
+# from _database import Coordinate
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
 
