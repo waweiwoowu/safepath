@@ -33,11 +33,11 @@ class CarAccident:
     
     def _read_csv_file(self):
         dtype_mapping = {
-            '發生日期': str,  # Assuming date is in a string format like 'YYYYMMDD'
-            '發生時間': str,  # Assuming time is in a string format like 'HHMMSS'
+            '發生日期': str,
+            '發生時間': str,
             '經度': float,
             '緯度': float,
-            '死亡受傷人數': str,  # Assuming this is a string that needs to be parsed later
+            '死亡受傷人數': str,
             '發生地點': str
         }
         if self.rank == 1 or self.rank == '1' or self.rank == "A1" or self.rank == "a1":
@@ -66,88 +66,33 @@ class CarAccident:
 class GetCarAccidentData(CarAccident):
     def __init__(self, df):
         self.df = df
-        self._casualties = None
-        self._location = None
-       
-    def date(self, id=None):
         self._dates = [datetime.strptime(str(int(d)), '%Y%m%d').strftime('%Y-%m-%d') for d in self.df['發生日期']]
-        if id:
-            return self._dates[id-1]
-        else:
-            return self._dates
-    
-    def time(self, id=None):
         self._times = [datetime.strptime(str(int(t)).zfill(6), '%H%M%S').strftime('%H:%M:%S') for t in self.df['發生時間']]
-        if id:
-            return self._times[id-1]
-        else:
-            return self._times
-    
-    def latitude(self, id=None):  
-        self._latitudes = self.df['緯度']
-        if id:
-            return self._latitudes[id - 1]
-        else:
-            return self._latitudes
-        
-    def longitude(self, id=None):       
         self._longitudes = self.df['經度']
-        if id:
-            return self._longitudes[id-1]
-        else:
-            return self._longitudes
-        
-    def fatality(self, id=None):
-        if self._casualties is None:
-            self._casualties = self.df['死亡受傷人數']
+        self._latitudes = self.df['緯度']
+        self._casualties = self.df['死亡受傷人數']
         self._fatalities = [int(c[2]) for c in self._casualties]
-        if id:
-            return self._fatalities[id-1]
-        else:
-            return self._fatalities
+        self._injuries = [int(c[-1]) for c in self._casualties]
+        self._location = self.df['發生地點']
+        self._administrative_area_level_1 = [loc[:3] for loc in self._location]
+        self._administrative_area_level_2 = [loc[3:6] for loc in self._location]
+        self._reorganize_data()
 
-    def injury(self, id=None):
-        if self._casualties is None:
-            self._casualties = self.df['死亡受傷人數']
-        self._injuries = [int(c[2]) for c in self._casualties]
-        if id:
-            return self._injuries[id-1]
-        else:
-            return self._injuries
-        
-    def administrative_area_level_1(self, id=None):
-        if self._location is None:
-            self._location = self.df['發生地點']
-        self._administrative_area_level_1s = [loc[:3] for loc in self._location]
-        if id:
-            return self._administrative_area_level_1s[id-1]
-        else:
-            return self._administrative_area_level_1s
-
-    def administrative_area_level_2(self, id=None):
-        if self._location is None:
-            self._location = self.df['發生地點']
-        self._administrative_area_level_2s = [loc[3:6] for loc in self._location]
-        if id:
-            return self._administrative_area_level_2s[id-1]
-        else:
-            return self._administrative_area_level_2s
-        
-    def all(self):
+    def _reorganize_data(self):
         check = 0
         longitude_check = 0
         latitude_check = 0
-        self.data = []
-        for i in range(len(self.dates)):
-            if self.times[i] == check:
+        self._data = []
+        for i in range(len(self._dates)):
+            if self._times[i] == check:
                 if (self._longitudes[i] == longitude_check) and (self._latitudes[i] == latitude_check):
                     continue
                 else:
                     longitude_check = self._longitudes[i]
                     latitude_check = self._latitudes[i]
             else:
-                check = self.times[i]
-                self.data.append([
+                check = self._times[i]
+                self._data.append([
                     self._dates[i],
                     self._times[i],
                     self._latitudes[i],
@@ -157,8 +102,7 @@ class GetCarAccidentData(CarAccident):
                     self._administrative_area_level_1[i],
                     self._administrative_area_level_2[i]
                 ])
-
-        self.newdata = pd.DataFrame(self.data, columns=[
+        self._newdata = pd.DataFrame(self._data, columns=[
             'date',
             'time',
             'latitude',
@@ -168,22 +112,75 @@ class GetCarAccidentData(CarAccident):
             'administrative_area_level_1',
             'administrative_area_level_2'
         ])
-        self._dates = self.newdata.iloc[:, 0]
-        self._times = self.newdata.iloc[:, 1]
-        self._latitudes = self.newdata.iloc[:, 2]
-        self._longitudes = self.newdata.iloc[:, 3]
-        self._fatalities = self.newdata.iloc[:, 4]
-        self._injuries = self.newdata.iloc[:, 5]
-        self._administrative_area_level_1s = self.newdata.iloc[:, 6]
-        self._administrative_area_level_2s = self.newdata.iloc[:, 7]
-        return self.newdata
+        self._dates = self._newdata.iloc[:, 0]
+        self._times = self._newdata.iloc[:, 1]
+        self._latitudes = self._newdata.iloc[:, 2]
+        self._longitudes = self._newdata.iloc[:, 3]
+        self._fatalities = self._newdata.iloc[:, 4]
+        self._injuries = self._newdata.iloc[:, 5]
+        self._administrative_area_level_1s = self._newdata.iloc[:, 6]
+        self._administrative_area_level_2s = self._newdata.iloc[:, 7]
+       
+    def date(self, id=None):
+        if id:
+            return self._dates[id-1]
+        else:
+            return self._dates
+    
+    def time(self, id=None):
+        if id:
+            return self._times[id-1]
+        else:
+            return self._times
+    
+    def latitude(self, id=None):  
+        if id:
+            return self._latitudes[id - 1]
+        else:
+            return self._latitudes
+        
+    def longitude(self, id=None):       
+        if id:
+            return self._longitudes[id-1]
+        else:
+            return self._longitudes
+        
+    def fatality(self, id=None):
+        if id:
+            return self._fatalities[id-1]
+        else:
+            return self._fatalities
+
+    def injury(self, id=None):
+        if id:
+            return self._injuries[id-1]
+        else:
+            return self._injuries
+        
+    def administrative_area_level_1(self, id=None):
+        if id:
+            return self._administrative_area_level_1s[id-1]
+        else:
+            return self._administrative_area_level_1s
+
+    def administrative_area_level_2(self, id=None):
+        if id:
+            return self._administrative_area_level_2s[id-1]
+        else:
+            return self._administrative_area_level_2s
+        
 
 if __name__ == "__main__":
     accident = CarAccident(year=111, month=1, rank="A2")
-    # print(accident.administrative_area_level_2s)
-    # print(accident.latitudes)
+    # print(accident.get.date())
+    # print(accident.get.time())
+    # print(accident.get.latitude())
+    # print(accident.get.longitude())
+    # print(accident.get.fatality())
+    # print(accident.get.injury())
+    # print(accident.get.administrative_area_level_1())
+    # print(accident.get.administrative_area_level_2())
     data_id = 1
-    # print(accident.get_all.dates)
     print(accident.get.date(data_id))
     print(accident.get.time(data_id))
     print(accident.get.latitude(data_id))
