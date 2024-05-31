@@ -23,9 +23,9 @@ def signin(request):
             return render(request, "signin.html", {"error": "Invalid username or password."})
 
         if user.password == password:
-            return render(request, "home.html", {"username": username})
+            return redirect('/explorer/home/')
         else:
-            return render(request, "signin.html", {"error": "Invalid username or password."})
+            return redirect('/explorer/signin/')
 
 def signup(request):
     if request.method == "GET":
@@ -82,9 +82,8 @@ async def home(request):
         # direction = Direction(origin=start, destination=destination)
 
         coordinates = direction.coordinates
-        # test
-        fatality = await direction.car_accident.fatality
-        injury = await direction.car_accident.injury
+        # fatality = await direction.car_accident.fatality
+        # injury = await direction.car_accident.injury
 
         return render(request, 'home.html', {
             'start': start,
@@ -93,5 +92,29 @@ async def home(request):
         })
     else:
         return render(request, 'home.html', {})
+
+
+
+
+# from django.http import JsonResponse
+# import json
+
+# def home(request):
+#     if request.method == 'POST' and request.is_ajax():
+#         data = json.loads(request.body)
+#         start = data.get('start')
+#         destination = data.get('destination')
+
+#         # Do whatever processing you need with start and destination here
+#         # For example, you can pass them to Direction class and get coordinates
+
+#         coordinates = []  # Assuming you get coordinates somehow
+#         return JsonResponse({
+#             'start': start,
+#             'destination': destination,
+#             'coordinates': coordinates
+#         })
+#     else:
+#         return render(request, 'home.html', {})
 
 
