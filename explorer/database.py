@@ -1,14 +1,56 @@
 import json
+import math
+import sqlite3
 import pandas as pd
 from datetime import datetime
 
+
+DEGREE_DIFFERENCE = 0.0001
+
+def rounding(degree, difference=DEGREE_DIFFERENCE):
+    power = math.log10(difference)
+    if power > 0:
+        return round(float(degree) / difference) * difference
+    else:
+        decimal_place = math.ceil(abs(power))
+        return round(round(float(degree) / difference) * difference, decimal_place)
+
+class InvalidCoordinateError(Exception):
+    def __init__(self, message="Invalid coordinate. Must provide either a single iterable or separate latitude and longitude values."):
+        self.message = message
+        super().__init__(self.message)
+
+class Coordinate:
+    def __init__(self, *coordinate) -> None:
+        """This class is mainly used to determine the round of the coordinate in specific degree difference
+        Both Coordinate(25.2525, 123.456) and Coordinate((25.2525, 123.456)) are available"""
+        if len(coordinate) == 1:
+            if len(coordinate[0]) != 2:
+                raise InvalidCoordinateError("Invalid coordinate format. Must provide latitude and longitude values.")
+            self.latitude = coordinate[0][0]
+            self.longitude = coordinate[0][1]
+        elif len(coordinate) == 2:
+            self.latitude = coordinate[0]
+            self.longitude = coordinate[1]
+        else:
+            raise InvalidCoordinateError()
+
+        if abs(self.latitude) > 90:
+            raise InvalidCoordinateError("Invalid latitude value. Must between -90 and 90 degrees.")
+        if abs(self.longitude) > 180:
+            raise InvalidCoordinateError("Invalid latitude value. Must between -180 and 180 degrees.")
+
+        self.latitude_grid = rounding(self.latitude)
+        self.longitude_grid = rounding(self.longitude)
+        self.car_accident_data = None
+        # self.earthquake = EarthquakeData(self.latitude, self.longitude)
 
 class InvalidCarAccidentError(Exception):
     def __init__(self, message="Invalid."):
         self.message = message
         super().__init__(self.message)
 
-class CarAccidentTest:
+class CarAccident:
     """This class is used to read data from car accident csv files."""
     def __init__(self, year, month=None, rank=2):
         self.year = year
@@ -55,16 +97,16 @@ class CarAccidentTest:
         elif self.rank == 2 or self.rank == '2' or self.rank == "A2" or self.rank == "a2":
             if not self.month:
                 for m in range(1, 13):
-                    monthly_data = pd.read_csv(f"./data/accidents/{self.year}/{self.year}年度A2交通事故資料_{m}.csv", dtype=dtype_mapping)
+                    monthly_data = pd.read_csv(f"./data/accidents/{self.year}/{self.year}年度A2交通事故資料_{m}.csv", dtype=dtype_mapping, low_memory=False)
                     monthly_data = monthly_data[:-2]
                     self.df = pd.concat([self.df, monthly_data], ignore_index=True)
             else:
-                self.df = pd.read_csv(f"./data/accidents/{self.year}/{self.year}年度A2交通事故資料_{self.month}.csv", low_memory=False)
+                self.df = pd.read_csv(f"./data/accidents/{self.year}/{self.year}年度A2交通事故資料_{self.month}.csv", dtype=dtype_mapping, low_memory=False)
                 self.df = self.df[:-2]
         else:
             raise InvalidCarAccidentError("Invalid rank. Must be either 1, '1', 'A1', 'a1', or 2, '2', 'A2', 'a2'.")
 
-class GetCarAccidentData():
+class GetCarAccidentData:
     def __init__(self, df):
         self.df = df
         self._dates = [datetime.strptime(str(int(d)), '%Y%m%d').strftime('%Y-%m-%d') for d in self.df['發生日期']]
@@ -170,17 +212,81 @@ class GetCarAccidentData():
         else:
             return self._administrative_area_level_2s
 
+class AllCarAccidentData:
+    def __init__(self, rank=2):
+        self._get_years()
+        self._rank = rank
+        self._get_data()
+        
+    def _get_years(self):
+        path = r".\data\tracking.json"
+        with open(path) as file:
+            data = json.load(file)
+            self._starting_year = data["car_accident"]["starting_year"]
+            self._ending_year = data["car_accident"]["ending_year"]
+            
+    def _get_data(self):
+        for year in range(self._starting_year, self._ending_year + 1):
+            for month in range(1, 13):
+                accident = CarAccident(year=year, month=month, rank=self._rank)
 
-if __name__ == "__main__":
+
+                
+class SQLController:
+    PATH = r"..\.\db.sqlite3"
+    def __init__(self):
+        self.conn = sqlite3.connect(SQLController.PATH)
+        self.cursor = self.conn.cursor()
+    
+    def close(self):
+        self.conn.close()
+    
+    def select(self, id=None):
+        if id:
+            sql = f"SELECT * FROM risk_car_accident_density where id={id}"
+            self.cursor.execute(sql)
+            return self.cursor.fetchone()
+        else:
+            sql = "SELECT * FROM risk_car_accident_density"
+            self.cursor.execute(sql)
+            return self.cursor.fetchall()     
+
+class CarAccdentDensitySQLController(SQLController):
+    def __init__(self):
+        self.conn = sqlite3.connect(SQLController.PATH)
+        self.cursor = self.conn.cursor()
+
+    def new(self, latitude, longitude, fatality, injury):
+        coordinate = Coordinate(latitude, longitude)
+        self.existing_id = self.coordinate_id(coordinate.latitude_grid, coordinate.longitude)
+        if self.existing_id:
+            sql = f"UPDATE risk_car_accident_density SET total_fatality = {fatality}, total_injury = {injury} WHERE id = '{self.existing_id}'"
+            self.cursor.execute(sql)
+        else:
+            sql = "INSERT INTO risk_car_accident_density (latitude, longitude, total_fatality, total_injury) VALUES (?, ?, ?, ?)"
+            self.cursor.execute(sql, (coordinate.latitude, coordinate.longitude, fatality, injury))
+        self.conn.commit()
+    
+    def coordinate_id(self, latitude, longitude):
+        sql = f"SELECT * FROM risk_car_accident_density where latitude={latitude} and longitude={longitude}"
+        self.cursor.execute(sql)
+        data = self.cursor.fetchone()
+        if data:
+            return data[0]
+        else:
+            return None
+
+
+def test_CarAccident():
     accident = CarAccident(year=111, month=12, rank=2)
-    # print(accident.get.date())
-    # print(accident.get.time())
-    # print(accident.get.latitude())
-    # print(accident.get.longitude())
-    # print(accident.get.fatality())
-    # print(accident.get.injury())
-    # print(accident.get.administrative_area_level_1())
-    # print(accident.get.administrative_area_level_2())
+    print(accident.get.date())
+    print(accident.get.time())
+    print(accident.get.latitude())
+    print(accident.get.longitude())
+    print(accident.get.fatality())
+    print(accident.get.injury())
+    print(accident.get.administrative_area_level_1())
+    print(accident.get.administrative_area_level_2())
     data_id = 1
     print(accident.get.date(data_id))
     print(accident.get.time(data_id))
@@ -190,3 +296,23 @@ if __name__ == "__main__":
     print(accident.get.injury(data_id))
     print(accident.get.administrative_area_level_1(data_id))
     print(accident.get.administrative_area_level_2(data_id))
+
+def test_SQLController():
+    controller = CarAccdentDensitySQLController()
+    test_latitude = 24.4389
+    test_longitude = 118.2497
+    # print(controller.coordinate_id(test_latitude, test_longitude))
+    # print(controller.coordinate_id(test_latitude+50, test_longitude))
+    print(controller.select(50956))
+    controller.new(test_latitude, test_longitude, 55, 66)
+    print(controller.select(50956))
+    controller.new(test_latitude, test_longitude, 99, 77)
+    print(controller.select(50956))
+    controller.new(test_latitude+50, test_longitude+20, 55, 123)
+    controller.close()
+
+
+if __name__ == "__main__":
+    # test_CarAccident()
+    test_SQLController()
+

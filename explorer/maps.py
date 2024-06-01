@@ -1,12 +1,16 @@
 import googlemaps
 import asyncio
 import json
-# runserver
-from explorer.test_data import *
-from explorer._database import Coordinate
-# run python file
-# import test_data
-# from _database import Coordinate
+
+### runserver
+# from explorer.test_data import *
+# from explorer._database import Coordinate
+# PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
+
+### run python file
+import test_data
+from _database import Coordinate
+PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
 
@@ -19,7 +23,7 @@ And then add the file location to the list of the json file in '.\data\keys\path
 """
 
 def _get_google_maps_api_paths():
-    filepath = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
+    filepath = PATH
     try:
         with open(filepath) as file:
             data = json.load(file)
@@ -46,7 +50,6 @@ def _get_google_maps_api_key():
     return
 
 GOOGLE_MAPS_API_KEY = _get_google_maps_api_key()
-
 
 class Coordinates():
     def __init__(self, coordinates):
@@ -87,7 +90,7 @@ class Direction():
     """
     def __init__(self, origin=None, destination=None):
         if origin and destination and GOOGLE_MAPS_API_KEY:
-            self.data = _GoogleMap().gmaps.directions(origin, destination, )[0]
+            self.data = _GoogleMap.gmaps.directions(origin, destination, )[0]
         else:
             self.data = test_data.DIRECTIONS[0]
         self.car_accident = _DirectionCarAccidentData(self.coordinates)
@@ -151,7 +154,7 @@ class Geocode():
         if not address:
             self.data = test_data.GEOCODE[0]
         else:
-            self.data = _GoogleMap().gmaps.geocode(address)[0]
+            self.data = _GoogleMap.gmaps.geocode(address)[0]
         self.postal_code = self.data["address_components"][-1]["long_name"]
         self.country = self.data["address_components"][-2]["long_name"]
         self.city = self.data["address_components"][-3]["long_name"]
@@ -164,13 +167,14 @@ class Geocode():
         self.lng = self.data["geometry"]["location"]["lng"]
         return (self.lat, self.lng)
 
+
 async def _main():
-    # geocode = Geocode("蘭嶼")
+    geocode = Geocode()
     # print(geocode.data)
     # print(geocode.city)
     # print(geocode.district)
     # print(geocode.address)
-    # print(geocode.location)
+    print(geocode.location)
 
     # direction = Direction()
     # print(direction.overivew_coordinates)
@@ -186,9 +190,9 @@ async def _main():
     # print(coords.grid)
 
     # print(GOOGLE_MAPS_API_KEY)
-    direction = Direction()
-    print(await direction.car_accident.fatality)
-    print(await direction.car_accident.injury)
+    # direction = Direction()
+    # print(await direction.car_accident.fatality)
+    # print(await direction.car_accident.injury)
     # direction.earthquake
 
 
