@@ -1,6 +1,7 @@
 import json
 import math
 import sqlite3
+import time
 import pandas as pd
 from datetime import datetime
 
@@ -271,20 +272,27 @@ class TrafficAccidentsSQLController(SQLController):
 
     def new(self, latitude, longitude, fatality, injury):
         coordinate = Coordinate(latitude, longitude)
-        self.existing_id = self.coordinate_id(coordinate.latitude_grid, coordinate.longitude_grid)
+        self.existing_id = self.coordinate_id(coordinate.latitude_grid, 
+                                              coordinate.longitude_grid)
         if self.existing_id:
             number = self.select(self.existing_id, "number") + 1
             fatality += self.select(self.existing_id, "fatality")
             injury += self.select(self.existing_id, "injury")
-            sql = f"UPDATE {self.table_name} SET number = {number}, fatality = {fatality}, injury = {injury} WHERE id = {self.existing_id}"
+            sql = f"""UPDATE {self.table_name} 
+                        SET number = {number}, fatality = {fatality}, injury = {injury} 
+                        WHERE id = {self.existing_id}"""
             self.cursor.execute(sql)
         else:
-            sql = f"INSERT INTO {self.table_name} (latitude, longitude, number, fatality, injury) VALUES (?, ?, ?, ?, ?)"
-            self.cursor.execute(sql, (coordinate.latitude_grid, coordinate.longitude_grid, 1, fatality, injury))
+            sql = f"""INSERT INTO {self.table_name} (latitude, longitude, number, 
+                        fatality, injury) VALUES (?, ?, ?, ?, ?)"""
+            self.cursor.execute(sql, (coordinate.latitude_grid, 
+                                      coordinate.longitude_grid, 
+                                      1, fatality, injury))
         self.conn.commit()
     
     def coordinate_id(self, latitude, longitude):
-        sql = f"SELECT * FROM {self.table_name} where latitude = {latitude} and longitude = {longitude}"
+        sql = f"""SELECT * FROM {self.table_name} 
+                    WHERE latitude = {latitude} AND longitude = {longitude}"""
         self.cursor.execute(sql)
         data = self.cursor.fetchone()
         if data:
@@ -292,27 +300,55 @@ class TrafficAccidentsSQLController(SQLController):
         else:
             return None
 
-class PedestrianHell(SQLController):
+class PedestrianHellSQLController(SQLController):
     def __init__(self):
         self.table_name = "risk_pedestrian_hell"
         super().__init__(self.table_name)
 
-    def new(self, latitude, longitude, fatality, injury):
-        coordinate = Coordinate(latitude, longitude)
-        self.existing_id = self.coordinate_id(coordinate.latitude_grid, coordinate.longitude_grid)
+    def new(self, administrative_area_level_1, administrative_area_level_2, 
+            fatality, injury, includes_pedestrian):
+        total_fatality = fatality
+        total_injury = injury
+        if includes_pedestrian:
+            pedestrian_fatality = fatality
+            pedestrian_injury = injury
+        else:
+            pedestrian_fatality = pedestrian_injury = 0
+            
+        self.existing_id = self.administrative_area_id(administrative_area_level_1, 
+                                                       administrative_area_level_2)
         if self.existing_id:
             number = self.select(self.existing_id, "number") + 1
-            fatality += self.select(self.existing_id, "fatality")
-            injury += self.select(self.existing_id, "injury")
-            sql = f"UPDATE {self.table_name} SET number = {number}, fatality = {fatality}, injury = {injury} WHERE id = {self.existing_id}"
+            total_fatality += self.select(self.existing_id, "total_fatality")
+            total_injury += self.select(self.existing_id, "total_injury")
+            pedestrian_fatality += self.select(self.existing_id, "pedestrian_fatality")
+            pedestrian_injury += self.select(self.existing_id, "pedestrian_injury")
+            sql = f"""UPDATE {self.table_name} 
+                    SET number = {number}, 
+                    total_fatality = {total_fatality}, 
+                    total_injury = {total_injury},
+                    pedestrian_fatality = {pedestrian_fatality}, 
+                    pedestrian_injury = {pedestrian_injury} WHERE id = {self.existing_id}"""
             self.cursor.execute(sql)
         else:
-            sql = f"INSERT INTO {self.table_name} (latitude, longitude, number, fatality, injury) VALUES (?, ?, ?, ?, ?)"
-            self.cursor.execute(sql, (coordinate.latitude_grid, coordinate.longitude_grid, 1, fatality, injury))
+            sql = f"""INSERT INTO {self.table_name} (
+                    administrative_area_level_1, 
+                    administrative_area_level_2, 
+                    number, 
+                    total_fatality, 
+                    total_injury, 
+                    pedestrian_fatality, 
+                    pedestrian_injury) VALUES (?, ?, ?, ?, ?, ?, ?)"""
+            self.cursor.execute(sql, (administrative_area_level_1, 
+                                      administrative_area_level_2, 
+                                      1, total_fatality, total_injury,
+                                      pedestrian_fatality, pedestrian_injury))
         self.conn.commit()
     
-    def coordinate_id(self, latitude, longitude):
-        sql = f"SELECT * FROM {self.table_name} where latitude = {latitude} and longitude = {longitude}"
+    def administrative_area_id(self, administrative_area_level_1, administrative_area_level_2):
+        sql = f"""SELECT * FROM {self.table_name} 
+                    WHERE administrative_area_level_1 = '{administrative_area_level_1}' 
+                    AND administrative_area_level_2 = '{administrative_area_level_2}'"""
         self.cursor.execute(sql)
         data = self.cursor.fetchone()
         if data:
@@ -323,17 +359,19 @@ class PedestrianHell(SQLController):
 class UpdateTrafficAccidentsData:
     def __init__(self):
         self.get_tracking_data()
+        self.determine_range()
         self.update_data()
+        self.update_tracking_data()
         
     def get_tracking_data(self):
-        path = r".\data\tracking.json"
-        with open(path) as file:
-            data = json.load(file)
-            self.starting_year = data["car_accident"]["starting_year"]
-            self.ending_year = data["car_accident"]["ending_year"]
-            self.tracking_year = data["car_accident_density"]["tracking_year"]
-            self.tracking_month = data["car_accident_density"]["tracking_month"]
-            self.tracking_rank = data["car_accident_density"]["tracking_rank"]
+        self.tracking_path = r".\data\tracking.json"
+        with open(self.tracking_path) as file:
+            self.tracking_data = json.load(file)
+            self.starting_year = self.tracking_data["car_accident"]["starting_year"]
+            self.ending_year = self.tracking_data["car_accident"]["ending_year"]
+            self.tracking_year = self.tracking_data["car_accident_density"]["tracking_year"]
+            self.tracking_month = self.tracking_data["car_accident_density"]["tracking_month"]
+            self.tracking_rank = self.tracking_data["car_accident_density"]["tracking_rank"]
     
     def initialize_range(self):
         if not self.tracking_year:
@@ -359,17 +397,35 @@ class UpdateTrafficAccidentsData:
                 self.tracking_month += 1
 
     def update_data(self):
-        self.determine_range()
-        self.accident = CarAccident(year=self.tracking_year, month=self.tracking_month, rank=self.tracking_rank)
-        self.traffic_sql_controller = TrafficAccidentsSQLController()
+        print("Collecting data...")
+        self.accident = CarAccident(year=self.tracking_year, 
+                                    month=self.tracking_month, 
+                                    rank=self.tracking_rank)
+        print("Starting Adding data...")
+        self.traffic_controller = TrafficAccidentsSQLController()
+        self.ped_hell_controller = PedestrianHellSQLController()
         for i in range(len(self.accident.data)):
             latitude = self.accident.latitude(i)
             longitude = self.accident.longitude(i)
             fatality = self.accident.fatality(i)
             injury = self.accident.injury(i)
-            # self.traffic_sql_controller.new(latitude, longitude, fatality, injury)
-            break
+            area_level_1 = self.accident.administrative_area_level_1(i)
+            area_level_2 = self.accident.administrative_area_level_2(i)
+            includes_pedestrian = self.accident.includes_pedestrian(i)
+            self.traffic_controller.new(latitude, longitude, fatality, injury)
+            self.ped_hell_controller.new(area_level_1, area_level_2, 
+                                         fatality, injury, includes_pedestrian)
+            print(f"Added: {i}")
+        self.traffic_controller.close()
+        self.ped_hell_controller.close()
+        print("Finished!")
         
+    def update_tracking_data(self):
+        self.tracking_data["car_accident_density"]["tracking_year"] = self.tracking_year
+        self.tracking_data["car_accident_density"]["tracking_month"] = self.tracking_month
+        self.tracking_data["car_accident_density"]["tracking_rank"] = self.tracking_rank
+        with open(self.tracking_path, 'w') as file:
+            json.dump(self.tracking_data, file)
         
 
 def test_CarAccident():
@@ -395,7 +451,7 @@ def test_CarAccident():
     print(accident.administrative_area_level_2(data_id))
 
 def test_SQLController():
-    controller = CarAccdentDensitySQLController()
+    controller = TrafficAccidentsSQLController()
     test_latitude = 24.4389
     test_longitude = 118.2497
     # print(controller.coordinate_id(test_latitude, test_longitude))
@@ -412,7 +468,11 @@ def test_UpdateTrafficAccidentsData():
     UpdateTrafficAccidentsData()
 
 if __name__ == "__main__":
+    start_time = time.time()
     # test_CarAccident()
     # test_SQLController()
     test_UpdateTrafficAccidentsData()
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"\nExecution time: {execution_time:.0f} seconds ({execution_time/60:.0f} minutes)")
 
