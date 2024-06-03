@@ -14,7 +14,7 @@ PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 ### run python file
 # from test_data import *
 # from _database import Coordinate
-PATH = r".\data\keys\paths.json"
+# PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
 
