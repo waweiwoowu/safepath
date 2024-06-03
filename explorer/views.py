@@ -117,4 +117,13 @@ async def home(request):
 #     else:
 #         return render(request, 'home.html', {})
 
+def travel(request):
+    if request.method == 'POST':
+        location = request.POST.get('location')
+        area = request.POST.get('area')
+
+        return render(request, 'travel.html')
+    else:
+        return render(request, 'travel.html')
+
 
