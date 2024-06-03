@@ -295,24 +295,40 @@ class TrafficAccidentSQLController(SQLController):
         self.table_name = "risk_traffic_accident"
         super().__init__(self.table_name)
 
-    def new(self, latitude, longitude, fatality, injury):
+    def new(self, latitude, longitude, fatality, injury, includes_pedestrian):
         coordinate = Coordinate(latitude, longitude)
         self.existing_id = self.coordinate_id(coordinate.latitude_grid, 
                                               coordinate.longitude_grid)
+        total_fatality = fatality
+        total_injury = injury
+        if includes_pedestrian:
+            pedestrian_fatality = fatality
+            pedestrian_injury = injury
+        else:
+            pedestrian_fatality = pedestrian_injury = 0
+        
         if self.existing_id:
             number = self.select(self.existing_id, "number") + 1
-            fatality += self.select(self.existing_id, "fatality")
-            injury += self.select(self.existing_id, "injury")
+            total_fatality += self.select(self.existing_id, "total_fatality")
+            total_injury += self.select(self.existing_id, "total_injury")
+            pedestrian_fatality += self.select(self.existing_id, "pedestrian_fatality")
+            pedestrian_injury += self.select(self.existing_id, "pedestrian_injury")
             sql = f"""UPDATE {self.table_name} 
-                        SET number = {number}, fatality = {fatality}, injury = {injury} 
+                        SET number = {number}, 
+                        total_fatality = {total_fatality},
+                        total_injury = {total_injury},
+                        pedestrian_fatality = {pedestrian_fatality},
+                        pedestrian_injury = {pedestrian_injury}
                         WHERE id = {self.existing_id}"""
             self.cursor.execute(sql)
         else:
             sql = f"""INSERT INTO {self.table_name} (latitude, longitude, number, 
-                        fatality, injury) VALUES (?, ?, ?, ?, ?)"""
+                        total_fatality, total_injury, pedestrian_fatality,
+                        pedestrian_injury) VALUES (?, ?, ?, ?, ?, ?, ?)"""
             self.cursor.execute(sql, (coordinate.latitude_grid, 
                                       coordinate.longitude_grid, 
-                                      1, fatality, injury))
+                                      1, total_fatality, total_injury,
+                                      pedestrian_fatality, pedestrian_injury))
         self.conn.commit()
     
     def coordinate_id(self, latitude, longitude):
@@ -436,7 +452,8 @@ class UpdateTrafficAccidentData:
             area_level_1 = self.accident.administrative_area_level_1(i)
             area_level_2 = self.accident.administrative_area_level_2(i)
             includes_pedestrian = self.accident.includes_pedestrian(i)
-            self.traffic_controller.new(latitude, longitude, fatality, injury)
+            self.traffic_controller.new(latitude, longitude, 
+                                        fatality, injury, includes_pedestrian)
             self.ped_hell_controller.new(area_level_1, area_level_2, 
                                          fatality, injury, includes_pedestrian)
         self.traffic_controller.close()
