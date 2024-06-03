@@ -1,1 +1,1 @@
-{"car_accident": {"starting_year": 111, "ending_year": 112}, "traffic_accident": {"tracking_year": 111, "tracking_month": 12, "tracking_rank": 1}}
+{"car_accident_csv": {"starting_year": 111, "ending_year": 112}, "traffic_accident": {"tracking_year": 111, "tracking_month": 12, "tracking_rank": 1}}

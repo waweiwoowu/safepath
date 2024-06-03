@@ -90,8 +90,8 @@ class CarAccident:
         path = r".\data\tracking.json"
         with open(path) as file:
             data = json.load(file)
-            starting_year = data["car_accident"]["starting_year"]
-            ending_year = data["car_accident"]["ending_year"]
+            starting_year = data["car_accident_csv"]["starting_year"]
+            ending_year = data["car_accident_csv"]["ending_year"]
         if (type(self._year) != int or (self._year < starting_year or self._year > ending_year)):
             message = f"Invalid year. Must be an integer between {starting_year} and {ending_year} (including)."
             raise InvalidCarAccidentError(message)
@@ -501,6 +501,65 @@ class PedestrianHellSQLController(SQLController):
         else:
             return None
 
+class EarthquakeSQLController(SQLController):
+    def __init__(self):
+        self.table_name = "risk_earthquake"
+        super().__init__(self.table_name)
+
+    def new(self, date, time, latitude, longitude, magnitude, depth):
+        sql = f"""INSERT INTO {self.table_name} (
+                date, time, latitude, longitude, 
+                magnitude, depth) VALUES (?, ?, ?, ?, ?, ?, ?)"""
+        self.cursor.execute(sql, (date, time, latitude, longitude, magnitude, depth))
+        self.conn.commit()
+
+class EarthquakeIntensitySQLController(SQLController):
+    def __init__(self):
+        self.table_name = "risk_earthquake_intensity"
+        super().__init__(self.table_name)
+
+    def new(self, area, intensity):
+        self.existing_id = self.administrative_area_id(area_1, 
+                                                       area_2)
+        if self.existing_id:
+            number = self.select(self.existing_id, "number") + 1
+            total_fatality += self.select(self.existing_id, "total_fatality")
+            total_injury += self.select(self.existing_id, "total_injury")
+            pedestrian_fatality += self.select(self.existing_id, "pedestrian_fatality")
+            pedestrian_injury += self.select(self.existing_id, "pedestrian_injury")
+            sql = f"""UPDATE {self.table_name} 
+                    SET number = {number}, 
+                    total_fatality = {total_fatality}, 
+                    total_injury = {total_injury},
+                    pedestrian_fatality = {pedestrian_fatality}, 
+                    pedestrian_injury = {pedestrian_injury} WHERE id = {self.existing_id}"""
+            self.cursor.execute(sql)
+        else:
+            sql = f"""INSERT INTO {self.table_name} (
+                    area_1, 
+                    area_2, 
+                    number, 
+                    total_fatality, 
+                    total_injury, 
+                    pedestrian_fatality, 
+                    pedestrian_injury) VALUES (?, ?, ?, ?, ?, ?, ?)"""
+            self.cursor.execute(sql, (area_1, 
+                                      area_2, 
+                                      1, total_fatality, total_injury,
+                                      pedestrian_fatality, pedestrian_injury))
+        self.conn.commit()
+    
+    def administrative_area_id(self, area_1, area_2):
+        sql = f"""SELECT * FROM {self.table_name} 
+                    WHERE area_1 = '{area_1}' 
+                    AND area_2 = '{area_2}'"""
+        self.cursor.execute(sql)
+        data = self.cursor.fetchone()
+        if data:
+            return data[0]
+        else:
+            return None
+
 class UpdateTrafficAccidentData:
     def __init__(self):
         self.get_tracking_data()
@@ -512,8 +571,8 @@ class UpdateTrafficAccidentData:
         self.tracking_path = r".\data\tracking.json"
         with open(self.tracking_path) as file:
             self.tracking_data = json.load(file)
-            self.starting_year = self.tracking_data["car_accident"]["starting_year"]
-            self.ending_year = self.tracking_data["car_accident"]["ending_year"]
+            self.starting_year = self.tracking_data["car_accident_csv"]["starting_year"]
+            self.ending_year = self.tracking_data["car_accident_csv"]["ending_year"]
             self.tracking_year = self.tracking_data["traffic_accident"]["tracking_year"]
             self.tracking_month = self.tracking_data["traffic_accident"]["tracking_month"]
             self.tracking_rank = self.tracking_data["traffic_accident"]["tracking_rank"]
