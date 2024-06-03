@@ -90,8 +90,8 @@ class CarAccident:
         path = r".\data\tracking.json"
         with open(path) as file:
             data = json.load(file)
-            starting_year = data["car_accident"]["starting_year"]
-            ending_year = data["car_accident"]["ending_year"]
+            starting_year = data["car_accident_csv"]["starting_year"]
+            ending_year = data["car_accident_csv"]["ending_year"]
         if (type(self._year) != int or (self._year < starting_year or self._year > ending_year)):
             message = f"Invalid year. Must be an integer between {starting_year} and {ending_year} (including)."
             raise InvalidCarAccidentError(message)
@@ -144,19 +144,19 @@ class CarAccident:
         
         self._dates = [datetime.strptime(str(int(d)), "%Y%m%d").strftime("%Y-%m-%d") for d in self._df["發生日期"]]
         self._times = [datetime.strptime(str(int(t)).zfill(6), "%H%M%S").strftime("%H:%M:%S") for t in self._df["發生時間"]]
-        self._longitudes = self._df["經度"]
         self._latitudes = self._df["緯度"]
+        self._longitudes = self._df["經度"]
         self._casualties = self._df["死亡受傷人數"]
         self._fatalities = [int(c[2]) for c in self._casualties]
         self._injuries = [int(c[-1]) for c in self._casualties]
         self._location = self._df["發生地點"]
-        self._administrative_area_level_1 = [loc[:3] for loc in self._location]
-        self._administrative_area_level_2 = [loc[3:6] for loc in self._location]
+        self._area_1 = [loc[:3] for loc in self._location]
+        self._area_2 = [loc[3:6] for loc in self._location]
         # Check if the third character of the string is not one of "鄉", "鎮", "市", or "區"
-        for i in range(len(self._administrative_area_level_2)):
-            if self._administrative_area_level_2[i][2] not in "鄉鎮市區":
+        for i in range(len(self._area_2)):
+            if self._area_2[i][2] not in "鄉鎮市區":
                 # If the condition is met, truncate the string to the first two characters
-                self._administrative_area_level_2[i] = self._administrative_area_level_2[i][:2]
+                self._area_2[i] = self._area_2[i][:2]
         self._includes_pedestrian = self._df["事故類型及型態大類別名稱"].str.contains('人')
         
         self._reorganize_data()
@@ -184,8 +184,8 @@ class CarAccident:
                     self._longitudes[i],
                     self._fatalities[i],
                     self._injuries[i],
-                    self._administrative_area_level_1[i],
-                    self._administrative_area_level_2[i],
+                    self._area_1[i],
+                    self._area_2[i],
                     self._includes_pedestrian[i]
                 ])
         self.data = pd.DataFrame(self._data, columns=[
@@ -195,8 +195,8 @@ class CarAccident:
             "longitude",
             "fatality",
             "injury",
-            "administrative_area_level_1",
-            "administrative_area_level_2",
+            "area_1",
+            "area_2",
             "includes_pedestrian"
         ])
         self._dates = self.data.iloc[:, 0]
@@ -205,8 +205,8 @@ class CarAccident:
         self._longitudes = self.data.iloc[:, 3]
         self._fatalities = self.data.iloc[:, 4]
         self._injuries = self.data.iloc[:, 5]
-        self._administrative_area_level_1s = self.data.iloc[:, 6]
-        self._administrative_area_level_2s = self.data.iloc[:, 7]
+        self._area_1s = self.data.iloc[:, 6]
+        self._area_2s = self.data.iloc[:, 7]
         self._includes_pedestrian = self.data.iloc[:, 8]
 
     def date(self, id=None):
@@ -245,24 +245,128 @@ class CarAccident:
         else:
             return self._injuries
 
-    def administrative_area_level_1(self, id=None):
+    def area_1(self, id=None):
         if id is not None:
-            return self._administrative_area_level_1s[id]
+            return self._area_1s[id]
         else:
-            return self._administrative_area_level_1s
+            return self._area_1s
 
-    def administrative_area_level_2(self, id=None):
+    def area_2(self, id=None):
         if id is not None:
-            return self._administrative_area_level_2s[id]
+            return self._area_2s[id]
         else:
-            return self._administrative_area_level_2s
+            return self._area_2s
     
     def includes_pedestrian(self, id=None):
         if id is not None:
             return self._includes_pedestrian[id]
         else:
             return self._includes_pedestrian
+
+class Earthquake:
+    def __init__(self, year):
+        self._year = year
+        self._df = pd.read_csv(f".\data\earthquakes\earthquake_{self._year}年.csv", engine='python', encoding="big5")
+        self._get_data()
+        self._reorganize_data()
+        
+    def _get_data(self):
+        self._dates = [datetime.strptime(d, "%Y-%m-%d") for d in self._df["Date"]]
+        if self._year == datetime.now().year:
+            self.size = 0
+            for date in self._dates:
+                if date.month == datetime.now().month:
+                    self._dates = self._dates[:self.size]
+                    break
+                self.size += 1
+        else:
+            self.size = len(self._df)
+        
+        self._times = [datetime.strptime(t, "%H:%M:%S").time() for t in self._df["Time"]][:self.size]
+        self._latitudes = self._df["北緯"][:self.size]
+        self._longitudes = self._df["東經"][:self.size]
+        self._magnitudes = self._df["芮氏規模"][:self.size]
+        self._depths = self._df["深度"][:self.size]
+        self._areas = self._df["城市"][:self.size]
+        self._intensities = self._df["震度"][:self.size]
+        for i in range(self.size):
+            if len(self._intensities[i]) != 1:
+                self._intensities[i] = self._intensities[i].replace(" ", "")
+            else:
+                self._intensities[i] += "級"
                 
+    def _reorganize_data(self):
+        data = []
+        for i in range(self.size):
+            data.append([
+                self._dates[i],
+                self._times[i],
+                self._latitudes[i],
+                self._longitudes[i],
+                self._magnitudes[i],
+                self._depths[i],
+                self._areas[i],
+                self._intensities[i]
+            ])
+        self.data = pd.DataFrame(data, columns=[
+            "date",
+            "time",
+            "latitude",
+            "longitude",
+            "magnitude",
+            "depth",
+            "area",
+            "intensity"
+        ])
+
+    def date(self, id=None):
+        if id is None:
+            return self._dates
+        else:
+            return self._dates[id]
+
+    def time(self, id=None):
+        if id is None:
+            return self._times
+        else:
+            return self._times[id]
+        
+    def latitude(self, id=None):
+        if id is None:
+            return self._latitudes
+        else:
+            return self._latitudes[id]
+        
+    def longitude(self, id=None):
+        if id is None:
+            return self._longitudes
+        else:
+            return self._longitudes[id]
+
+    def magnitude(self, id=None):
+        if id is None:
+            return self._magnitudes
+        else:
+            return self._magnitudes[id]
+        
+    def depth(self, id=None):
+        if id is None:
+            return self._depths
+        else:
+            return self._depths[id]
+        
+    def area(self, id=None):
+        if id is None:
+            return self._areas
+        else:
+            return self._areas[id]
+
+    def intensity(self, id=None):
+        if id is None:
+            return self._intensities
+        else:
+            return self._intensities[id]
+
 class SQLController:
     """This class is used to control 'db.sqlites' by using sqlite3 module."""
     
@@ -346,7 +450,7 @@ class PedestrianHellSQLController(SQLController):
         self.table_name = "risk_pedestrian_hell"
         super().__init__(self.table_name)
 
-    def new(self, administrative_area_level_1, administrative_area_level_2, 
+    def new(self, area_1, area_2, 
             fatality, injury, includes_pedestrian):
         total_fatality = fatality
         total_injury = injury
@@ -356,8 +460,8 @@ class PedestrianHellSQLController(SQLController):
         else:
             pedestrian_fatality = pedestrian_injury = 0
             
-        self.existing_id = self.administrative_area_id(administrative_area_level_1, 
-                                                       administrative_area_level_2)
+        self.existing_id = self.administrative_area_id(area_1, 
+                                                       area_2)
         if self.existing_id:
             number = self.select(self.existing_id, "number") + 1
             total_fatality += self.select(self.existing_id, "total_fatality")
@@ -373,23 +477,82 @@ class PedestrianHellSQLController(SQLController):
             self.cursor.execute(sql)
         else:
             sql = f"""INSERT INTO {self.table_name} (
-                    administrative_area_level_1, 
-                    administrative_area_level_2, 
+                    area_1, 
+                    area_2, 
                     number, 
                     total_fatality, 
                     total_injury, 
                     pedestrian_fatality, 
                     pedestrian_injury) VALUES (?, ?, ?, ?, ?, ?, ?)"""
-            self.cursor.execute(sql, (administrative_area_level_1, 
-                                      administrative_area_level_2, 
+            self.cursor.execute(sql, (area_1, 
+                                      area_2, 
                                       1, total_fatality, total_injury,
                                       pedestrian_fatality, pedestrian_injury))
         self.conn.commit()
     
-    def administrative_area_id(self, administrative_area_level_1, administrative_area_level_2):
+    def administrative_area_id(self, area_1, area_2):
         sql = f"""SELECT * FROM {self.table_name} 
-                    WHERE administrative_area_level_1 = '{administrative_area_level_1}' 
-                    AND administrative_area_level_2 = '{administrative_area_level_2}'"""
+                    WHERE area_1 = '{area_1}' 
+                    AND area_2 = '{area_2}'"""
+        self.cursor.execute(sql)
+        data = self.cursor.fetchone()
+        if data:
+            return data[0]
+        else:
+            return None
+
+class EarthquakeSQLController(SQLController):
+    def __init__(self):
+        self.table_name = "risk_earthquake"
+        super().__init__(self.table_name)
+
+    def new(self, date, time, latitude, longitude, magnitude, depth):
+        sql = f"""INSERT INTO {self.table_name} (
+                date, time, latitude, longitude, 
+                magnitude, depth) VALUES (?, ?, ?, ?, ?, ?, ?)"""
+        self.cursor.execute(sql, (date, time, latitude, longitude, magnitude, depth))
+        self.conn.commit()
+
+class EarthquakeIntensitySQLController(SQLController):
+    def __init__(self):
+        self.table_name = "risk_earthquake_intensity"
+        super().__init__(self.table_name)
+
+    def new(self, area, intensity):
+        self.existing_id = self.administrative_area_id(area_1, 
+                                                       area_2)
+        if self.existing_id:
+            number = self.select(self.existing_id, "number") + 1
+            total_fatality += self.select(self.existing_id, "total_fatality")
+            total_injury += self.select(self.existing_id, "total_injury")
+            pedestrian_fatality += self.select(self.existing_id, "pedestrian_fatality")
+            pedestrian_injury += self.select(self.existing_id, "pedestrian_injury")
+            sql = f"""UPDATE {self.table_name} 
+                    SET number = {number}, 
+                    total_fatality = {total_fatality}, 
+                    total_injury = {total_injury},
+                    pedestrian_fatality = {pedestrian_fatality}, 
+                    pedestrian_injury = {pedestrian_injury} WHERE id = {self.existing_id}"""
+            self.cursor.execute(sql)
+        else:
+            sql = f"""INSERT INTO {self.table_name} (
+                    area_1, 
+                    area_2, 
+                    number, 
+                    total_fatality, 
+                    total_injury, 
+                    pedestrian_fatality, 
+                    pedestrian_injury) VALUES (?, ?, ?, ?, ?, ?, ?)"""
+            self.cursor.execute(sql, (area_1, 
+                                      area_2, 
+                                      1, total_fatality, total_injury,
+                                      pedestrian_fatality, pedestrian_injury))
+        self.conn.commit()
+    
+    def administrative_area_id(self, area_1, area_2):
+        sql = f"""SELECT * FROM {self.table_name} 
+                    WHERE area_1 = '{area_1}' 
+                    AND area_2 = '{area_2}'"""
         self.cursor.execute(sql)
         data = self.cursor.fetchone()
         if data:
@@ -408,11 +571,11 @@ class UpdateTrafficAccidentData:
         self.tracking_path = r".\data\tracking.json"
         with open(self.tracking_path) as file:
             self.tracking_data = json.load(file)
-            self.starting_year = self.tracking_data["car_accident"]["starting_year"]
-            self.ending_year = self.tracking_data["car_accident"]["ending_year"]
-            self.tracking_year = self.tracking_data["car_accident_density"]["tracking_year"]
-            self.tracking_month = self.tracking_data["car_accident_density"]["tracking_month"]
-            self.tracking_rank = self.tracking_data["car_accident_density"]["tracking_rank"]
+            self.starting_year = self.tracking_data["car_accident_csv"]["starting_year"]
+            self.ending_year = self.tracking_data["car_accident_csv"]["ending_year"]
+            self.tracking_year = self.tracking_data["traffic_accident"]["tracking_year"]
+            self.tracking_month = self.tracking_data["traffic_accident"]["tracking_month"]
+            self.tracking_rank = self.tracking_data["traffic_accident"]["tracking_rank"]
     
     def initialize_range(self):
         if not self.tracking_year:
@@ -449,20 +612,20 @@ class UpdateTrafficAccidentData:
             longitude = self.accident.longitude(i)
             fatality = self.accident.fatality(i)
             injury = self.accident.injury(i)
-            area_level_1 = self.accident.administrative_area_level_1(i)
-            area_level_2 = self.accident.administrative_area_level_2(i)
+            area_1 = self.accident.area_1(i)
+            area_2 = self.accident.area_2(i)
             includes_pedestrian = self.accident.includes_pedestrian(i)
             self.traffic_controller.new(latitude, longitude, 
                                         fatality, injury, includes_pedestrian)
-            self.ped_hell_controller.new(area_level_1, area_level_2, 
+            self.ped_hell_controller.new(area_1, area_2, 
                                          fatality, injury, includes_pedestrian)
         self.traffic_controller.close()
         self.ped_hell_controller.close()
         
     def update_tracking_data(self):
-        self.tracking_data["car_accident_density"]["tracking_year"] = self.tracking_year
-        self.tracking_data["car_accident_density"]["tracking_month"] = self.tracking_month
-        self.tracking_data["car_accident_density"]["tracking_rank"] = self.tracking_rank
+        self.tracking_data["traffic_accident"]["tracking_year"] = self.tracking_year
+        self.tracking_data["traffic_accident"]["tracking_month"] = self.tracking_month
+        self.tracking_data["traffic_accident"]["tracking_rank"] = self.tracking_rank
         with open(self.tracking_path, 'w') as file:
             json.dump(self.tracking_data, file)
         
@@ -475,21 +638,19 @@ def test_CarAccident():
     # print(accident.longitude())
     # print(accident.fatality())
     # print(accident.injury())
-    # print(accident.administrative_area_level_1())
-    print(accident.administrative_area_level_2())
+    # print(accident.area_1())
+    # print(accident.area_2())
     # print(accident.includes_pedestrian())
     # print(accident.includes_pedestrian().sum())
-    # data_id = 1
+    data_id = 1
     # print(accident.date(data_id))
     # print(accident.time(data_id))
     # print(accident.latitude(data_id))
     # print(accident.longitude(data_id))
     # print(accident.fatality(data_id))
     # print(accident.injury(data_id))
-    # print(accident.administrative_area_level_1(data_id))
-    # print(accident.administrative_area_level_2(data_id))
-    # for i in range(200):
-    #     print(accident.administrative_area_level_2(i))
+    # print(accident.area_1(data_id))
+    print(accident.area_2(data_id))
 
 def test_SQLController():
     controller = TrafficAccidentSQLController()

@@ -13,46 +13,47 @@ class Earthquake(models.Model):
         db_table = "risk_earthquake"
 
     def __str__(self):
-        return f"{self.date} {self.time} - ({self.latitude}, {self.longitude}) - {self.magnitude}"
+        return f"{self.date} {self.time} - Magnitude: {self.magnitude} in ({self.latitude}, {self.longitude})"
 
-class Intensity(models.Model):
-    earthquake = models.ForeignKey("Earthquake", on_delete=models.CASCADE, db_constraint=False)
+class EarthquakeIntensity(models.Model):
+    area = models.TextField(max_length=5)
+    number = models.IntegerField()
     intensity = models.TextField(max_length=3)
-    administrative_area_level_1 = models.TextField(max_length=10)
+    pgv_lower = models.DecimalField(max_digits=8, decimal_places=5)
 
     class Meta:
         db_table = "risk_earthquake_intensity"
 
     def __str__(self):
-        return f"{self.administrative_area_level_1} - {self.intensity}"
+        return f"{self.area} - Average Intensity: {self.intensity}"
 
-class CarAccident(models.Model):
-    date = models.DateField()
-    time = models.TimeField()
-    latitude = models.DecimalField(max_digits=8, decimal_places=5)
-    longitude = models.DecimalField(max_digits=8, decimal_places=5)
-    fatality = models.IntegerField()
-    injury = models.IntegerField()
-    administrative_area_level_1 = models.TextField(max_length=10)
-    administrative_area_level_2 = models.TextField(max_length=10)
+# class CarAccident(models.Model):
+#     date = models.DateField()
+#     time = models.TimeField()
+#     latitude = models.DecimalField(max_digits=8, decimal_places=5)
+#     longitude = models.DecimalField(max_digits=8, decimal_places=5)
+#     fatality = models.IntegerField()
+#     injury = models.IntegerField()
+#     area_1 = models.TextField(max_length=10)
+#     area_2 = models.TextField(max_length=10)
 
-    class Meta:
-        db_table = "risk_car_accident"
+#     class Meta:
+#         db_table = "risk_car_accident"
 
-    def __str__(self):
-        return f"({self.latitude}, {self.longitude}) Fatality: {self.fatality}, Injure: {self.injury}"
+#     def __str__(self):
+#         return f"({self.latitude}, {self.longitude}) Fatality: {self.fatality}, Injure: {self.injury}"
 
-class CarAccidentDensity(models.Model):
-    latitude = models.DecimalField(max_digits=8, decimal_places=5)
-    longitude = models.DecimalField(max_digits=8, decimal_places=5)
-    total_fatality = models.IntegerField()
-    total_injury = models.IntegerField()
+# class CarAccidentDensity(models.Model):
+#     latitude = models.DecimalField(max_digits=8, decimal_places=5)
+#     longitude = models.DecimalField(max_digits=8, decimal_places=5)
+#     total_fatality = models.IntegerField()
+#     total_injury = models.IntegerField()
 
-    class Meta:
-        db_table = "risk_car_accident_density"
+#     class Meta:
+#         db_table = "risk_car_accident_density"
 
-    def __str__(self):
-        return f"({self.latitude}, {self.longitude}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injury}"
+#     def __str__(self):
+#         return f"({self.latitude}, {self.longitude}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injury}"
 
 class TrafficAccident(models.Model):
     latitude = models.DecimalField(max_digits=10, decimal_places=6)
@@ -67,13 +68,13 @@ class TrafficAccident(models.Model):
         db_table = "risk_traffic_accident"
 
     def __str__(self):
-        return f"""({self.latitude}, {self.longitude}) 
-                    Total Fatality: {self.total_fatality}, 
+        return f"""Traffic Accident in ({self.latitude}, {self.longitude}) -
+                    Total Fatality: {self.total_fatality},
                     Total Injure: {self.total_injury}"""
 
 class PedestrianHell(models.Model):
-    administrative_area_level_1 = models.TextField(max_length=5)
-    administrative_area_level_2 = models.TextField(max_length=10)
+    area_1 = models.TextField(max_length=5)
+    area_2 = models.TextField(max_length=10)
     number = models.IntegerField()
     total_fatality = models.IntegerField()
     total_injury = models.IntegerField()
@@ -84,8 +85,8 @@ class PedestrianHell(models.Model):
         db_table = "risk_pedestrian_hell"
 
     def __str__(self):
-        return f"""{self.administrative_area_level_1} {self.administrative_area_level_2} 
-                    Pedestrian Fatality: {self.pedestrian_fatality}, 
+        return f"""{self.area_1} {self.area_2} -
+                    Pedestrian Fatality: {self.pedestrian_fatality},
                     Pedestrian Total Injure: {self.pedestrian_injury}"""
 
 class UserInfo(models.Model):
