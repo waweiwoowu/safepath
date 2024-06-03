@@ -7,13 +7,13 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ### runserver
-# from explorer.test_data import *
-# from explorer._database import Coordinate
-# PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
+from explorer.test_data import *
+from explorer._database import Coordinate
+PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 
 ### run python file
-from test_data import *
-from _database import Coordinate
+# from test_data import *
+# from _database import Coordinate
 PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]

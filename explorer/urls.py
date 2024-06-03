@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^signup/', views.signup, name="signup"),
     url(r'^verify/', views.verify, name="verify"),
     url(r'^home/', views.home, name='home'),
+    url(r'^travel/', views.travel, name='travel'),
 ]
