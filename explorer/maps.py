@@ -98,7 +98,8 @@ class Direction():
             self.data = _GoogleMap.gmaps.directions(origin, destination, )[0]
         else:
             self.data = DIRECTIONS[0]
-        self.car_accident = _DirectionCarAccidentData(self.coordinates)
+        self.traffic_accident = _DirectionTrafficAccidentData(self.coordinates)
+        # self.car_accident = _DirectionCarAccidentData(self.coordinates)
         self.earthquake = _DirectionEarthquakeData(self.coordinates)
 
     @property
@@ -122,6 +123,26 @@ class Direction():
         for step in self.data['legs'][0]['steps']:
             route_instructions.append(step['html_instructions'])
         return route_instructions
+
+class _DirectionTrafficAccidentData():
+    def __init__(self, coordinates):
+        self.coordinates = coordinates
+
+    @property
+    async def fatality(self):
+        fatality = 0
+        for coordinate in self.coordinates:
+            coord = Coordinate(coordinate)
+            fatality += await coord.fatality
+        return fatality
+
+    @property
+    async def injury(self):
+        injury = 0
+        for coordinate in self.coordinates:
+            coord = Coordinate(coordinate)
+            injury += await coord.injury
+        return injury
 
 class _DirectionCarAccidentData():
     def __init__(self, coordinates):
