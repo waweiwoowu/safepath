@@ -28,7 +28,12 @@ class Earthquake:
         self._depths = self._df["深度"][:self.size]
         self._cities = self._df["城市"][:self.size]
         self._intensities = self._df["震度"][:self.size]
-        
+        for i in range(self.size):
+            if len(self._intensities[i]) != 1:
+                self._intensities[i] = self._intensities[i].replace(" ", "")
+            else:
+                self._intensities[i] += "級"
+                
     def _reorganize_data(self):
         data = []
         for i in range(self.size):
@@ -99,16 +104,16 @@ class Earthquake:
         if id is None:
             return self._intensities
         else:
-            return self._intensities[id]+"級"
+            return self._intensities[id]
         
 
 if __name__ == "__main__":
-    year = 2023
+    year = 2024
     earthquake = Earthquake(year)
-    data = earthquake.data
-    print(data)
+    # data = earthquake.data
+    # print(data)
     # for in_id in range(len(earthquake.date())):
-    #     print(earthquake.date(in_id))
+        # print(earthquake.date(in_id))
         # print(earthquake.time(in_id))
         # print(earthquake.latitude(in_id))
         # print(earthquake.longitude(in_id))
