@@ -7,7 +7,7 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}">
     <script src="{% static 'js/map.js' %}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFzApqD1tGY615APaue-nIwjC6Lx5pOp0&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=___Your__API__Key__Here___&callback=initMap" async defer></script>
 
 </head>
 <body>
@@ -22,6 +22,7 @@
         </form>
     </div>
     <br>
+    <!--
     <p>AAA</p>
     {% if start %}
         <p>Start: {{ start }}</p>
@@ -29,6 +30,7 @@
     {% if destination %}
         <p>Destination: {{ destination }}</p>
     {% endif %}
+    -->
     <div class="container">
         <div class="left">
             <div id="map" style="height: 100%; width: 100%;"></div>
