@@ -152,10 +152,15 @@ class CarAccident:
         self._location = self._df["發生地點"]
         self._administrative_area_level_1 = [loc[:3] for loc in self._location]
         self._administrative_area_level_2 = [loc[3:6] for loc in self._location]
+        # Check if the third character of the string is not one of "鄉", "鎮", "市", or "區"
+        for i in range(len(self._administrative_area_level_2)):
+            if self._administrative_area_level_2[i][2] not in "鄉鎮市區":
+                # If the condition is met, truncate the string to the first two characters
+                self._administrative_area_level_2[i] = self._administrative_area_level_2[i][:2]
         self._includes_pedestrian = self._df["事故類型及型態大類別名稱"].str.contains('人')
         
         self._reorganize_data()
-
+        
     def _reorganize_data(self):
         """This method is used to take out the duplicated data"""
         
@@ -454,18 +459,20 @@ def test_CarAccident():
     # print(accident.fatality())
     # print(accident.injury())
     # print(accident.administrative_area_level_1())
-    # print(accident.administrative_area_level_2())
-    print(accident.includes_pedestrian())
-    print(accident.includes_pedestrian().sum())
-    data_id = 1
-    print(accident.date(data_id))
-    print(accident.time(data_id))
-    print(accident.latitude(data_id))
-    print(accident.longitude(data_id))
-    print(accident.fatality(data_id))
-    print(accident.injury(data_id))
-    print(accident.administrative_area_level_1(data_id))
-    print(accident.administrative_area_level_2(data_id))
+    print(accident.administrative_area_level_2())
+    # print(accident.includes_pedestrian())
+    # print(accident.includes_pedestrian().sum())
+    # data_id = 1
+    # print(accident.date(data_id))
+    # print(accident.time(data_id))
+    # print(accident.latitude(data_id))
+    # print(accident.longitude(data_id))
+    # print(accident.fatality(data_id))
+    # print(accident.injury(data_id))
+    # print(accident.administrative_area_level_1(data_id))
+    # print(accident.administrative_area_level_2(data_id))
+    # for i in range(200):
+    #     print(accident.administrative_area_level_2(i))
 
 def test_SQLController():
     controller = TrafficAccidentSQLController()
@@ -483,7 +490,7 @@ def test_SQLController():
 
 
 if __name__ == "__main__":
-    # test_CarAccident()
+    test_CarAccident()
     # test_SQLController()
     pass
     

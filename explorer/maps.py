@@ -60,7 +60,7 @@ class Coordinates():
     def __init__(self, coordinates):
         self.coordinates = coordinates
         self.grid = []
-        for coordinate in coordinates:
+        for coordinate in self.coordinates:
             coord = Coordinate(coordinate)
             self.grid.append((coord.latitude_grid, coord.longitude_grid))
         self.grid = list(set(self.grid))
