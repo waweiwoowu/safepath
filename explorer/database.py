@@ -417,14 +417,13 @@ class UpdateTrafficAccidentData:
                 self.tracking_month += 1
 
     def update_data(self):
-        # print("Collecting data...")
         self.accident = CarAccident(year=self.tracking_year, 
                                     month=self.tracking_month, 
                                     rank=self.tracking_rank)
-        # print("Starting Adding data...")
         self.traffic_controller = TrafficAccidentSQLController()
         self.ped_hell_controller = PedestrianHellSQLController()
-        for i in range(len(self.accident.data)):
+        self.number_of_data = len(self.accident.data)
+        for i in range(self.number_of_data):
             latitude = self.accident.latitude(i)
             longitude = self.accident.longitude(i)
             fatality = self.accident.fatality(i)
@@ -435,11 +434,8 @@ class UpdateTrafficAccidentData:
             self.traffic_controller.new(latitude, longitude, fatality, injury)
             self.ped_hell_controller.new(area_level_1, area_level_2, 
                                          fatality, injury, includes_pedestrian)
-            # print(f"Added: {i}")
         self.traffic_controller.close()
         self.ped_hell_controller.close()
-        # print("Finished!")
-        print(f"Adding {len(self.accident.data)} data successfully!")
         
     def update_tracking_data(self):
         self.tracking_data["car_accident_density"]["tracking_year"] = self.tracking_year
