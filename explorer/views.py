@@ -2,24 +2,30 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import UserInfo
 from django.core.mail import send_mail
+from asgiref.sync import sync_to_async
 import random
+from .maps import Direction
 
 def signin(request):
     if request.method == "GET":
         return render(request, "signin.html", {})
     else:
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        if not username or not password:
+            return render(request, "signin.html", {"error": "Username and password are required."})
+
         try:
             user = UserInfo.objects.get(username=username)
         except UserInfo.DoesNotExist:
             # Username does not exist
-            return render(request, "signin.html")
+            return render(request, "signin.html", {"error": "Invalid username or password."})
 
         if user.password == password:
-            return render(request, "home.html", {"username": username})
+            return redirect('/explorer/home/')
         else:
-            return render(request, "signin.html")
+            return redirect('/explorer/signin/')
 
 def signup(request):
     if request.method == "GET":
@@ -64,3 +70,51 @@ def verify(request):
             return redirect('signin')
         except:
             return HttpResponse("Failed")
+
+async def home(request):
+    if request.method == 'POST':
+        start = request.POST.get('start', '')
+        destination = request.POST.get('destination', '')
+
+        # Assuming `Direction` class methods are synchronous
+        direction = Direction()
+        # or Direction(start, destination) if you need to pass arguments
+        # direction = Direction(origin=start, destination=destination)
+
+        coordinates = direction.coordinates
+        # fatality = await direction.car_accident.fatality
+        # injury = await direction.car_accident.injury
+
+        return render(request, 'home.html', {
+            'start': start,
+            'destination': destination,
+            'coordinates': coordinates
+        })
+    else:
+        return render(request, 'home.html', {})
+
+
+
+
+# from django.http import JsonResponse
+# import json
+
+# def home(request):
+#     if request.method == 'POST' and request.is_ajax():
+#         data = json.loads(request.body)
+#         start = data.get('start')
+#         destination = data.get('destination')
+
+#         # Do whatever processing you need with start and destination here
+#         # For example, you can pass them to Direction class and get coordinates
+
+#         coordinates = []  # Assuming you get coordinates somehow
+#         return JsonResponse({
+#             'start': start,
+#             'destination': destination,
+#             'coordinates': coordinates
+#         })
+#     else:
+#         return render(request, 'home.html', {})
+
+
