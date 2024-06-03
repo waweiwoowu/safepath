@@ -1,7 +1,6 @@
 import json
 import math
 import sqlite3
-import time
 import pandas as pd
 from datetime import datetime
 
@@ -9,6 +8,11 @@ from datetime import datetime
 DEGREE_DIFFERENCE = 0.0001
 
 def rounding(degree, difference=DEGREE_DIFFERENCE):
+    """This method is used to determine rounded values of degrees of latitudes
+        or longitudes based on degrees of latitude difference and longitude
+        difference, respectively. By default, both latitude and longitude are
+        calculated by a constant 'DEGREE_DIFFERENCE' in a value of 0.0001."""
+        
     power = math.log10(difference)
     if power > 0:
         return round(float(degree) / difference) * difference
@@ -17,17 +21,23 @@ def rounding(degree, difference=DEGREE_DIFFERENCE):
         return round(round(float(degree) / difference) * difference, decimal_place)
 
 class InvalidCoordinateError(Exception):
-    def __init__(self, message="Invalid coordinate. Must provide either a single iterable or separate latitude and longitude values."):
+    def __init__(self, message="""Invalid coordinate. Must provide either a single 
+                                 iterable or separate latitude and longitude values."""):
         self.message = message
         super().__init__(self.message)
 
 class Coordinate:
     def __init__(self, *coordinate) -> None:
-        """This class is mainly used to determine the round of the coordinate in specific degree difference
-        Both Coordinate(25.2525, 123.456) and Coordinate((25.2525, 123.456)) are available"""
+        """This class is mainly used to determine rounded values of coordinates 
+            in specific degree difference
+            
+        :param *coordinate: The latitude value and the longitude value.
+        :type *coordinate: two float numbers or a tuple (25.2525, 123.456)."""
+        
         if len(coordinate) == 1:
             if len(coordinate[0]) != 2:
-                raise InvalidCoordinateError("Invalid coordinate format. Must provide latitude and longitude values.")
+                message = "Invalid coordinate format. Must provide latitude and longitude values."
+                raise InvalidCoordinateError(message)
             self.latitude = coordinate[0][0]
             self.longitude = coordinate[0][1]
         elif len(coordinate) == 2:
@@ -37,14 +47,14 @@ class Coordinate:
             raise InvalidCoordinateError()
 
         if abs(self.latitude) > 90:
-            raise InvalidCoordinateError("Invalid latitude value. Must between -90 and 90 degrees.")
+            message = "Invalid latitude value. Must between -90 and 90 degrees."
+            raise InvalidCoordinateError(message)
         if abs(self.longitude) > 180:
-            raise InvalidCoordinateError("Invalid latitude value. Must between -180 and 180 degrees.")
+            message = "Invalid latitude value. Must between -180 and 180 degrees."
+            raise InvalidCoordinateError(message)
 
         self.latitude_grid = rounding(self.latitude)
         self.longitude_grid = rounding(self.longitude)
-        self.car_accident_data = None
-        # self.earthquake = EarthquakeData(self.latitude, self.longitude)
 
 class InvalidCarAccidentError(Exception):
     def __init__(self, message="Invalid."):
@@ -52,8 +62,20 @@ class InvalidCarAccidentError(Exception):
         super().__init__(self.message)
 
 class CarAccident:
-    """This class is used to read data from car accident csv files."""
     def __init__(self, year, month=None, rank=2):
+        """This class is used to get data from car accident csv files.
+        
+        :param year: The year value of Republic of China.
+        :type year: int
+        
+        :param month: The month value.
+        :type month: int
+        
+        :param rank: The type of rank value of a car accident. There are three
+            types of car accidents: A1, A2, and A3. Currently, A3-type data is 
+            not supported.
+        :type rank: int or string"""
+        
         self._year = year
         self._month = month
         self._rank = rank
@@ -63,18 +85,24 @@ class CarAccident:
         self._get_data()
 
     def _is_arg_valid(self):
+        """This method is used to determine if the auguments are valid."""
+        
         path = r".\data\tracking.json"
         with open(path) as file:
             data = json.load(file)
             starting_year = data["car_accident"]["starting_year"]
             ending_year = data["car_accident"]["ending_year"]
         if (type(self._year) != int or (self._year < starting_year or self._year > ending_year)):
-            raise InvalidCarAccidentError(f"Invalid year. Must be an integer between {starting_year} and {ending_year} (including).")
+            message = f"Invalid year. Must be an integer between {starting_year} and {ending_year} (including)."
+            raise InvalidCarAccidentError(message)
         if self._month:
             if type(self._month) != int or (self._month < 1 or self._month > 12):
-                raise InvalidCarAccidentError("Invalid mouth. Must be an integer between 1 and 12 (including).")
+                message = "Invalid mouth. Must be an integer between 1 and 12 (including)."
+                raise InvalidCarAccidentError(message)
 
     def _read_csv_file(self):
+        """This method is used to read and get data from the csv files."""
+        
         dtype_mapping = {
             "發生日期": str,
             "發生時間": str,
@@ -85,7 +113,8 @@ class CarAccident:
             "事故類型": str
         }
         if self._rank == 1 or self._rank == '1' or self._rank == "A1" or self._rank == "a1":
-            self._df = pd.read_csv(f"./data/accidents/{self._year}/{self._year}年度A1交通事故資料.csv")
+            path = f"./data/accidents/{self._year}/{self._year}年度A1交通事故資料.csv"
+            self._df = pd.read_csv(path)
             self._df = self._df[:-2]
             # if self._month:
             #     self._df['發生日期'] = self._df['發生日期'].astype(int)
@@ -98,16 +127,21 @@ class CarAccident:
         elif self._rank == 2 or self._rank == '2' or self._rank == "A2" or self._rank == "a2":
             if not self._month:
                 for m in range(1, 13):
-                    monthly_data = pd.read_csv(f"./data/accidents/{self._year}/{self._year}年度A2交通事故資料_{m}.csv", dtype=dtype_mapping, low_memory=False)
+                    path = f"./data/accidents/{self._year}/{self._year}年度A2交通事故資料_{m}.csv"
+                    monthly_data = pd.read_csv(path, dtype=dtype_mapping, low_memory=False)
                     monthly_data = monthly_data[:-2]
                     self._df = pd.concat([self._df, monthly_data], ignore_index=True)
             else:
-                self._df = pd.read_csv(f"./data/accidents/{self._year}/{self._year}年度A2交通事故資料_{self._month}.csv", dtype=dtype_mapping, low_memory=False)
+                path = f"./data/accidents/{self._year}/{self._year}年度A2交通事故資料_{self._month}.csv"
+                self._df = pd.read_csv(path, dtype=dtype_mapping, low_memory=False)
                 self._df = self._df[:-2]
         else:
-            raise InvalidCarAccidentError("Invalid rank. Must be either 1, '1', 'A1', 'a1', or 2, '2', 'A2', 'a2'.")
+            message = "Invalid rank. Must be either 1, '1', 'A1', 'a1', or 2, '2', 'A2', 'a2'."
+            raise InvalidCarAccidentError(message)
 
     def _get_data(self):
+        """This method is used to take the data of interest"""
+        
         self._dates = [datetime.strptime(str(int(d)), "%Y%m%d").strftime("%Y-%m-%d") for d in self._df["發生日期"]]
         self._times = [datetime.strptime(str(int(t)).zfill(6), "%H%M%S").strftime("%H:%M:%S") for t in self._df["發生時間"]]
         self._longitudes = self._df["經度"]
@@ -123,6 +157,8 @@ class CarAccident:
         self._reorganize_data()
 
     def _reorganize_data(self):
+        """This method is used to take out the duplicated data"""
+        
         check = 0
         longitude_check = 0
         latitude_check = 0
@@ -221,26 +257,10 @@ class CarAccident:
             return self._includes_pedestrian[id]
         else:
             return self._includes_pedestrian
-
-class AllCarAccidentData:
-    def __init__(self, rank=2):
-        self._get_years()
-        self._rank = rank
-        self._get_data()
-        
-    def _get_years(self):
-        path = r".\data\tracking.json"
-        with open(path) as file:
-            data = json.load(file)
-            self._starting_year = data["car_accident"]["starting_year"]
-            self._ending_year = data["car_accident"]["ending_year"]
-            
-    def _get_data(self):
-        for year in range(self._starting_year, self._ending_year + 1):
-            for month in range(1, 13):
-                accident = CarAccident(year=year, month=month, rank=self._rank)
                 
 class SQLController:
+    """This class is used to control 'db.sqlites' by using sqlite3 module."""
+    
     PATH = r"..\.\db.sqlite3"
     def __init__(self, table_name):
         self.table_name = table_name
@@ -265,9 +285,9 @@ class SQLController:
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
-class TrafficAccidentsSQLController(SQLController):
+class TrafficAccidentSQLController(SQLController):
     def __init__(self):
-        self.table_name = "risk_traffic_accidents"
+        self.table_name = "risk_traffic_accident"
         super().__init__(self.table_name)
 
     def new(self, latitude, longitude, fatality, injury):
@@ -356,7 +376,7 @@ class PedestrianHellSQLController(SQLController):
         else:
             return None
 
-class UpdateTrafficAccidentsData:
+class UpdateTrafficAccidentData:
     def __init__(self):
         self.get_tracking_data()
         self.determine_range()
@@ -397,12 +417,12 @@ class UpdateTrafficAccidentsData:
                 self.tracking_month += 1
 
     def update_data(self):
-        print("Collecting data...")
+        # print("Collecting data...")
         self.accident = CarAccident(year=self.tracking_year, 
                                     month=self.tracking_month, 
                                     rank=self.tracking_rank)
-        print("Starting Adding data...")
-        self.traffic_controller = TrafficAccidentsSQLController()
+        # print("Starting Adding data...")
+        self.traffic_controller = TrafficAccidentSQLController()
         self.ped_hell_controller = PedestrianHellSQLController()
         for i in range(len(self.accident.data)):
             latitude = self.accident.latitude(i)
@@ -415,10 +435,11 @@ class UpdateTrafficAccidentsData:
             self.traffic_controller.new(latitude, longitude, fatality, injury)
             self.ped_hell_controller.new(area_level_1, area_level_2, 
                                          fatality, injury, includes_pedestrian)
-            print(f"Added: {i}")
+            # print(f"Added: {i}")
         self.traffic_controller.close()
         self.ped_hell_controller.close()
-        print("Finished!")
+        # print("Finished!")
+        print(f"Adding {len(self.accident.data)} data successfully!")
         
     def update_tracking_data(self):
         self.tracking_data["car_accident_density"]["tracking_year"] = self.tracking_year
@@ -451,11 +472,11 @@ def test_CarAccident():
     print(accident.administrative_area_level_2(data_id))
 
 def test_SQLController():
-    controller = TrafficAccidentsSQLController()
+    controller = TrafficAccidentSQLController()
     test_latitude = 24.4389
     test_longitude = 118.2497
-    # print(controller.coordinate_id(test_latitude, test_longitude))
-    # print(controller.coordinate_id(test_latitude+50, test_longitude))
+    print(controller.coordinate_id(test_latitude, test_longitude))
+    print(controller.coordinate_id(test_latitude+50, test_longitude))
     print(controller.select(50956, "total_injury"))
     # controller.new(test_latitude, test_longitude, 55, 66)
     # print(controller.select(50956))
@@ -464,15 +485,10 @@ def test_SQLController():
     # controller.new(test_latitude+50, test_longitude+20, 55, 123)
     controller.close()
 
-def test_UpdateTrafficAccidentsData():
-    UpdateTrafficAccidentsData()
 
 if __name__ == "__main__":
-    start_time = time.time()
     # test_CarAccident()
     # test_SQLController()
-    test_UpdateTrafficAccidentsData()
-    end_time = time.time()
-    execution_time = end_time - start_time
-    print(f"\nExecution time: {execution_time:.0f} seconds ({execution_time/60:.0f} minutes)")
+    pass
+    
 

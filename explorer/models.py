@@ -54,7 +54,7 @@ class CarAccidentDensity(models.Model):
     def __str__(self):
         return f"({self.latitude}, {self.longitude}) Total Fatality: {self.total_fatality}, Total Injure: {self.total_injury}"
 
-class TrafficAccidents(models.Model):
+class TrafficAccident(models.Model):
     latitude = models.DecimalField(max_digits=10, decimal_places=6)
     longitude = models.DecimalField(max_digits=10, decimal_places=6)
     number = models.IntegerField()
@@ -62,7 +62,7 @@ class TrafficAccidents(models.Model):
     injury = models.IntegerField()
 
     class Meta:
-        db_table = "risk_traffic_accidents"
+        db_table = "risk_traffic_accident"
 
     def __str__(self):
         return f"({self.latitude}, {self.longitude}) Fatality: {self.fatality}, Total Injure: {self.injury}"
