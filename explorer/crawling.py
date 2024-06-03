@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jun  3 12:02:08 2024
-
-@author: 恆慈
-"""
-
 import threading
 import os
 import requests
@@ -151,7 +144,7 @@ def read_csv(year):
         return None
     
 # 進入點,使用threading多工同時爬取每一年份之數據
-def main():
+def earthquake_crawling():
     years = years_range(input(eval("請輸入年份:")))
     last_year = max(years)
     existing_data = read_csv(last_year)
@@ -169,4 +162,4 @@ def main():
 
 # 測試環境，進入點為main()方法
 if __name__ == "__main__":
-    main()
+    earthquake_crawling()

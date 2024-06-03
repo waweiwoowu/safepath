@@ -144,8 +144,8 @@ class CarAccident:
         
         self._dates = [datetime.strptime(str(int(d)), "%Y%m%d").strftime("%Y-%m-%d") for d in self._df["發生日期"]]
         self._times = [datetime.strptime(str(int(t)).zfill(6), "%H%M%S").strftime("%H:%M:%S") for t in self._df["發生時間"]]
-        self._longitudes = self._df["經度"]
         self._latitudes = self._df["緯度"]
+        self._longitudes = self._df["經度"]
         self._casualties = self._df["死亡受傷人數"]
         self._fatalities = [int(c[2]) for c in self._casualties]
         self._injuries = [int(c[-1]) for c in self._casualties]
@@ -410,9 +410,9 @@ class UpdateTrafficAccidentData:
             self.tracking_data = json.load(file)
             self.starting_year = self.tracking_data["car_accident"]["starting_year"]
             self.ending_year = self.tracking_data["car_accident"]["ending_year"]
-            self.tracking_year = self.tracking_data["car_accident_density"]["tracking_year"]
-            self.tracking_month = self.tracking_data["car_accident_density"]["tracking_month"]
-            self.tracking_rank = self.tracking_data["car_accident_density"]["tracking_rank"]
+            self.tracking_year = self.tracking_data["traffic_accident"]["tracking_year"]
+            self.tracking_month = self.tracking_data["traffic_accident"]["tracking_month"]
+            self.tracking_rank = self.tracking_data["traffic_accident"]["tracking_rank"]
     
     def initialize_range(self):
         if not self.tracking_year:
@@ -460,9 +460,9 @@ class UpdateTrafficAccidentData:
         self.ped_hell_controller.close()
         
     def update_tracking_data(self):
-        self.tracking_data["car_accident_density"]["tracking_year"] = self.tracking_year
-        self.tracking_data["car_accident_density"]["tracking_month"] = self.tracking_month
-        self.tracking_data["car_accident_density"]["tracking_rank"] = self.tracking_rank
+        self.tracking_data["traffic_accident"]["tracking_year"] = self.tracking_year
+        self.tracking_data["traffic_accident"]["tracking_month"] = self.tracking_month
+        self.tracking_data["traffic_accident"]["tracking_rank"] = self.tracking_rank
         with open(self.tracking_path, 'w') as file:
             json.dump(self.tracking_data, file)
         

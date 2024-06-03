@@ -15,10 +15,13 @@ class Earthquake(models.Model):
     def __str__(self):
         return f"{self.date} {self.time} - ({self.latitude}, {self.longitude}) - {self.magnitude}"
 
-class Intensity(models.Model):
-    earthquake = models.ForeignKey("Earthquake", on_delete=models.CASCADE, db_constraint=False)
-    intensity = models.TextField(max_length=3)
-    administrative_area_level_1 = models.TextField(max_length=10)
+class EarthquakeIntensity(models.Model):
+    administrative_area_level_1 = models.TextField(max_length=5)
+    number = models.IntegerField()
+    avg_intensity = models.TextField(max_length=3)
+    
+    avg_pgv_lower = models.DecimalField(max_digits=8, decimal_places=5)
+    
 
     class Meta:
         db_table = "risk_earthquake_intensity"
