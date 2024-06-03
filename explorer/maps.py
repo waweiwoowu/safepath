@@ -162,23 +162,25 @@ class Geocode():
             self.data = _GoogleMap.gmaps.geocode(address)[0]
         self.postal_code = self.data["address_components"][-1]["long_name"]
         self.country = self.data["address_components"][-2]["long_name"]
-        self.city = self.data["address_components"][-3]["long_name"]
-        self.district = self.data["address_components"][-4]["long_name"]
+        self.administrative_area_level_1 = self.data["address_components"][-3]["long_name"]
+        self.administrative_area_level_2 = self.data["address_components"][-4]["long_name"]
         self.address = self.data["formatted_address"]
+        self.latitude = self.data["geometry"]["location"]["lat"]
+        self.longitude = self.data["geometry"]["location"]["lng"]
 
     @property
     def location(self):
-        self.lat = self.data["geometry"]["location"]["lat"]
-        self.lng = self.data["geometry"]["location"]["lng"]
-        return (self.lat, self.lng)
+        return (self.latitude, self.longitude)
 
 async def _main():
-    # geocode = Geocode()
-    # print(geocode.data)
-    # print(geocode.city)
-    # print(geocode.district)
-    # print(geocode.address)
-    # print(geocode.location)
+    geocode = Geocode()
+    print(geocode.data)
+    print(geocode.administrative_area_level_1)
+    print(geocode.administrative_area_level_2)
+    print(geocode.address)
+    print(geocode.location)
+    print(geocode.latitude)
+    print(geocode.longitude)
 
     # direction = Direction()
     # print(direction.overivew_coordinates)
