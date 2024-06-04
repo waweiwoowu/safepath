@@ -3,9 +3,10 @@ import math
 import sqlite3
 import pandas as pd
 from datetime import datetime
-
+import risk
 
 DEGREE_DIFFERENCE = 0.0001
+TRACKING_JSON_PATH = r".\data\tracking.json"
 
 def rounding(degree, difference=DEGREE_DIFFERENCE):
     """This method is used to determine rounded values of degrees of latitudes
@@ -56,8 +57,14 @@ class Coordinate:
         self.latitude_grid = rounding(self.latitude)
         self.longitude_grid = rounding(self.longitude)
 
-class InvalidCarAccidentError(Exception):
-    def __init__(self, message="Invalid."):
+def check_if_month_is_valid(month):
+    if month is not None:
+        if type(month) != int or (month < 1 or month > 12):
+            message = "Invalid mouth. Must be an integer between 1 and 12 (including)."
+            raise InvalidRangeError(message)
+
+class InvalidRangeError(Exception):
+    def __init__(self, message="Invalid range."):
         self.message = message
         super().__init__(self.message)
 
@@ -87,18 +94,14 @@ class CarAccident:
     def _is_arg_valid(self):
         """This method is used to determine if the auguments are valid."""
         
-        path = r".\data\tracking.json"
-        with open(path) as file:
+        with open(TRACKING_JSON_PATH) as file:
             data = json.load(file)
-            starting_year = data["car_accident_csv"]["starting_year"]
-            ending_year = data["car_accident_csv"]["ending_year"]
+            starting_year = data["csv"]["car_accident"]["starting_year"]
+            ending_year = data["csv"]["car_accident"]["ending_year"]
         if (type(self._year) != int or (self._year < starting_year or self._year > ending_year)):
             message = f"Invalid year. Must be an integer between {starting_year} and {ending_year} (including)."
-            raise InvalidCarAccidentError(message)
-        if self._month:
-            if type(self._month) != int or (self._month < 1 or self._month > 12):
-                message = "Invalid mouth. Must be an integer between 1 and 12 (including)."
-                raise InvalidCarAccidentError(message)
+            raise InvalidRangeError(message)
+        check_if_month_is_valid(self._month)
 
     def _read_csv_file(self):
         """This method is used to read and get data from the csv files."""
@@ -137,7 +140,7 @@ class CarAccident:
                 self._df = self._df[:-2]
         else:
             message = "Invalid rank. Must be either 1, '1', 'A1', 'a1', or 2, '2', 'A2', 'a2'."
-            raise InvalidCarAccidentError(message)
+            raise InvalidRangeError(message)
 
     def _get_data(self):
         """This method is used to take the data of interest"""
@@ -264,60 +267,91 @@ class CarAccident:
             return self._includes_pedestrian
 
 class Earthquake:
-    def __init__(self, year):
+    def __init__(self, year, starting_month=None, ending_month=None):
         self._year = year
-        self._df = pd.read_csv(f".\data\earthquakes\earthquake_{self._year}年.csv", engine='python', encoding="big5")
+        self._starting_momth = starting_month
+        self._ending_month = ending_month
+        self._get_range()
+        self._read_csv_file()
         self._get_data()
-        self._reorganize_data()
+    
+    def _get_range(self):
+        with open(TRACKING_JSON_PATH) as file:
+            tracking_data = json.load(file)
+            starting_year = tracking_data["csv"]["earthquake"]["starting_year"]
+        ending_year = datetime.now().year
+        if (type(self._year) != int or (self._year < starting_year or self._year > ending_year)):
+            message = f"Invalid year. Must be an integer between {starting_year} and {ending_year} (including)."
+            raise InvalidRangeError(message)
+        check_if_month_is_valid(self._starting_momth)
+        check_if_month_is_valid(self._ending_month)
+
+        # Initialize starting month
+        if not self._starting_momth:
+            self._starting_momth = 1
+        # Initialize ending month
+        if self._year == datetime.now().year:
+            if self._starting_momth >= datetime.now().month:
+                message = "Invalid range. Cannot find data in this range."
+                raise InvalidRangeError(message)
+            if not self._ending_month:
+                self._ending_month = datetime.now().month - 1
+                if self._ending_month == 0:
+                    message = "Invalid range. Cannot find data in this range."
+                    raise InvalidRangeError(message) 
+        else:
+            if not self._ending_month:
+                self._ending_month = 12
+        if self._starting_momth > self._ending_month:
+            message = "Invalid range. Parameter 'starting_month' must be equal to or smaller than 'ending_month'."
+            raise InvalidRangeError(message)
+
+    def _read_csv_file(self):
+        path = f".\data\earthquakes\earthquake_{self._year}年.csv"
+        dtype_mapping = {
+            "Date": str,
+            "Time": str,
+            "北緯": float,
+            "東經": float,
+            "芮氏規模": float,
+            "深度": float,
+            "城市": str,
+            "震度": str
+        }
+        self._df = pd.read_csv(path, engine='python', encoding="big5", dtype=dtype_mapping)
         
+
     def _get_data(self):
         self._dates = [datetime.strptime(d, "%Y-%m-%d") for d in self._df["Date"]]
-        if self._year == datetime.now().year:
-            self.size = 0
-            for date in self._dates:
-                if date.month == datetime.now().month:
-                    self._dates = self._dates[:self.size]
-                    break
-                self.size += 1
-        else:
-            self.size = len(self._df)
+        self.starting_index = self.ending_index = 0
+        starting_flag = True
+        for date in self._dates:
+            if starting_flag:
+                if date.month == self._starting_momth:
+                    starting_flag = False
+                else:
+                    self.starting_index += 1
+            if date.month == self._ending_month + 1:
+                break
+            self.ending_index += 1
+        self.size = self.ending_index - self.starting_index
         
-        self._times = [datetime.strptime(t, "%H:%M:%S").time() for t in self._df["Time"]][:self.size]
-        self._latitudes = self._df["北緯"][:self.size]
-        self._longitudes = self._df["東經"][:self.size]
-        self._magnitudes = self._df["芮氏規模"][:self.size]
-        self._depths = self._df["深度"][:self.size]
-        self._areas = self._df["城市"][:self.size]
-        self._intensities = self._df["震度"][:self.size]
-        for i in range(self.size):
+        self._dates = self._df["Date"][self.starting_index: self.ending_index]
+        self._times = self._df["Time"][self.starting_index: self.ending_index]
+        for i in range(self.starting_index, self.ending_index):
+            self._dates[i] = datetime.strptime(self._dates[i], "%Y-%m-%d").date()
+            self._times[i] = datetime.strptime(self._times[i], "%H:%M:%S").time()
+        self._latitudes = self._df["北緯"][self.starting_index: self.ending_index]
+        self._longitudes = self._df["東經"][self.starting_index: self.ending_index]
+        self._magnitudes = self._df["芮氏規模"][self.starting_index: self.ending_index]
+        self._depths = self._df["深度"][self.starting_index: self.ending_index]
+        self._areas = self._df["城市"][self.starting_index: self.ending_index]
+        self._intensities = self._df["震度"][self.starting_index: self.ending_index]
+        for i in range(self.starting_index, self.ending_index):
             if len(self._intensities[i]) != 1:
                 self._intensities[i] = self._intensities[i].replace(" ", "")
             else:
                 self._intensities[i] += "級"
-                
-    def _reorganize_data(self):
-        data = []
-        for i in range(self.size):
-            data.append([
-                self._dates[i],
-                self._times[i],
-                self._latitudes[i],
-                self._longitudes[i],
-                self._magnitudes[i],
-                self._depths[i],
-                self._areas[i],
-                self._intensities[i]
-            ])
-        self.data = pd.DataFrame(data, columns=[
-            "date",
-            "time",
-            "latitude",
-            "longitude",
-            "magnitude",
-            "depth",
-            "area",
-            "intensity"
-        ])
 
     def date(self, id=None):
         if id is None:
@@ -509,8 +543,8 @@ class EarthquakeSQLController(SQLController):
     def new(self, date, time, latitude, longitude, magnitude, depth):
         sql = f"""INSERT INTO {self.table_name} (
                 date, time, latitude, longitude, 
-                magnitude, depth) VALUES (?, ?, ?, ?, ?, ?, ?)"""
-        self.cursor.execute(sql, (date, time, latitude, longitude, magnitude, depth))
+                magnitude, depth) VALUES (?, ?, ?, ?, ?, ?)"""
+        self.cursor.execute(sql, (date, str(time), latitude, longitude, magnitude, depth))
         self.conn.commit()
 
 class EarthquakeIntensitySQLController(SQLController):
@@ -519,40 +553,27 @@ class EarthquakeIntensitySQLController(SQLController):
         super().__init__(self.table_name)
 
     def new(self, area, intensity):
-        self.existing_id = self.administrative_area_id(area_1, 
-                                                       area_2)
+        self.existing_id = self.area_id(area)
         if self.existing_id:
-            number = self.select(self.existing_id, "number") + 1
-            total_fatality += self.select(self.existing_id, "total_fatality")
-            total_injury += self.select(self.existing_id, "total_injury")
-            pedestrian_fatality += self.select(self.existing_id, "pedestrian_fatality")
-            pedestrian_injury += self.select(self.existing_id, "pedestrian_injury")
-            sql = f"""UPDATE {self.table_name} 
-                    SET number = {number}, 
-                    total_fatality = {total_fatality}, 
-                    total_injury = {total_injury},
-                    pedestrian_fatality = {pedestrian_fatality}, 
-                    pedestrian_injury = {pedestrian_injury} WHERE id = {self.existing_id}"""
+            number = self.select(self.existing_id, "number")
+            avg_pga = self.select(self.existing_id, "pga")
+            total_pga = avg_pga * number + risk.intensity_to_pga(intensity)
+            number += 1
+            avg_pga = total_pga / number
+            avg_intensity = risk.pga_to_intensity(avg_pga)
+            sql = f"""UPDATE {self.table_name} SET number = {number}, 
+                    intensity = '{avg_intensity}', pga = {avg_pga}
+                    WHERE id = {self.existing_id}"""
             self.cursor.execute(sql)
         else:
-            sql = f"""INSERT INTO {self.table_name} (
-                    area_1, 
-                    area_2, 
-                    number, 
-                    total_fatality, 
-                    total_injury, 
-                    pedestrian_fatality, 
-                    pedestrian_injury) VALUES (?, ?, ?, ?, ?, ?, ?)"""
-            self.cursor.execute(sql, (area_1, 
-                                      area_2, 
-                                      1, total_fatality, total_injury,
-                                      pedestrian_fatality, pedestrian_injury))
+            sql = f"""INSERT INTO {self.table_name} (area, number, intensity, 
+                    pgv_lower) VALUES (?, ?, ?, ?)"""
+            pgv_lower = risk.intensity_to_pgv_lower(intensity)
+            self.cursor.execute(sql, (area, 1, intensity, pgv_lower))
         self.conn.commit()
     
-    def administrative_area_id(self, area_1, area_2):
-        sql = f"""SELECT * FROM {self.table_name} 
-                    WHERE area_1 = '{area_1}' 
-                    AND area_2 = '{area_2}'"""
+    def area_id(self, area):
+        sql = f"SELECT * FROM {self.table_name} WHERE area = '{area}'"
         self.cursor.execute(sql)
         data = self.cursor.fetchone()
         if data:
@@ -568,14 +589,13 @@ class UpdateTrafficAccidentData:
         self.update_tracking_data()
         
     def get_tracking_data(self):
-        self.tracking_path = r".\data\tracking.json"
-        with open(self.tracking_path) as file:
+        with open(TRACKING_JSON_PATH) as file:
             self.tracking_data = json.load(file)
-            self.starting_year = self.tracking_data["car_accident_csv"]["starting_year"]
-            self.ending_year = self.tracking_data["car_accident_csv"]["ending_year"]
-            self.tracking_year = self.tracking_data["traffic_accident"]["tracking_year"]
-            self.tracking_month = self.tracking_data["traffic_accident"]["tracking_month"]
-            self.tracking_rank = self.tracking_data["traffic_accident"]["tracking_rank"]
+            self.starting_year = self.tracking_data["csv"]["car_accident"]["starting_year"]
+            self.ending_year = self.tracking_data["csv"]["car_accident"]["ending_year"]
+            self.tracking_year = self.tracking_data["sqlite3"]["traffic_accident"]["tracking_year"]
+            self.tracking_month = self.tracking_data["sqlite3"]["traffic_accident"]["tracking_month"]
+            self.tracking_rank = self.tracking_data["sqlite3"]["traffic_accident"]["tracking_rank"]
     
     def initialize_range(self):
         if not self.tracking_year:
@@ -623,12 +643,80 @@ class UpdateTrafficAccidentData:
         self.ped_hell_controller.close()
         
     def update_tracking_data(self):
-        self.tracking_data["traffic_accident"]["tracking_year"] = self.tracking_year
-        self.tracking_data["traffic_accident"]["tracking_month"] = self.tracking_month
-        self.tracking_data["traffic_accident"]["tracking_rank"] = self.tracking_rank
-        with open(self.tracking_path, 'w') as file:
+        self.tracking_data["sqlite3"]["traffic_accident"]["tracking_year"] = self.tracking_year
+        self.tracking_data["sqlite3"]["traffic_accident"]["tracking_month"] = self.tracking_month
+        self.tracking_data["sqlite3"]["traffic_accident"]["tracking_rank"] = self.tracking_rank
+        with open(TRACKING_JSON_PATH, 'w') as file:
             json.dump(self.tracking_data, file)
         
+class UpdateEarthquakeData:
+    def __init__(self):
+        self.get_tracking_data()
+        self.update_data()
+        
+    def get_tracking_data(self):
+        with open(TRACKING_JSON_PATH) as file:
+            self.tracking_data = json.load(file)
+            starting_year = self.tracking_data["csv"]["earthquake"]["starting_year"]
+            self.tracking_year = self.tracking_data["sqlite3"]["earthquake"]["tracking_year"]
+            self.starting_month = self.tracking_data["sqlite3"]["earthquake"]["tracking_month"]
+
+        if not self.tracking_year:
+            self.tracking_year = starting_year
+        if not self.starting_month:
+            self.starting_month = 0
+        elif self.starting_month == 12:
+            self.starting_month = 0
+            self.tracking_year += 1
+
+        if self.tracking_year == datetime.now().year:
+            self.starting_month += 1
+            self.ending_month = datetime.now().month - 1
+        else:
+            self.ending_month = 12
+        
+    def update_data(self):
+        try:
+            if self.tracking_year == datetime.now().year:
+                self.earthquake = Earthquake(year=self.tracking_year, 
+                                             starting_month=self.starting_month, 
+                                             ending_month=self.ending_month)
+            else:
+                self.earthquake = Earthquake(self.tracking_year)
+        except:
+            return
+        self.earthquake_controller = EarthquakeSQLController()
+        self.earthquake_intensity_controller = EarthquakeIntensitySQLController()
+        self.number_of_data = self.earthquake.size
+        check_date = check_time = 0
+        for index in range(self.earthquake.starting_index, self.earthquake.ending_index):
+            date = self.earthquake.date(index)
+            time = self.earthquake.time(index)
+            latitude = self.earthquake.latitude(index)
+            longitude = self.earthquake.longitude(index)
+            magnitude = self.earthquake.magnitude(index)
+            depth = self.earthquake.depth(index)
+            area = self.earthquake.area(index)
+            intensity = self.earthquake.intensity(index)
+
+            self.earthquake_intensity_controller.new(area, intensity)
+            if check_date == date and check_time == time:
+                continue
+            else:
+                self.earthquake_controller.new(date, time, latitude, longitude, magnitude, depth)
+                check_date = date
+                check_time = time
+            
+        self.earthquake_controller.close()
+        self.earthquake_intensity_controller.close()
+        self.update_tracking_data()
+        
+    def update_tracking_data(self):
+        self.tracking_data["sqlite3"]["earthquake"]["tracking_year"] = self.tracking_year
+        self.tracking_data["sqlite3"]["earthquake"]["tracking_month"] = self.ending_month
+        with open(TRACKING_JSON_PATH, 'w') as file:
+            json.dump(self.tracking_data, file)
+
 
 def test_CarAccident():
     accident = CarAccident(year=111, month=2, rank=2)
@@ -652,7 +740,7 @@ def test_CarAccident():
     # print(accident.area_1(data_id))
     print(accident.area_2(data_id))
 
-def test_SQLController():
+def test_TrafficAccident():
     controller = TrafficAccidentSQLController()
     test_latitude = 24.4389
     test_longitude = 118.2497
@@ -665,11 +753,26 @@ def test_SQLController():
     # print(controller.select(50956))
     # controller.new(test_latitude+50, test_longitude+20, 55, 123)
     controller.close()
+    pass
 
+def test_Earthquake():
+    year = 2024
+    starting_momth = 2
+    ending_month = None
+    earthquke = Earthquake(year, starting_momth, ending_month)
+    # print(earthquke.date())
+    print(earthquke.time())
+    # print(earthquke.area())
+    # controller = EarthquakeIntensitySQLController()
+    # area = "地球"
+    # intensity = "5弱"
+    # controller.new(area, intensity)
+    pass
 
 if __name__ == "__main__":
-    test_CarAccident()
-    # test_SQLController()
+    # test_CarAccident()
+    # test_TrafficAccident()
+    test_Earthquake()
     pass
     
 
