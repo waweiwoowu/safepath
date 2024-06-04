@@ -556,13 +556,13 @@ class EarthquakeIntensitySQLController(SQLController):
         self.existing_id = self.area_id(area)
         if self.existing_id:
             number = self.select(self.existing_id, "number")
-            avg_pgv_lower = self.select(self.existing_id, "pgv_lower")
-            total_pgv_lower = avg_pgv_lower * number + risk.intensity_to_pgv_lower(intensity)
+            avg_pga = self.select(self.existing_id, "pga")
+            total_pga = avg_pga * number + risk.intensity_to_pga(intensity)
             number += 1
-            avg_pgv_lower = total_pgv_lower / number
-            avg_intensity = risk.pgv_lower_to_intensity(avg_pgv_lower)
+            avg_pga = total_pga / number
+            avg_intensity = risk.pga_to_intensity(avg_pga)
             sql = f"""UPDATE {self.table_name} SET number = {number}, 
-                    intensity = '{avg_intensity}', pgv_lower = {avg_pgv_lower}
+                    intensity = '{avg_intensity}', pga = {avg_pga}
                     WHERE id = {self.existing_id}"""
             self.cursor.execute(sql)
         else:

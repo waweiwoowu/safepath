@@ -19,7 +19,7 @@ class EarthquakeIntensity(models.Model):
     area = models.TextField(max_length=5)
     number = models.IntegerField()
     intensity = models.TextField(max_length=3)
-    pgv_lower = models.DecimalField(max_digits=8, decimal_places=5)
+    pga = models.DecimalField(max_digits=8, decimal_places=5)
 
     class Meta:
         db_table = "risk_earthquake_intensity"
