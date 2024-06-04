@@ -34,58 +34,64 @@ class SeismicIntensityScale:
                               SEISMIC_INTENSITY_SCALE["6強"]["PGA"]["lower"]) / 2
             self.pgv_lower = (SEISMIC_INTENSITY_SCALE["6弱"]["PGV"]["lower"] + 
                               SEISMIC_INTENSITY_SCALE["6強"]["PGV"]["lower"]) / 2
+        else:
+            self.pga_lower = self.pgv_lower = None
             
-        
-
-def pgv_lower_to_scale(value):
-    if value >= SEISMIC_INTENSITY_SCALE["7級"]["PGV"]["lower"]:
+def pgv_lower_to_intensity(pgv_lower):
+    pgv_lowers = pgv_lower
+    if type(pgv_lowers) != list:
+        pgv_lowers = []
+        pgv_lowers.append(pgv_lower)
+    pgv_lower = 0
+    for pgv in pgv_lowers:
+        pgv_lower += pgv
+    pgv_lower /= len(pgv_lowers)
+    
+    if pgv_lower >= SEISMIC_INTENSITY_SCALE["7級"]["PGV"]["lower"]:
         return "7級"
-    elif value >= SEISMIC_INTENSITY_SCALE["6強"]["PGV"]["lower"]:
+    elif pgv_lower >= SEISMIC_INTENSITY_SCALE["6強"]["PGV"]["lower"]:
         return "6強"
-    elif value >= SEISMIC_INTENSITY_SCALE["6弱"]["PGV"]["lower"]:
+    elif pgv_lower >= SEISMIC_INTENSITY_SCALE["6弱"]["PGV"]["lower"]:
         return "6弱"
-    elif value >= SEISMIC_INTENSITY_SCALE["5強"]["PGV"]["lower"]:
+    elif pgv_lower >= SEISMIC_INTENSITY_SCALE["5強"]["PGV"]["lower"]:
         return "5強"
-    elif value >= SEISMIC_INTENSITY_SCALE["5弱"]["PGV"]["lower"]:
+    elif pgv_lower >= SEISMIC_INTENSITY_SCALE["5弱"]["PGV"]["lower"]:
         return "5弱"
-    elif value >= SEISMIC_INTENSITY_SCALE["4級"]["PGV"]["lower"]:
+    elif pgv_lower >= SEISMIC_INTENSITY_SCALE["4級"]["PGV"]["lower"]:
         return "4級"
-    elif value >= SEISMIC_INTENSITY_SCALE["3級"]["PGV"]["lower"]:
+    elif pgv_lower >= SEISMIC_INTENSITY_SCALE["3級"]["PGV"]["lower"]:
         return "3級"
-    elif value >= SEISMIC_INTENSITY_SCALE["2級"]["PGV"]["lower"]:
+    elif pgv_lower >= SEISMIC_INTENSITY_SCALE["2級"]["PGV"]["lower"]:
         return "2級"
-    elif value >= SEISMIC_INTENSITY_SCALE["1級"]["PGV"]["lower"]:
+    elif pgv_lower >= SEISMIC_INTENSITY_SCALE["1級"]["PGV"]["lower"]:
         return "1級"
-    elif value >= SEISMIC_INTENSITY_SCALE["0級"]["PGV"]["lower"]:
+    elif pgv_lower >= SEISMIC_INTENSITY_SCALE["0級"]["PGV"]["lower"]:
         return "0級"
     else:
         return "error"
 
-class AverageIntensity:
-    def __init__(self, intensity):
-        self._intensity = intensity
-        if type(self._intensity) != list:
-            self._intensity = list(self._intensity)
-        
-    @property
-    def pgv_lower(self):
-        energy = 0
-        for intensity in self._intensity:
-            scale = SeismicIntensityScale(intensity)
-            energy += scale.pgv_lower ** 2
-        return (energy / len(self._intensity)) ** 0.5
-    
-    @property
-    def scale(self):
-        return pgv_lower_to_scale(self.pgv_lower)
-    
+def intensity_to_pgv_lower(intensity):
+    intensities = intensity
+    if type(intensities) != list:
+        intensities = []
+        intensities.append(intensity)
+    energy = 0
+    for intensity in intensities:
+        scale = SeismicIntensityScale(intensity)
+        energy += scale.pgv_lower ** 2
+    return (energy / len(intensities)) ** 0.5
+
+
 if __name__ == "__main__":
     intensity = "5級"
-    scale = SeismicIntensityScale(intensity)
-    print(scale.pgv_lower)
-    intensity = ["0級", "1級", "2級", "3級", "4級", "5弱", "5強", "6弱", "6強", "7級"]
-    average_intensity = AverageIntensity(intensity)
-    print(average_intensity.pgv_lower)
-    print(average_intensity.scale)
-
+    # scale = SeismicIntensityScale(intensity)
+    # print(scale.pgv_lower)
+    print(intensity_to_pgv_lower(intensity))
+    intensity_list = ["0級", "1級", "2級", "3級", "4級", "5弱", "5強", "6弱", "6強", "7級"]
+    print(intensity_to_pgv_lower(intensity_list))
+    
+    pgv_lower = 22.5
+    print(pgv_lower_to_intensity(pgv_lower))
+    pgv_lower_list = [1, 2, 3, 4, 60]
+    print(pgv_lower_to_intensity(pgv_lower_list))
 
