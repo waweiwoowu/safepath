@@ -126,7 +126,7 @@ class Direction():
         if self._traffic_accident is None:
             self._traffic_accident = _DirectionTrafficAccidentData(self.coordinates)
         return self._traffic_accident
-    
+
     @property
     def earthquake(self):
         if self._earthquake is None:
@@ -138,7 +138,7 @@ class _DirectionTrafficAccidentData():
         self._coords = []
         for coordinate in coordinates:
             self._coords.append(Coordinate(coordinate))
-    
+
     @property
     def data(self):
         data = []
@@ -147,7 +147,7 @@ class _DirectionTrafficAccidentData():
             if _data:
                 data.append(_data)
         return data
-    
+
     @property
     def number(self):
         total_number = 0
@@ -165,7 +165,7 @@ class _DirectionTrafficAccidentData():
             if fatality:
                 total_fatality += fatality
         return total_fatality
-    
+
     @property
     def total_injury(self):
         total_injury = 0
@@ -174,7 +174,7 @@ class _DirectionTrafficAccidentData():
             if injury:
                 total_injury += injury
         return total_injury
-    
+
     @property
     def pedestrian_fatality(self):
         pedestrian_fatality = 0
@@ -183,7 +183,7 @@ class _DirectionTrafficAccidentData():
             if fatality:
                 pedestrian_fatality += fatality
         return pedestrian_fatality
-    
+
     @property
     def pedestrian_injury(self):
         pedestrian_injury = 0
@@ -247,7 +247,7 @@ class _DirectionEarthquakeData():
                 longitude.append(data[4])
             return longitude
         return None
-    
+
     @property
     def coordinate(self):
         if self.data:
