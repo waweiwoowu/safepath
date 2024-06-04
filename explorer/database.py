@@ -567,9 +567,9 @@ class EarthquakeIntensitySQLController(SQLController):
             self.cursor.execute(sql)
         else:
             sql = f"""INSERT INTO {self.table_name} (area, number, intensity, 
-                    pgv_lower) VALUES (?, ?, ?, ?)"""
-            pgv_lower = risk.intensity_to_pgv_lower(intensity)
-            self.cursor.execute(sql, (area, 1, intensity, pgv_lower))
+                    pga) VALUES (?, ?, ?, ?)"""
+            pga = risk.intensity_to_pga(intensity)
+            self.cursor.execute(sql, (area, 1, intensity, pga))
         self.conn.commit()
     
     def area_id(self, area):
