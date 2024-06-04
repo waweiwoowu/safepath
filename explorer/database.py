@@ -56,7 +56,51 @@ class Coordinate:
 
         self.latitude_grid = rounding(self.latitude)
         self.longitude_grid = rounding(self.longitude)
+        self._traffic_accident = None
+        self._earthquake = None
+        
+    @property
+    def traffic_accident(self):
+        if self._traffic_accident is None:
+            self._traffic_accident = TrafficAccidentData(self.latitude_grid, self.longitude_grid)
+        return self._traffic_accident
+    
+    @property
+    def earthquake(self):
+        if self._earthquake is None:
+            self._earthquake = EarthquakeData(self.latitude_grid, self.longitude_grid)
+        return self._earthquake
+        
+class TrafficAccidentData():
+    def __init__(self, latitude, longitude):
+        controller = TrafficAccidentSQLController()
+        self.data = controller.select_from_coordinate(latitude, longitude)[0]
+        self.id = self.data[0]
+        self.number = self.data[3]
+        self.total_fatality = self.data[4]
+        self.total_injury = self.data[5]
+        self.pedestrian_fatality = self.data[6]
+        self.pedestrian_injury = self.data[7]
 
+class EarthquakeData():
+    def __init__(self, latitude, longitude):
+        self.latitude = rounding(latitude, difference=0.01)
+        self.longitude = rounding(longitude, difference=0.01)
+        controller = EarthquakeSQLController()
+        self.data = controller.select_from_coordinate(self.latitude, self.longitude)
+        
+        self.id = []
+        self.date = []
+        self.time = []
+        self.magnitude = []
+        self.depth = []
+        for data in self.data:
+            self.id.append(data[0])
+            self.date.append(data[1])
+            self.time.append(data[2])
+            self.magnitude.append(data[5])
+            self.depth.append(data[6])
+            
 def check_if_month_is_valid(month):
     if month is not None:
         if type(month) != int or (month < 1 or month > 12):
@@ -416,17 +460,30 @@ class SQLController:
     def select(self, id=None, column=None):
         if id:
             if column:
-                sql = f"SELECT {column} FROM {self.table_name} where id={id}"
+                sql = f"SELECT {column} FROM {self.table_name} WHERE id={id}"
                 self.cursor.execute(sql)
                 return self.cursor.fetchone()[0]
             else:
-                sql = f"SELECT * FROM {self.table_name} where id={id}"
+                sql = f"SELECT * FROM {self.table_name} WHERE id={id}"
                 self.cursor.execute(sql)
                 return self.cursor.fetchone()
         else:
-            sql = "SELECT * FROM {self.table_name}"
+            if column:
+                sql = f"SELECT {column} FROM {self.table_name}"
+            else:
+                sql = f"SELECT * FROM {self.table_name}"
         self.cursor.execute(sql)
         return self.cursor.fetchall()
+    
+    def select_from_coordinate(self, latitude, longitude):
+        sql = f"""SELECT * FROM {self.table_name} 
+                WHERE latitude={latitude} AND longitude={longitude}"""
+        self.cursor.execute(sql)
+        data = self.cursor.fetchall()
+        if data:
+            return data
+        else:
+            return None
 
 class TrafficAccidentSQLController(SQLController):
     def __init__(self):
@@ -718,6 +775,16 @@ class UpdateEarthquakeData:
             json.dump(self.tracking_data, file)
 
 
+def test_Coordinate():
+    # coordinate = (23.05, 120.19)
+    # coord = Coordinate(coordinate)
+    # print(coord.earthquake.data)
+    # print(coord.earthquake.magnitude)
+    coordinate = (23.6865, 120.4114)
+    coord = Coordinate(coordinate)
+    print(coord.traffic_accident.data)
+    print(coord.traffic_accident.id)
+    
 def test_CarAccident():
     accident = CarAccident(year=111, month=2, rank=2)
     # print(accident.date())
@@ -770,9 +837,10 @@ def test_Earthquake():
     pass
 
 if __name__ == "__main__":
+    test_Coordinate()
     # test_CarAccident()
     # test_TrafficAccident()
-    test_Earthquake()
+    # test_Earthquake()
     pass
     
 

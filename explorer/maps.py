@@ -7,14 +7,14 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ### runserver
-from explorer.test_data import *
-from explorer._database import Coordinate
-PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
+# from explorer.test_data import *
+# from explorer._database import Coordinate
+# KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 
 ### run python file
-# from test_data import *
-# from _database import Coordinate
-# PATH = r".\data\keys\paths.json"
+from test_data import *
+from _database import Coordinate
+KEY_PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
 
@@ -27,9 +27,8 @@ And then add the file location to the list of the json file in '.\data\keys\path
 """
 
 def _get_google_maps_api_paths():
-    filepath = PATH
     try:
-        with open(filepath) as file:
+        with open(KEY_PATH) as file:
             data = json.load(file)
         paths = data["GOOGLE_MAPS_API_KEY"]
         return paths
@@ -99,7 +98,6 @@ class Direction():
         else:
             self.data = DIRECTIONS[0]
         self.traffic_accident = _DirectionTrafficAccidentData(self.coordinates)
-        # self.car_accident = _DirectionCarAccidentData(self.coordinates)
         self.earthquake = _DirectionEarthquakeData(self.coordinates)
 
     @property
