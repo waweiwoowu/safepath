@@ -74,13 +74,22 @@ class Coordinate:
 class TrafficAccidentData():
     def __init__(self, latitude, longitude):
         controller = TrafficAccidentSQLController()
-        self.data = controller.select_from_coordinate(latitude, longitude)[0]
-        self.id = self.data[0]
-        self.number = self.data[3]
-        self.total_fatality = self.data[4]
-        self.total_injury = self.data[5]
-        self.pedestrian_fatality = self.data[6]
-        self.pedestrian_injury = self.data[7]
+        self.data = controller.select_from_coordinate(latitude, longitude)
+        self.id = None
+        self.number = None
+        self.total_fatality = None
+        self.total_injury = None
+        self.pedestrian_fatality = None
+        self.pedestrian_injury = None
+        
+        if self.data:
+            self.data = self.data[0]
+            self.id = self.data[0]
+            self.number = self.data[3]
+            self.total_fatality = self.data[4]
+            self.total_injury = self.data[5]
+            self.pedestrian_fatality = self.data[6]
+            self.pedestrian_injury = self.data[7]
 
 class EarthquakeData():
     def __init__(self, latitude, longitude):
@@ -94,12 +103,13 @@ class EarthquakeData():
         self.time = []
         self.magnitude = []
         self.depth = []
-        for data in self.data:
-            self.id.append(data[0])
-            self.date.append(data[1])
-            self.time.append(data[2])
-            self.magnitude.append(data[5])
-            self.depth.append(data[6])
+        if self.data:
+            for data in self.data:
+                self.id.append(data[0])
+                self.date.append(data[1])
+                self.time.append(data[2])
+                self.magnitude.append(data[5])
+                self.depth.append(data[6])
             
 def check_if_month_is_valid(month):
     if month is not None:
@@ -776,14 +786,15 @@ class UpdateEarthquakeData:
 
 
 def test_Coordinate():
-    # coordinate = (23.05, 120.19)
-    # coord = Coordinate(coordinate)
-    # print(coord.earthquake.data)
-    # print(coord.earthquake.magnitude)
-    coordinate = (23.6865, 120.4114)
+    coordinate = (23.05, 120.19)
     coord = Coordinate(coordinate)
-    print(coord.traffic_accident.data)
-    print(coord.traffic_accident.id)
+    print(coord.earthquake.data)
+    print(coord.earthquake.magnitude)
+    # coordinate = (23.6865, 120.4114)
+    # coord = Coordinate(coordinate)
+    # print(coord.traffic_accident.data)
+    # print(coord.traffic_accident.id)
+    pass
     
 def test_CarAccident():
     accident = CarAccident(year=111, month=2, rank=2)
@@ -806,6 +817,7 @@ def test_CarAccident():
     # print(accident.injury(data_id))
     # print(accident.area_1(data_id))
     print(accident.area_2(data_id))
+    pass
 
 def test_TrafficAccident():
     controller = TrafficAccidentSQLController()

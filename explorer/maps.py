@@ -1,5 +1,4 @@
 import googlemaps
-import asyncio
 import json
 import sys
 import os
@@ -8,12 +7,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ### runserver
 # from explorer.test_data import *
-# from explorer._database import Coordinate
+# from explorer.database import Coordinate
 # KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 
 ### run python file
 from test_data import *
-from _database import Coordinate
+from database import Coordinate
 KEY_PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
@@ -97,8 +96,8 @@ class Direction():
             self.data = _GoogleMap.gmaps.directions(origin, destination, )[0]
         else:
             self.data = DIRECTIONS[0]
-        self.traffic_accident = _DirectionTrafficAccidentData(self.coordinates)
-        self.earthquake = _DirectionEarthquakeData(self.coordinates)
+        self._traffic_accident = None
+        self._earthquake = None
 
     @property
     def overivew_coordinates(self):
@@ -122,55 +121,159 @@ class Direction():
             route_instructions.append(step['html_instructions'])
         return route_instructions
 
+    @property
+    def traffic_accident(self):
+        if self._traffic_accident is None:
+            self._traffic_accident = _DirectionTrafficAccidentData(self.coordinates)
+        return self._traffic_accident
+    
+    @property
+    def earthquake(self):
+        if self._earthquake is None:
+            self._earthquake = _DirectionEarthquakeData(self.coordinates)
+        return self._earthquake
+
 class _DirectionTrafficAccidentData():
     def __init__(self, coordinates):
-        self.coordinates = coordinates
+        self._coords = []
+        for coordinate in coordinates:
+            self._coords.append(Coordinate(coordinate))
+    
+    @property
+    def data(self):
+        data = []
+        for coord in self._coords:
+            _data = coord.traffic_accident.data
+            if _data:
+                data.append(_data)
+        return data
+    
+    @property
+    def number(self):
+        total_number = 0
+        for coord in self._coords:
+            number = coord.traffic_accident.number
+            if number:
+                total_number += number
+        return total_number
 
     @property
-    async def fatality(self):
-        fatality = 0
-        for coordinate in self.coordinates:
-            coord = Coordinate(coordinate)
-            fatality += await coord.fatality
-        return fatality
-
+    def total_fatality(self):
+        total_fatality = 0
+        for coord in self._coords:
+            fatality = coord.traffic_accident.total_fatality
+            if fatality:
+                total_fatality += fatality
+        return total_fatality
+    
     @property
-    async def injury(self):
-        injury = 0
-        for coordinate in self.coordinates:
-            coord = Coordinate(coordinate)
-            injury += await coord.injury
-        return injury
-
-class _DirectionCarAccidentData():
-    def __init__(self, coordinates):
-        self.coordinates = coordinates
-
+    def total_injury(self):
+        total_injury = 0
+        for coord in self._coords:
+            injury = coord.traffic_accident.total_injury
+            if injury:
+                total_injury += injury
+        return total_injury
+    
     @property
-    async def fatality(self):
-        fatality = 0
-        for coordinate in self.coordinates:
-            coord = Coordinate(coordinate)
-            fatality += await coord.fatality
-        return fatality
-
+    def pedestrian_fatality(self):
+        pedestrian_fatality = 0
+        for coord in self._coords:
+            fatality = coord.traffic_accident.pedestrian_fatality
+            if fatality:
+                pedestrian_fatality += fatality
+        return pedestrian_fatality
+    
     @property
-    async def injury(self):
-        injury = 0
-        for coordinate in self.coordinates:
-            coord = Coordinate(coordinate)
-            injury += await coord.injury
-        return injury
+    def pedestrian_injury(self):
+        pedestrian_injury = 0
+        for coord in self._coords:
+            injury = coord.traffic_accident.pedestrian_injury
+            if injury:
+                pedestrian_injury += injury
+        return pedestrian_injury
 
 class _DirectionEarthquakeData():
     def __init__(self, coordinates):
-        self.data = []
-        for coord in coordinates:
-            self.data.append(Coordinate(coord))
+        self._coords = []
+        for coordinate in coordinates:
+            self._coords.append(Coordinate(coordinate))
+
+    @property
+    def data(self):
+        data = []
+        for coord in self._coords:
+            elements = coord.earthquake.data
+            if elements:
+                for element in elements:
+                    data.append(element)
+        if len(data) == 0:
+            return None
+        else:
+            return list(set(data))
+
+    @property
+    def date(self):
+        if self.data:
+            date = []
+            for data in self.data:
+                date.append(data[1])
+            return date
+        return None
+
+    @property
+    def time(self):
+        if self.data:
+            time = []
+            for data in self.data:
+                time.append(data[2])
+            return time
+        return None
+
+    @property
+    def latitude(self):
+        if self.data:
+            latitude = []
+            for data in self.data:
+                latitude.append(data[3])
+            return latitude
+        return None
+
+    @property
+    def longitude(self):
+        if self.data:
+            longitude = []
+            for data in self.data:
+                longitude.append(data[4])
+            return longitude
+        return None
+    
+    @property
+    def coordinate(self):
+        if self.data:
+            coordinate = []
+            for data in self.data:
+                coordinate.append((data[3], data[4]))
+            return coordinate
+        return None
 
     @property
     def magnitude(self):
-        pass
+        if self.data:
+            magnitude = []
+            for data in self.data:
+                magnitude.append(data[5])
+            return magnitude
+        return None
+
+    @property
+    def depth(self):
+        if self.data:
+            depth = []
+            for data in self.data:
+                depth.append(data[6])
+            return depth
+        return None
 
 
 class Geocode():
@@ -191,35 +294,27 @@ class Geocode():
     def location(self):
         return (self.latitude, self.longitude)
 
-async def _main():
-    geocode = Geocode()
-    print(geocode.data)
-    print(geocode.administrative_area_level_1)
-    print(geocode.administrative_area_level_2)
-    print(geocode.address)
-    print(geocode.location)
-    print(geocode.latitude)
-    print(geocode.longitude)
 
-    # direction = Direction()
-    # print(direction.overivew_coordinates)
-    # print(len(direction.coordinates))
-
-    # coord = Coordinate(24.613, 121.852)
-    # print(coord.latitude_grid)
-    # print(coord.longitude_grid)
-    # print(await coord.fatality)
-    # print(await coord.injure)
-
-    # coords = Coordinates(direction.coordinates)
-    # print(coords.grid)
-
-    # print(GOOGLE_MAPS_API_KEY)
+def test():
     direction = Direction()
-    print(await direction.car_accident.fatality)
-    print(await direction.car_accident.injury)
-    # direction.earthquake
+    # print(direction.coordinates)
+    print(direction.traffic_accident.data)
+    print(direction.traffic_accident.number)
+    print(direction.traffic_accident.total_fatality)
+    print(direction.traffic_accident.total_injury)
+    print(direction.traffic_accident.pedestrian_fatality)
+    print(direction.traffic_accident.pedestrian_injury)
+    print(direction.earthquake.data)
+    print(direction.earthquake.date)
+    print(direction.earthquake.time)
+    print(direction.earthquake.latitude)
+    print(direction.earthquake.longitude)
+    print(direction.earthquake.coordinate)
+    print(direction.earthquake.magnitude)
+    print(direction.earthquake.depth)
+    pass
 
 
 if __name__ == "__main__":
-    asyncio.run(_main())
+    test()
+    pass

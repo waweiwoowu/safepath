@@ -46,6 +46,6 @@ def update_earthquake_data(count=1):
 
 
 if __name__ == "__main__":
-    # update_traffic_accident_data()
-    update_earthquake_data(10)
+    update_traffic_accident_data()
+    # update_earthquake_data(10)
     pass
