@@ -525,29 +525,30 @@ class Attraction:
                 check = self._name[i]
                 self._data.append([
                     self._name[i],
-                    self._image[i],
                     self._latitudes[i],
                     self._longitudes[i],
-                    self._address[i],
                     self._area_1[i],
                     self._area_2[i],
+                    self._address[i],
+                    self._image[i],
                 ])
         self.data = pd.DataFrame(self._data, columns=[
             "name",
-            "image",
             "latitude",
             "longitude",
-            "address",
             "area_1",
             "area_2",
+            "address",
+            "image",
         ])
         self._names = self.data.iloc[:, 0]
-        self._images = self.data.iloc[:, 1]
-        self._latitudes = self.data.iloc[:, 2]
-        self._longitudes = self.data.iloc[:, 3]
-        self._addresses = self.data.iloc[:, 4]
-        self._area_1s = self.data.iloc[:, 5]
-        self._area_2s = self.data.iloc[:, 6]
+        self._latitudes = self.data.iloc[:, 1]
+        self._longitudes = self.data.iloc[:, 2]
+        self._area_1s = self.data.iloc[:, 3]
+        self._area_2s = self.data.iloc[:, 4]
+        self._addresses = self.data.iloc[:, 5]
+        self._images = self.data.iloc[:, 6]
+        self.size = len(self._data)
 
     def name(self, id=None):
         if id is not None:
@@ -591,6 +592,11 @@ class Attraction:
         else:
             return self._area_2s
 
+class FormattedAttraction(Attraction):
+    def __init__(self, index=1):
+        super().__init__(index)
+        for i in range(self.size):
+            geocode = None
 
 ### SQLController ###
 
@@ -937,7 +943,7 @@ def test_Coordinate():
 
 def test_CarAccident():
     accident = CarAccident(year=111, month=2, rank=2)
-    # print(accident.date())
+    print(accident.date())
     # print(accident.time())
     # print(accident.latitude())
     # print(accident.longitude())
@@ -959,9 +965,11 @@ def test_CarAccident():
     pass
 
 def test_Attraction():
-    attraction = Attraction()
-    attr_id = None
-    print(attraction.address(attr_id))
+    # attraction = Attraction()
+    # attr_id = None
+    # print(attraction.address(attr_id))
+    formatted_attr = FormattedAttraction()
+    formatted_attr.data
 
 def test_TrafficAccident():
     controller = TrafficAccidentSQLController()
