@@ -284,8 +284,8 @@ class Geocode():
             self.data = _GoogleMap.gmaps.geocode(address)[0]
         self.postal_code = self.data["address_components"][-1]["long_name"]
         self.country = self.data["address_components"][-2]["long_name"]
-        self.administrative_area_level_1 = self.data["address_components"][-3]["long_name"]
-        self.administrative_area_level_2 = self.data["address_components"][-4]["long_name"]
+        self.area_1 = self.data["address_components"][-3]["long_name"]
+        self.area_2 = self.data["address_components"][-4]["long_name"]
         self.address = self.data["formatted_address"]
         self.latitude = self.data["geometry"]["location"]["lat"]
         self.longitude = self.data["geometry"]["location"]["lng"]
@@ -295,7 +295,7 @@ class Geocode():
         return (self.latitude, self.longitude)
 
 
-def test():
+def test_Direction():
     direction = Direction()
     # print(direction.coordinates)
     print(direction.traffic_accident.data)
@@ -314,7 +314,13 @@ def test():
     print(direction.earthquake.depth)
     pass
 
+def test_Geocode():
+    address = "台北101"
+    # geocode = Geocode(address)
+    geocode = Geocode()
+    print(geocode.address)
 
 if __name__ == "__main__":
-    test()
+    # test_Direction()
+    test_Geocode()
     pass

@@ -827,12 +827,6 @@ def test_TrafficAccident():
     print(controller.coordinate_id(test_latitude, test_longitude))
     print(controller.coordinate_id(test_latitude+50, test_longitude))
     print(controller.select(50956, "total_injury"))
-    # controller.new(test_latitude, test_longitude, 55, 66)
-    # print(controller.select(50956))
-    # controller.new(test_latitude, test_longitude, 99, 77)
-    # print(controller.select(50956))
-    # controller.new(test_latitude+50, test_longitude+20, 55, 123)
-    controller.close()
     pass
 
 def test_Earthquake():
