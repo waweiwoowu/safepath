@@ -10,25 +10,31 @@
 <body>
     <div class="MainPanel">
         <!-- Region 1: Pick an Area -->
+        <form method="POST">
         <div class="Area">
             <div>
+                {% csrf_token %}
                 <label for="area_1">城市:</label>
                 <!-- 選擇城市後 需刷新 鄉鎮下拉選單 -->
                 <select id="area_1">
-                    <option value="area_1">City 1</option>
-                    <option value="area_1">City 2</option>
+                    {% for location in lacations%}
+                    <option value="area_1">{{location}}</option>
+                    {% endfor %}
                 </select>
+
             </div>
             <div>
                 <label for="area_2">鄉鎮:</label>
                 <!-- 選擇鄉鎮 + 按下推薦景點 需刷新 div class="Recommend_spot" 與 class="Recommend_food"-->
                 <select id="area_2">
-                    <option value="area_2">Town 1</option>
-                    <option value="area_2">Town 2</option>
+                    {% for area in areas%}
+                    <option value="area_2">{{area}}</option>
+                    {% endfor %}
                 </select>
             </div>
-            <button>推薦景點</button>
+            <button type="submit">推薦景點</button>
         </div>
+    </form>
 
         <!-- Region 2: Optimal_route -->
         <div class="Optimal_route">
