@@ -468,6 +468,132 @@ class Earthquake:
         else:
             return self._intensities[id]
 
+class Attraction:
+    def __init__(self, index=1):
+        self._index = index
+        self._df = pd.DataFrame()
+        self._read_csv_file()
+        self._get_data()
+
+    def _read_csv_file(self):
+        """This method is used to read and get data from the csv files."""
+
+        dtype_mapping = {
+            "title": str,
+            "address": str,
+            "longtitude": float,
+            "latitude": float,
+            "area_1": str,
+            "area_2": str,
+            "image": str
+        }
+        if self._index == 1 or self._index == 2 or self._index == 3:
+            path = f"./data/hotspots/Taiwan_attractions_{self._index}.csv"
+            self._df = pd.read_csv(path, dtype=dtype_mapping, low_memory=False)
+        else:
+            message = "Invalid index. Must be either 1, 2, or 3."
+            raise InvalidRangeError(message)
+
+    def _get_data(self):
+        """This method is used to take the data of interest"""
+
+        self._name = self._df["title"]
+        self._image = self._df["image"]
+        self._latitudes = self._df["Latitude"]
+        self._longitudes = self._df["Longtitude"]
+        self._address = self._df["address"]
+        self._area_1 = self._df["area_1"]
+        self._area_2 = self._df["area_2"]
+
+        self._reorganize_data()
+
+    def _reorganize_data(self):
+        """This method is used to take out the duplicated data"""
+
+        check = 0
+        longitude_check = 0
+        latitude_check = 0
+        self._data = []
+        for i in range(len(self._name)):
+            if self._name[i] == check:
+                if (self._longitudes[i] == longitude_check) and (self._latitudes[i] == latitude_check):
+                    continue
+                else:
+                    longitude_check = self._longitudes[i]
+                    latitude_check = self._latitudes[i]
+            else:
+                check = self._name[i]
+                self._data.append([
+                    self._name[i],
+                    self._image[i],
+                    self._latitudes[i],
+                    self._longitudes[i],
+                    self._address[i],
+                    self._area_1[i],
+                    self._area_2[i],
+                ])
+        self.data = pd.DataFrame(self._data, columns=[
+            "name",
+            "image",
+            "latitude",
+            "longitude",
+            "address",
+            "area_1",
+            "area_2",
+        ])
+        self._names = self.data.iloc[:, 0]
+        self._images = self.data.iloc[:, 1]
+        self._latitudes = self.data.iloc[:, 2]
+        self._longitudes = self.data.iloc[:, 3]
+        self._addresses = self.data.iloc[:, 4]
+        self._area_1s = self.data.iloc[:, 5]
+        self._area_2s = self.data.iloc[:, 6]
+
+    def name(self, id=None):
+        if id is not None:
+            return self._names[id]
+        else:
+            return self._names
+
+    def image(self, id=None):
+        if id is not None:
+            return self._images[id]
+        else:
+            return self._images
+
+    def latitude(self, id=None):
+        if id is not None:
+            return self._latitudes[id]
+        else:
+            return self._latitudes
+
+    def longitude(self, id=None):
+        if id is not None:
+            return self._longitudes[id]
+        else:
+            return self._longitudes
+    
+    def address(self,id=None):
+        if id is not None:
+            return self._addresses[id]
+        else:
+            return self._addresses
+    
+    def area_1(self, id=None):
+        if id is not None:
+            return self._area_1s[id]
+        else:
+            return self._area_1s
+
+    def area_2(self, id=None):
+        if id is not None:
+            return self._area_2s[id]
+        else:
+            return self._area_2s
+
+
+### SQLController ###
+
 class SQLController:
     """This class is used to control 'db.sqlites' by using sqlite3 module."""
 
@@ -832,6 +958,11 @@ def test_CarAccident():
     # print(accident.area_2(data_id))
     pass
 
+def test_Attraction():
+    attraction = Attraction()
+    attr_id = None
+    print(attraction.address(attr_id))
+
 def test_TrafficAccident():
     controller = TrafficAccidentSQLController()
     test_latitude = 24.4389
@@ -857,7 +988,8 @@ def test_Earthquake():
 
 if __name__ == "__main__":
     # test_Coordinate()
-    test_CarAccident()
+    # test_CarAccident()
+    test_Attraction()
     # test_TrafficAccident()
     # test_Earthquake()
     pass
