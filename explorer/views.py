@@ -71,14 +71,17 @@ def verify(request):
         except:
             return HttpResponse("Failed")
 
-def travel(request):
-    if request.method == 'POST':
-        location = request.POST.get('location')
-        area = request.POST.get('area')
+# def travel(request):
+#     if request.method == 'POST':
+#         location = request.POST.get('location')
+#         area = request.POST.get('area')
 
-        return render(request, 'travel.html')
-    else:
-        return render(request, 'travel.html')
+#         return render(request, 'travel.html')
+#     else:
+#         return render(request, 'travel.html')
+
+def travel(request):
+    return render(request, 'travel.html')
 
 
 async def home(request):
