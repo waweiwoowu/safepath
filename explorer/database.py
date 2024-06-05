@@ -3,11 +3,20 @@ import math
 import sqlite3
 import pandas as pd
 from datetime import datetime
-import explorer.risk
+
 # import risk
+
+import os
+import sys
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import explorer.risk as risk
+
 
 DEGREE_DIFFERENCE = 0.0001
 TRACKING_JSON_PATH = r".\data\tracking.json"
+# TRACKING_JSON_PATH = r"C:\Users\user\Documents\GitHub\safepath\explorer\data\tracking.json"
 
 def rounding(degree, difference=DEGREE_DIFFERENCE):
     """This method is used to determine rounded values of degrees of latitudes
