@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import UserInfo
 from django.core.mail import send_mail
 from asgiref.sync import sync_to_async
@@ -91,22 +91,29 @@ async def home(request):
         # or Direction(start, destination) if you need to pass arguments
         # direction = Direction(origin=start, destination=destination)
 
-        coordinates = direction.coordinates
+        # coordinates = direction.coordinates
         # fatality = await direction.traffic_accident.total_fatality
         # injury = await direction.traffic_accident.total_injury
+        fatality = direction.traffic_accident.total_fatality
+        if fatality == 0:
+            fatality = "無死亡"
+        injury = direction.traffic_accident.total_injury
+        if injury == 0:
+            injury = "無受傷"
 
-        return render(request, 'home.html', {
-            'start': start,
-            'destination': destination,
-            'coordinates': coordinates,
-            # 'fatality': fatality,
-            # 'injury': injury
-        })
+        # return render(request, 'home.html', {
+        #     'start': start,
+        #     'destination': destination,
+        #     'coordinates': coordinates,
+        #     'fatality': fatality,
+        #     'injury': injury
+        # })
+        return JsonResponse({
+        'fatality': fatality,
+        'injury': injury
+    })
     else:
         return render(request, 'home.html', {})
-
-
-
 
 # from django.http import JsonResponse
 # import json

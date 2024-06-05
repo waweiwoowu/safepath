@@ -138,17 +138,20 @@ function initMap() {
                 csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
             },
             success: function(response) {
-                // Remove existing displayed values
                 $('#display-info').html('');
 
-                // Add new displayed values
                 if (start) {
                     $('#display-info').append('<p>Start: ' + start + '</p>');
                 }
                 if (destination) {
                     $('#display-info').append('<p>Destination: ' + destination + '</p>');
                 }
-
+                if (response.fatality) {
+                    $('#display-info').append('<p>Fatality: ' + response.fatality + '</p>');
+                }
+                if (response.injury) {
+                    $('#display-info').append('<p>Injury: ' + response.injury + '</p>');
+                }
                 // Calculate and display the route
                 calculateAndDisplayRoute(start, destination);
             }

@@ -3,11 +3,20 @@ import math
 import sqlite3
 import pandas as pd
 from datetime import datetime
-import explorer.risk
+
 # import risk
+
+import os
+import sys
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import explorer.risk as risk
+
 
 DEGREE_DIFFERENCE = 0.0001
 TRACKING_JSON_PATH = r".\data\tracking.json"
+# TRACKING_JSON_PATH = r"C:\Users\user\Documents\GitHub\safepath\explorer\data\tracking.json"
 
 def rounding(degree, difference=DEGREE_DIFFERENCE):
     """This method is used to determine rounded values of degrees of latitudes
@@ -209,12 +218,15 @@ class CarAccident:
         self._injuries = [int(c[-1]) for c in self._casualties]
         self._location = self._df["發生地點"]
         self._area_1 = [loc[:3] for loc in self._location]
-        self._area_2 = [loc[3:6] for loc in self._location]
+        self._area_2 = [loc[3:7] for loc in self._location]
         # Check if the third character of the string is not one of "鄉", "鎮", "市", or "區"
         for i in range(len(self._area_2)):
             if self._area_2[i][2] not in "鄉鎮市區":
-                # If the condition is met, truncate the string to the first two characters
-                self._area_2[i] = self._area_2[i][:2]
+                if self._area_2[i][1] in "鄉鎮市區":
+                    # If the condition is met, truncate the string to the first two characters
+                    self._area_2[i] = self._area_2[i][:2]
+            else:
+                self._area_2[i] = self._area_2[i][:3]
         self._includes_pedestrian = self._df["事故類型及型態大類別名稱"].str.contains('人')
 
         self._reorganize_data()
@@ -809,7 +821,7 @@ def test_CarAccident():
     # print(accident.area_2())
     # print(accident.includes_pedestrian())
     # print(accident.includes_pedestrian().sum())
-    data_id = 1
+    # data_id = 1
     # print(accident.date(data_id))
     # print(accident.time(data_id))
     # print(accident.latitude(data_id))
@@ -817,7 +829,7 @@ def test_CarAccident():
     # print(accident.fatality(data_id))
     # print(accident.injury(data_id))
     # print(accident.area_1(data_id))
-    print(accident.area_2(data_id))
+    # print(accident.area_2(data_id))
     pass
 
 def test_TrafficAccident():
@@ -844,8 +856,8 @@ def test_Earthquake():
     pass
 
 if __name__ == "__main__":
-    test_Coordinate()
-    # test_CarAccident()
+    # test_Coordinate()
+    test_CarAccident()
     # test_TrafficAccident()
     # test_Earthquake()
     pass
