@@ -1,65 +1,65 @@
-let map, directionsService, directionsRenderer;     // 自定義的全域變數用於 地圖 服務 渲染
+// let map, directionsService, directionsRenderer;     // 自定義的全域變數用於 地圖 服務 渲染
 
-//此版本 前端 console 可印出座標
-function initMap() {
-    // 初始化 google maps API: 設定中心 縮放尺度
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 23.83876, lng: 120.9876 },
-        zoom: 8
-    });
+// //此版本 前端 console 可印出座標
+// function initMap() {
+//     // 初始化 google maps API: 設定中心 縮放尺度
+//     map = new google.maps.Map(document.getElementById('map'), {
+//         center: { lat: 23.83876, lng: 120.9876 },
+//         zoom: 8
+//     });
 
-    // 實體化 google API (DirectionsService)
-    directionsService = new google.maps.DirectionsService();
-    // 實體化 google API (DirectionsRenderer)
-    directionsRenderer = new google.maps.DirectionsRenderer();
-    // DirectionsRenderer 與地圖綁定
-    directionsRenderer.setMap(map);
+//     // 實體化 google API (DirectionsService)
+//     directionsService = new google.maps.DirectionsService();
+//     // 實體化 google API (DirectionsRenderer)
+//     directionsRenderer = new google.maps.DirectionsRenderer();
+//     // DirectionsRenderer 與地圖綁定
+//     directionsRenderer.setMap(map);
 
-    // JavaScript 等待第一個 form submit 觸發執行 calculateAndDisplayRoute()
-    document.querySelector('form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        calculateAndDisplayRoute();
-    });
-}
+//     // JavaScript 等待第一個 form submit 觸發執行 calculateAndDisplayRoute()
+//     document.querySelector('form').addEventListener('submit', function(event) {
+//         event.preventDefault();
+//         calculateAndDisplayRoute();
+//     });
+// }
 
-// 計算起點終點
-function calculateAndDisplayRoute() {
-    // 取得輸入的值 起點 終點
-    const start = document.getElementById('start').value;
-    const destination = document.getElementById('destination').value;
+// // 計算起點終點
+// function calculateAndDisplayRoute() {
+//     // 取得輸入的值 起點 終點
+//     const start = document.getElementById('start').value;
+//     const destination = document.getElementById('destination').value;
 
-    // google maps API (DirectionsService) 計算路線
-    directionsService.route({
-        origin: start,
-        destination: destination,
-        travelMode: google.maps.TravelMode.DRIVING
-    }, function(response, status) {
-        if (status === google.maps.DirectionsStatus.OK) {
-            directionsRenderer.setDirections(response);
+//     // google maps API (DirectionsService) 計算路線
+//     directionsService.route({
+//         origin: start,
+//         destination: destination,
+//         travelMode: google.maps.TravelMode.DRIVING
+//     }, function(response, status) {
+//         if (status === google.maps.DirectionsStatus.OK) {
+//             directionsRenderer.setDirections(response);
 
-            // 取得所有必經路線的座標點
-            const route = response.routes[0];
-            const coordinates = [];
-            route.legs.forEach(leg => {
-                leg.steps.forEach(step => {
-                    step.path.forEach(latlng => {
-                        coordinates.push({
-                            lat: latlng.lat(),
-                            lng: latlng.lng()
-                        });
-                    });
-                });
-            });
-            console.log(coordinates);  // 肥包子 20240603 增加，這裡會輸出所有的座標點
+//             // 取得所有必經路線的座標點
+//             const route = response.routes[0];
+//             const coordinates = [];
+//             route.legs.forEach(leg => {
+//                 leg.steps.forEach(step => {
+//                     step.path.forEach(latlng => {
+//                         coordinates.push({
+//                             lat: latlng.lat(),
+//                             lng: latlng.lng()
+//                         });
+//                     });
+//                 });
+//             });
+//             console.log(coordinates);  // 肥包子 20240603 增加，這裡會輸出所有的座標點
 
-        } else {
-            // 錯誤訊息
-            console.log('Directions request failed due to ' + status);
-        }
-    });
-}
-// 避免地圖初始化失敗 (Bug 處理中 目前為替代作法: 補呼叫一次初始化)
-initMap();
+//         } else {
+//             // 錯誤訊息
+//             console.log('Directions request failed due to ' + status);
+//         }
+//     });
+// }
+// // 避免地圖初始化失敗 (Bug 處理中 目前為替代作法: 補呼叫一次初始化)
+// initMap();
 
 
 /*
@@ -110,3 +110,77 @@ function calculateAndDisplayRoute() {
 }
 initMap();
 */
+
+let map, directionsService, directionsRenderer;
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 23.83876, lng: 120.9876 },
+        zoom: 8
+    });
+
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
+
+    $('#route-form').on('submit', function(event) {
+        event.preventDefault();
+        const start = $('#start').val();
+        const destination = $('#destination').val();
+
+        // Perform AJAX form submission
+        $.ajax({
+            url: '',
+            type: 'POST',
+            data: {
+                start: start,
+                destination: destination,
+                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+            },
+            success: function(response) {
+                // Remove existing displayed values
+                $('#display-info').html('');
+
+                // Add new displayed values
+                if (start) {
+                    $('#display-info').append('<p>Start: ' + start + '</p>');
+                }
+                if (destination) {
+                    $('#display-info').append('<p>Destination: ' + destination + '</p>');
+                }
+
+                // Calculate and display the route
+                calculateAndDisplayRoute(start, destination);
+            }
+        });
+    });
+}
+
+function calculateAndDisplayRoute(start, destination) {
+    directionsService.route({
+        origin: start,
+        destination: destination,
+        travelMode: google.maps.TravelMode.DRIVING
+    }, function(response, status) {
+        if (status === google.maps.DirectionsStatus.OK) {
+            directionsRenderer.setDirections(response);
+            const route = response.routes[0];
+            const coordinates = [];
+            route.legs.forEach(leg => {
+                leg.steps.forEach(step => {
+                    step.path.forEach(latlng => {
+                        coordinates.push({
+                            lat: latlng.lat(),
+                            lng: latlng.lng()
+                        });
+                    });
+                });
+            });
+            console.log(coordinates);
+        } else {
+            console.log('Directions request failed due to ' + status);
+        }
+    });
+}
+
+initMap();
