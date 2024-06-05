@@ -1,41 +1,14 @@
 import pandas as pd
-import json
-# TRACKING_JSON_PATH = r".\data\tracking.json"
-TRACKING_JSON_PATH = r"./data/hotspots/tracking.json"
+
+
 class attractions:
     def __init__(self,rank):
-        """This class is used to get data from car accident csv files.
 
-        :param year: The year value of Republic of China.
-        :type year: int
-
-        :param month: The month value.
-        :type month: int
-
-        :param rank: The type of rank value of a car accident. There are three
-            types of car accidents: A1, A2, and A3. Currently, A3-type data is
-            not supported.
-        :type rank: int or string"""
-
-        # self._year = year
-        # self._month = month
         self._rank = rank
-        # self._is_arg_valid()
         self._df = pd.DataFrame()
         self._read_csv_file()
         self._get_data()
 
-    # def _is_arg_valid(self):
-    #     """This method is used to determine if the auguments are valid."""
-
-    #     with open(TRACKING_JSON_PATH) as file:
-    #         data = json.load(file)
-    #         starting_year = data["csv"]["car_accident"]["starting_year"]
-    #         ending_year = data["csv"]["car_accident"]["ending_year"]
-    #     if (type(self._year) != int or (self._year < starting_year or self._year > ending_year)):
-    #         message = f"Invalid year. Must be an integer between {starting_year} and {ending_year} (including)."
-    #         raise InvalidRangeError(message)
-    #     check_if_month_is_valid(self._month)
 
     def _read_csv_file(self):
         """This method is used to read and get data from the csv files."""
@@ -170,10 +143,10 @@ if __name__ == "__main__":
     rank = 1
     attraction_data = attractions(rank)
 
-    # print("Title:", attraction_data.title(10))
-    # print("Image:", attraction_data.image(10))
-    # print("Latitude:", attraction_data.latitude(10))
-    # print("Longitude:", attraction_data.longitude(10))
-    # print("Address:", attraction_data.address(10))
-    # print("Area 1:", attraction_data.area_1(10))
-    # print("Area 2:", attraction_data.area_2(10))
+    print("Title:", attraction_data.title(10))
+    print("Image:", attraction_data.image(10))
+    print("Latitude:", attraction_data.latitude(10))
+    print("Longitude:", attraction_data.longitude(10))
+    print("Address:", attraction_data.address(10))
+    print("Area 1:", attraction_data.area_1(10))
+    print("Area 2:", attraction_data.area_2(10))

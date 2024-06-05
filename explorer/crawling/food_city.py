@@ -6,6 +6,8 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+
+
 class CrawlingFoods():
     def __init__(self, city):
         self.driver = webdriver.Chrome()
@@ -13,6 +15,7 @@ class CrawlingFoods():
         self.get_urls_from_page()
         self.crawling_pages()
         self.driver.quit()
+        self.write_to_csv()
         
     def get_urls_from_page(self):
         self.urls = []
@@ -27,15 +30,14 @@ class CrawlingFoods():
                 soup = BeautifulSoup(r.text, 'html.parser')
                 hrefs = soup.find_all('a', class_='jsx-320828271 title-text')
                 for h in hrefs:
-                    self.urls.append(f'https://ifoodie.tw{h.get("href")}')
+                    self.urls.append(f"https://ifoodie.tw{h.get('href')}")
                
-
     def crawling_pages(self):
         self.data = []
         for url in self.urls:
-            self.data.append(self.get_json_from_web(url))
+            self.data.append(self.get_json_from_page(url))
 
-    def get_json_from_web(self, url):
+    def get_json_from_page(self, url):
         self.driver.get(url)
         # 使用显式等待，等待 <script id="__NEXT_DATA__"> 出现
         WebDriverWait(self.driver, 10).until(
@@ -58,10 +60,10 @@ class CrawlingFoods():
             "area_1": str,
             "area_2": str,
             "address": str,
-            "phone":str,
-            "opening_hours_all":list,
-            "rating":float,
-            "avg_price":int
+            "phone": str,
+            "opening_hours": list,
+            "rating": float,
+            "avg_price": int
         }
 
         # 将数据写入 CSV 文件
@@ -77,7 +79,7 @@ class CrawlingFoods():
             "area_2": restaurant.area_2,
             "address": restaurant.address,
             "phone": restaurant.phone,
-            "opening_hours_all": restaurant.opening_hours.all,
+            "opening_hours": restaurant.opening_hours.all,
             "rating": restaurant.rating,
             "avg_price": restaurant.avg_price
         }
@@ -120,5 +122,4 @@ class Week:
 
 if __name__ == "__main__":
     city = "台北市"  # 示例城市
-    food = CrawlingFoods(city)
-    food.write_to_csv()
+    CrawlingFoods(city)

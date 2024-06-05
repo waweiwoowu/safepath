@@ -177,3 +177,23 @@ GEOCODE = [{
                             'southwest': {'lat': 25.0324921197085, 'lng': 121.5631660197085}}},
     'place_id': 'ChIJH56c2rarQjQRphD9gvC8BhI',
     'types': ['premise']}]
+
+GEOCODE_ZH = [{
+    'address_components': [
+        {'long_name': '大安森林公園', 'short_name': '大安森林公園', 'types': ['establishment', 'park', 'point_of_interest', 'tourist_attraction']}, 
+        {'long_name': '1號', 'short_name': '1號', 'types': ['street_number']}, 
+        {'long_name': '新生南路二段', 'short_name': '新生南路二段', 'types': ['route']}, 
+        {'long_name': '龍門里', 'short_name': '龍門里', 'types': ['administrative_area_level_3', 'political']}, 
+        {'long_name': '大安區', 'short_name': '大安區', 'types': ['administrative_area_level_2', 'political']}, 
+        {'long_name': '台北市', 'short_name': '台北市', 'types': ['administrative_area_level_1', 'political']}, 
+        {'long_name': '台灣', 'short_name': 'TW', 'types': ['country', 'political']}, 
+        {'long_name': '106', 'short_name': '106', 'types': ['postal_code']}], 
+    'formatted_address': '106台灣台北市大安區新生南路二段1號大安森林公園', 
+    'geometry': {'location': {'lat': 25.0296587, 'lng': 121.5362867}, 
+                 'location_type': 'ROOFTOP', 
+                 'viewport': {'northeast': {'lat': 25.0334161, 'lng': 121.5375213}, 
+                              'southwest': {'lat': 25.0288186, 'lng': 121.5345102}}}, 
+    'partial_match': True, 
+    'place_id': 'ChIJnzZlOoCpQjQRH-WG9egh-2E', 
+    'plus_code': {'compound_code': '2GHP+VG 台灣台北市大安區龍門里', 'global_code': '7QQ32GHP+VG'}, 
+    'types': ['establishment', 'park', 'point_of_interest', 'tourist_attraction']}]

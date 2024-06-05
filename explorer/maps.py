@@ -6,14 +6,14 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ### runserver
-from explorer.test_data import *
-from explorer.database import Coordinate
-KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
+# from explorer.test_data import *
+# from explorer.database import Coordinate
+# KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 
 ### run python file
-# from test_data import *
-# from database import Coordinate
-# KEY_PATH = r".\data\keys\paths.json"
+from test_data import *
+from database import Coordinate
+KEY_PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
 
@@ -278,20 +278,24 @@ class _DirectionEarthquakeData():
 
 class Geocode():
     def __init__(self, address=None):
+        language = "zh-TW"
         if not address:
-            self.data = GEOCODE[0]
+            self.data = GEOCODE_ZH[0]
         else:
-            self.data = _GoogleMap.gmaps.geocode(address)[0]
+            self.data = _GoogleMap.gmaps.geocode(address=address, language=language)[0]
+        self.name = self.data["address_components"][0]["long_name"]
         self.postal_code = self.data["address_components"][-1]["long_name"]
         self.country = self.data["address_components"][-2]["long_name"]
         self.area_1 = self.data["address_components"][-3]["long_name"]
         self.area_2 = self.data["address_components"][-4]["long_name"]
+        self.area_3 = self.data["address_components"][-5]["long_name"]
         self.address = self.data["formatted_address"]
         self.latitude = self.data["geometry"]["location"]["lat"]
         self.longitude = self.data["geometry"]["location"]["lng"]
+        self.place_id = self.data["place_id"]
 
     @property
-    def location(self):
+    def coordinate(self):
         return (self.latitude, self.longitude)
 
 
@@ -315,10 +319,22 @@ def test_Direction():
     pass
 
 def test_Geocode():
-    address = "台北101"
+    address = "大安森林公園"
     # geocode = Geocode(address)
     geocode = Geocode()
+    # print(geocode.data)
+    print(geocode.name)
+    print(geocode.postal_code)
+    print(geocode.country)
+    print(geocode.area_1)
+    print(geocode.area_2)
+    print(geocode.area_3)
     print(geocode.address)
+    print(geocode.latitude)
+    print(geocode.longitude)
+    print(geocode.coordinate)
+    print(geocode.place_id)
+    
 
 if __name__ == "__main__":
     # test_Direction()
