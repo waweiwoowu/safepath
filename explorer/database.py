@@ -3,8 +3,8 @@ import math
 import sqlite3
 import pandas as pd
 from datetime import datetime
-# import explorer.risk
-import risk
+import explorer.risk
+# import risk
 
 DEGREE_DIFFERENCE = 0.0001
 TRACKING_JSON_PATH = r".\data\tracking.json"

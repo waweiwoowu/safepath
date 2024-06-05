@@ -7,30 +7,21 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}">
     <script src="{% static 'js/map.js' %}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=___Your__API__Key__Here___&callback=initMap" async defer></script>
-
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFzApqD1tGY615APaue-nIwjC6Lx5pOp0&callback=initMap" async defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="top-bar">
-        <form action="" method="post">
+        <form id="route-form" action="" method="post">
             {% csrf_token %}
             <label for="start">Start:</label>
-            <input type="text" id="start" name="start" required>
+            <input type="text" id="start" name="start" value="{{ start }}" required>
             <label for="destination">Destination:</label>
-            <input type="text" id="destination" name="destination" required>
+            <input type="text" id="destination" name="destination" value="{{ destination }}" required>
             <button type="submit">OK</button>
         </form>
     </div>
     <br>
-    <!--
-    <p>AAA</p>
-    {% if start %}
-        <p>Start: {{ start }}</p>
-    {% endif %}
-    {% if destination %}
-        <p>Destination: {{ destination }}</p>
-    {% endif %}
-    -->
     <div class="container">
         <div class="left">
             <div id="map" style="height: 100%; width: 100%;"></div>
@@ -38,6 +29,7 @@
         <div class="right">
             <input type="text" id="risk_t" name="risk_t" placeholder="Risk_T">
             <input type="text" id="risk_e" name="risk_e" placeholder="Risk_E">
+            <div id="display-info"></div>
         </div>
     </div>
 </body>

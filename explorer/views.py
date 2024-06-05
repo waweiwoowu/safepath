@@ -92,13 +92,15 @@ async def home(request):
         # direction = Direction(origin=start, destination=destination)
 
         coordinates = direction.coordinates
-        # fatality = await direction.car_accident.fatality
-        # injury = await direction.car_accident.injury
+        # fatality = await direction.traffic_accident.total_fatality
+        # injury = await direction.traffic_accident.total_injury
 
         return render(request, 'home.html', {
             'start': start,
             'destination': destination,
-            'coordinates': coordinates
+            'coordinates': coordinates,
+            # 'fatality': fatality,
+            # 'injury': injury
         })
     else:
         return render(request, 'home.html', {})
