@@ -11,30 +11,32 @@
     <div class="MainPanel">
         <!-- Region 1: Pick an Area -->
         <form method="POST">
-        <div class="Area">
-            <div>
-                {% csrf_token %}
-                <label for="area_1">城市:</label>
-                <!-- 選擇城市後 需刷新 鄉鎮下拉選單 -->
-                <select id="area_1">
-                    {% for location in lacations%}
-                    <option value="area_1">{{location}}</option>
-                    {% endfor %}
-                </select>
-
+            <div class="Area">
+                <div>
+                    {% csrf_token %}
+                    <label for="city">城市:</label>
+                    <!-- City selection triggers area dropdown refresh -->
+                    <select id="city" name="city">
+                        <option value="">選擇城市</option>
+                        {% for city in cities %}
+                        <option value="{{ city.CityName }}">{{ city.CityName }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="area">鄉鎮:</label>
+                    <!-- Area selection -->
+                    <select id="area" name="area" style="display:none;">
+                        <option value="">選擇鄉鎮</option>
+                    </select>
+                </div>
+                <button type="submit">推薦景點</button>
             </div>
-            <div>
-                <label for="area_2">鄉鎮:</label>
-                <!-- 選擇鄉鎮 + 按下推薦景點 需刷新 div class="Recommend_spot" 與 class="Recommend_food"-->
-                <select id="area_2">
-                    {% for area in areas%}
-                    <option value="area_2">{{area}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit">推薦景點</button>
-        </div>
-    </form>
+        </form>
+        <div id="result" style="margin-top: 20px;"></div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="{% static 'js/travel.js' %}"></script>
 
         <!-- Region 2: Optimal_route -->
         <div class="Optimal_route">
@@ -125,6 +127,8 @@
     </div>
 </body>
 </html>
+
+{% comment %} 上面原版 {% endcomment %}
 
 {% comment %} <!DOCTYPE html>
 <html lang="en">
