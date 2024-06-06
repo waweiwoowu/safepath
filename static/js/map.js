@@ -152,6 +152,9 @@ function initMap() {
                 if (response.injury) {
                     $('#display-info').append('<p>Injury: ' + response.injury + '</p>');
                 }
+                if (response.magnitude) {
+                    $('#display-info').append('<p>Magnitude: ' + response.magnitude + '</p>');
+                }
                 // Calculate and display the route
                 calculateAndDisplayRoute(start, destination);
             }

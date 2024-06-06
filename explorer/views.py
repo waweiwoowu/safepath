@@ -141,7 +141,7 @@ async def home(request):
         injury = direction.traffic_accident.total_injury
         if injury == 0:
             injury = "無受傷"
-
+        magnitude = direction.earthquake.magnitude[0]
         # return render(request, 'home.html', {
         #     'start': start,
         #     'destination': destination,
@@ -151,7 +151,8 @@ async def home(request):
         # })
         return JsonResponse({
         'fatality': fatality,
-        'injury': injury
+        'injury': injury,
+        'magnitude': magnitude
     })
     else:
         return render(request, 'home.html', {})

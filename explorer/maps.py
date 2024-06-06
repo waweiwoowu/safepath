@@ -6,13 +6,13 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ### runserver
-# from explorer.test_data import *
-# from explorer.database import Coordinate, PedestrianHellSQLController
+from explorer.test_data import *
+from explorer.database import Coordinate, PedestrianHellSQLController
 # KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 
 ### run python file
-from test_data import *
-from database import Coordinate, PedestrianHellSQLController
+# from test_data import *
+# from database import Coordinate, PedestrianHellSQLController
 KEY_PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
@@ -285,7 +285,7 @@ class Geocode():
             self.data = GEOCODE_ZH_2[0]
         else:
             self.data = _GoogleMap.gmaps.geocode(address=address, language=language)[0]
-        # print(self.data)    
+        # print(self.data)
         self.name = self.data["address_components"][0]["long_name"]
         # self.postal_code = self.data["address_components"][-1]["long_name"]
         # self.country = self.data["address_components"][-2]["long_name"]
@@ -314,14 +314,14 @@ class _TrafficAccidentData():
         self.total_injury = GetSQLData(self._controller, "total_injury", 5)
         self.pedestrian_fatality = GetSQLData(self._controller, "pedestrian_fatality", 6)
         self.pedestrian_injury = GetSQLData(self._controller, "pedestrian_injury", 7)
-        
+
 class GetSQLData:
     def __init__(self, controller, column, index):
         self._controller = controller
         self._column = column
         self._index = index
         self._data = None
-        
+
     def sorting(self, number_of_data=None, is_ascending=False):
         if self._data is None:
             self._data = self._controller.select_by_order(self._column, is_ascending)
@@ -329,7 +329,7 @@ class GetSQLData:
             return self._data[:number_of_data]
         else:
             return self._data
-    
+
     def sum(self):
         sum_ = 0
         if self._data is None:
@@ -337,7 +337,7 @@ class GetSQLData:
         for data in self._data:
             sum_ += data[self._index]
         return sum_
-    
+
 
 def test_Direction():
     direction = Direction()
@@ -381,7 +381,7 @@ def test_Taiwan():
     taiwan = Taiwan()
     number_of_data = 5
     is_ascending = False
-    
+
     number = taiwan.traffic_accident.number.sorting(number_of_data, is_ascending)
     total_fatality = taiwan.traffic_accident.total_fatality.sorting(number_of_data, is_ascending)
     total_injury = taiwan.traffic_accident.total_injury.sorting(number_of_data, is_ascending)
@@ -392,13 +392,13 @@ def test_Taiwan():
     print()
     print("2022年交通事故統計")
     print()
-    
+
     print("[事故次數]")
     print(f"全 國: {number_sum}次 (每月{number_sum//12}次)")
     for i in range(number_of_data):
         print(f"第{i+1}名:", end=" ")
         print(f"{number[i][1]} {number[i][2]} {number[i][3]}")
-    
+
     print()
     print("[死亡人數]")
     print(f"全 國: {total_fatality_sum}人 (每月{total_fatality_sum//12}人)")
@@ -413,7 +413,7 @@ def test_Taiwan():
         print(f"第{i+1}名:", end=" ")
         print(f" {total_injury[i][1]} {total_injury[i][2]} {total_injury[i][5]}")
     pass
-    
+
 if __name__ == "__main__":
     # test_Direction()
     # test_Geocode()
