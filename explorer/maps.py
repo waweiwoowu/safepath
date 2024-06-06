@@ -308,7 +308,36 @@ class Taiwan():
 
 class _TrafficAccidentData():
     def __init__(self):
-        controller = PedestrianHellSQLController()
+        self._controller = PedestrianHellSQLController()
+        self.number = GetSQLData(self._controller, "number", 3)
+        self.total_fatality = GetSQLData(self._controller, "total_fatality", 4)
+        self.total_injury = GetSQLData(self._controller, "total_injury", 5)
+        self.pedestrian_fatality = GetSQLData(self._controller, "pedestrian_fatality", 6)
+        self.pedestrian_injury = GetSQLData(self._controller, "pedestrian_injury", 7)
+        
+class GetSQLData:
+    def __init__(self, controller, column, index):
+        self._controller = controller
+        self._column = column
+        self._index = index
+        self._data = None
+        
+    def sorting(self, number_of_data=None, is_ascending=False):
+        if self._data is None:
+            self._data = self._controller.select_by_order(self._column, is_ascending)
+        if number_of_data:
+            return self._data[:number_of_data]
+        else:
+            return self._data
+    
+    def sum(self):
+        sum_ = 0
+        if self._data is None:
+            self._data = self.sorting()
+        for data in self._data:
+            sum_ += data[self._index]
+        return sum_
+    
 
 def test_Direction():
     direction = Direction()
@@ -346,8 +375,47 @@ def test_Geocode():
     # print(geocode.longitude)
     # print(geocode.coordinate)
     # print(geocode.place_id)
+    pass
+
+def test_Taiwan():
+    taiwan = Taiwan()
+    number_of_data = 5
+    is_ascending = False
+    
+    number = taiwan.traffic_accident.number.sorting(number_of_data, is_ascending)
+    total_fatality = taiwan.traffic_accident.total_fatality.sorting(number_of_data, is_ascending)
+    total_injury = taiwan.traffic_accident.total_injury.sorting(number_of_data, is_ascending)
+    number_sum = taiwan.traffic_accident.number.sum()
+    total_fatality_sum = taiwan.traffic_accident.total_fatality.sum()
+    total_injury_sum = taiwan.traffic_accident.total_injury.sum()
+
+    print()
+    print("2022年交通事故統計")
+    print()
+    
+    print("[事故次數]")
+    print(f"全 國: {number_sum}次 (每月{number_sum//12}次)")
+    for i in range(number_of_data):
+        print(f"第{i+1}名:", end=" ")
+        print(f"{number[i][1]} {number[i][2]} {number[i][3]}")
+    
+    print()
+    print("[死亡人數]")
+    print(f"全 國: {total_fatality_sum}人 (每月{total_fatality_sum//12}人)")
+    for i in range(number_of_data):
+        print(f"第{i+1}名:", end=" ")
+        print(f"{total_fatality[i][1]} {total_fatality[i][2]} {total_fatality[i][4]}")
+
+    print()
+    print("[受傷人數]")
+    print(f"全 國: {total_injury_sum}人 (每月{total_injury_sum//12}人)")
+    for i in range(number_of_data):
+        print(f"第{i+1}名:", end=" ")
+        print(f" {total_injury[i][1]} {total_injury[i][2]} {total_injury[i][5]}")
+    pass
     
 if __name__ == "__main__":
     # test_Direction()
-    test_Geocode()
+    # test_Geocode()
+    test_Taiwan()
     pass

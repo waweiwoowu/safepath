@@ -668,7 +668,7 @@ class SQLController:
     def select_by_order(self, ordered_column, is_ascending=True):
         sql = f"SELECT * FROM {self.table_name} ORDER BY {ordered_column}"
         if not is_ascending:
-            sql + " DESC"
+            sql += " DESC"
         self.cursor.execute(sql)
         data = self.cursor.fetchall()
         if data:
