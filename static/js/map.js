@@ -128,7 +128,10 @@ function initMap() {
         const start = $('#start').val();
         const destination = $('#destination').val();
 
-        // Perform AJAX form submission
+        // Clear previous results and show the loading message
+        $('#display-info').html('');
+        $('#loading-message').html('Loading, please wait...Don\'t refresh the screen!!!!!!!!!!!!').show();
+
         $.ajax({
             url: '',
             type: 'POST',
@@ -155,8 +158,17 @@ function initMap() {
                 if (response.magnitude) {
                     $('#display-info').append('<p>Magnitude: ' + response.magnitude + '</p>');
                 }
+
+                // Hide the loading message
+                $('#loading-message').hide();
+
                 // Calculate and display the route
                 calculateAndDisplayRoute(start, destination);
+            },
+            error: function() {
+                // Hide the loading message even if there's an error
+                $('#loading-message').hide();
+                $('#display-info').html('<p>An error occurred while processing your request.</p>');
             }
         });
     });
