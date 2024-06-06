@@ -72,54 +72,51 @@ def verify(request):
             return HttpResponse("Failed")
 
 def travel(request):
-    citys = ['台北市','台中市']
-    areas = ['中正區','北屯區']
     attractions = []
     food_places = []
     if request.method == 'POST':
-        location = request.POST.get('location')
-        area = request.POST.get('area')
-        if location == "台北市" and area == "文山區":
-            attractions = [
-                {
-                    'title': '景點A',
-                    'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
-                    'address': '地址A',
-                    'phone': '電話A'
-                },
-                {
-                    'title': '景點B',
-                    'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
-                    'address': '地址B',
-                    'phone': '電話B'
-                }
-            ]
-            food_places = [
-                {
-                    'title': '美食A',
-                    'image': 'https://media.istockphoto.com/id/483120255/zh/%E7%85%A7%E7%89%87/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
-                    'rating': '5星',
-                    'address': '地址B',
-                    'phone': '電話B',
-                    'openhour': '星期一 11:30-23:00',
-                    'price':'800-1000'
-                },
-                {
-                    'title': '美食B',
-                    'image': 'https://media.istockphoto.com/id/483120255/zh/%E7%85%A7%E7%89%87/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
-                    'rating': '4星',
-                    'address': '地址B',
-                    'phone': '電話B',
-                    'openhour': '星期一 11:30-23:00',
-                    'price':'400-500'
-                }
-            ]
+        location = request.POST.get('city')
+        area = request.POST.get('county')
+        # if location == "台北市" and area == "文山區":
+        attractions = [
+            {
+                'title': '景點A',
+                'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
+                'address': '地址A',
+                'phone': '電話A'
+            },
+            {
+                'title': '景點B',
+                'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
+                'address': '地址B',
+                'phone': '電話B'
+            }
+        ]
+        food_places = [
+            {
+                'title': '美食A',
+                'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
+                'rating': '5星',
+                'address': '地址B',
+                'phone': '電話B',
+                'openhour': '星期一 11:30-23:00',
+                'price':'800-1000'
+            },
+            {
+                'title': '美食B',
+                'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
+                'rating': '4星',
+                'address': '地址B',
+                'phone': '電話B',
+                'openhour': '星期一 11:30-23:00',
+                'price':'400-500'
+            }
+        ]
 
-            return render(request, 'travel.html', {'lacations':citys, 'areas':areas,"attractions":attractions, "food_places":food_places})
+        return render(request, 'travel.html', {"attractions":attractions, "food_places":food_places})
     else:
-        citys = ['台北市','台中市']
-        areas = ['中正區','北屯區']
-        return render(request, 'travel.html', {'lacations':citys, 'areas':areas})
+
+        return render(request, 'travel.html')
 
 
 async def home(request):
@@ -141,7 +138,14 @@ async def home(request):
         injury = direction.traffic_accident.total_injury
         if injury == 0:
             injury = "無受傷"
-        magnitude = direction.earthquake.magnitude[0]
+
+        magnitude = direction.earthquake.magnitude
+        if magnitude is None:
+            magnitude = "無地震"
+        else:
+            magnitude = direction.earthquake.magnitude[0]
+
+
         # return render(request, 'home.html', {
         #     'start': start,
         #     'destination': destination,

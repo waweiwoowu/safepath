@@ -6,6 +6,22 @@
     <title>Map Project</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/travel.css' %}">
+    <style>
+        .Recommend_spot .Recommend_food {
+            display: flex;
+            justify-content: space-between;
+        }
+        .column {
+            width: 45%;
+        }
+        .result {
+            margin-bottom: 20px;
+        }
+        .result img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
     <div class="MainPanel">
@@ -49,79 +65,41 @@
 
         <!-- Region 3: Recommend Hotspot -->
         <div class="Recommend_spot">
-            <div class="left">
-                <h3>選擇景點</h3>
-                <!-- JavaScript: addEventListener('Cursor Hover label') 滑鼠飄過(Hover) 任一景點 label 刷新 景點資訊 + 景點圖片 -->
-                <input type="checkbox" id="hotSpot_1" name="hotSpot_1">
-                <label for="hotSpot_1">景點1</label><br>
+            <div class="column">
 
-                <input type="checkbox" id="hotSpot_2" name="hotSpot_2">
-                <label for="hotSpot_2">景點2</label><br>
-
-                <input type="checkbox" id="hotSpot_3" name="hotSpot_3">
-                <label for="hotSpot_3">景點3</label><br>
-
-                <input type="checkbox" id="hotSpot_4" name="hotSpot_4">
-                <label for="hotSpot_4">景點4</label><br>
-
-                <input type="checkbox" id="hotSpot_5" name="hotSpot_5">
-                <label for="hotSpot_5">景點5</label><br>
-                <!-- Click Button 刷新 Region 2: Optimal_route class='Optimal_route'-->
-                <button class="Insert_To_WayPoints">加入景點行程</button>
-            </div>
-            <div class="middle">
                 <h3>景點資訊</h3>
-                <p id="St"><strong>景點:</strong>
-                    <input id="hotSpot_Nm" name="hotSpot_nm">
-                </p>
-                <p id="St_Addr"><strong>地址:</strong>
-                    <input id="hotSpot_Addr" name="hotSpot_Addr">
-                </p>
-                <p id="St_Tel"><strong>電話:</strong>
-                    <input id="hotSpot_Tel" name="hotSpot_Tel">
-                </p>
-            </div>
-            <div class="right">
-                <img src="HotSpot_Picture" alt="Hotspot Picture">
+                {% for attraction in attractions %}
+                <div class="result">
+                    <input type="checkbox" id="hotSpot_5" name="hotSpot_1">
+                    <label for="hotSpot_5">{{ attraction.title }}</label><br>
+                    <h3>{{ attraction.title }}</h3>
+                    <img src="{{ attraction.image }}" alt="{{ attraction.title }}">
+                    <p>地址: {{ attraction.address }}</p>
+                    <p>電話: {{ attraction.phone }}</p>
+                </div>
+                {% endfor %}
+                <button class="Insert_To_WayPoints">加入景點行程</button>
+
             </div>
         </div>
-
         <!-- Region 4: Recommend Food -->
         <div class="Recommend_food">
-            <div class="left">
-                <h3>選擇美食</h3>
-                <input type="checkbox" id="food_1" name="food_1">
-                <!-- JavaScript: addEventListener('Cursor Hover label') 滑鼠飄過(Hover) 任一美食 label 刷新 美食資訊 + 美食圖片 -->
-                <label for="food_1">美食1</label><br>
-
-                <input type="checkbox" id="food_2" name="food_2">
-                <label for="food_2">美食2</label><br>
-
-                <input type="checkbox" id="food_3" name="food_3">
-                <label for="food_3">美食3</label><br>
-
-                <input type="checkbox" id="food_4" name="food_4">
-                <label for="food_4">美食4</label><br>
-
-                <input type="checkbox" id="food_5" name="food_5">
-                <label for="food_5">美食5</label><br>
-                <!-- Click Button 刷新 Region 2: Optimal_route class='Optimal_route'-->
-                <button class="Insert_To_WayPoints">加入美食行程</button>
-            </div>
-            <div class="middle">
+            <div class="column">
                 <h3>美食資訊</h3>
-                <p id="Fd"><strong>美食:</strong>
-                    <input id="food_Nm" name="food_nm">
-                </p>
-                <p id="Fd_addr"><strong>地址:</strong>
-                    <input id="food_Addr" name="food_Addr">
-                </p>
-                <p id="Fd_Tel"><strong>電話:</strong>
-                    <input id="food_Tel" name="food_Tel">
-                </p>
-            </div>
-            <div class="right">
-                <img src="Food_Picture" alt="Food Picture">
+                {% for food in food_places %}
+                <div class="result">
+                    <input type="checkbox" id="food_2" name="food_2">
+                    <label for="food_2">{{ food.title }}</label><br>
+                    <h3>{{ food.title }}</h3>
+                    <img src="{{ food.image }}" alt="{{ food.title }}">
+                    <p>評價: {{ food.rating }}</p>
+                    <p>地址: {{ food.address }}</p>
+                    <p>電話: {{ food.phone }}</p>
+                    <p>營業時間: {{ food.openhour }}</p>
+                    <p>平均消費: {{ food.price }}</p>
+                </div>
+                {% endfor %}
+                <button class="Insert_To_WayPoints">加入美食行程</button>
             </div>
         </div>
     </div>
