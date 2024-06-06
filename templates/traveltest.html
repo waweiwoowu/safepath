@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>搜尋景點及美食</title>
+    <title>Map Project</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/travel.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <style>
         .container {
             display: flex;
@@ -22,34 +25,77 @@
     </style>
 </head>
 <body>
-    <h1>輸入地名及區域</h1>
-    <form method="POST">
-        {% csrf_token %}
-        <label for="location">地名:</label>
-        <input type="text" placeholder="縣市" name="location" required>
-        <br>
-        <label for="area">區域:</label>
-        <input type="text" placeholder="鄉鎮區域" name="area" required>
-        <br>
-        <button type="submit">搜尋</button>
+    <div class="MainPanel">
+        <!-- Region 1: Pick an Area -->
+        <form method="POST">
+        <div class="Area">
+            <div>
+                {% csrf_token %}
+                <label for="area_1">城市:</label>
+                <!-- 選擇城市後 需刷新 鄉鎮下拉選單 -->
+                <select name="city" onchange="listCities()">
+                    {% for city in citys %}
+                        <option style="text-align: center" value="{{city.id}}" {% if city == cityName %} selected="selected" {% endif %}>{{city}}</option>  s
+                    {% endfor %}
+                </select>
+
+            </div>
+            <div>
+                <label for="area_2">鄉鎮:</label>
+                <!-- 選擇鄉鎮 + 按下推薦景點 需刷新 div class="Recommend_spot" 與 class="Recommend_food"-->
+                <select id="countylist" name="county">
+                    <option style="text-align: center" value="全區">全區</option>
+                    {% for county in counties %}
+                        <option style="text-align: center" value="{{county.name}}" {% if county == countyName %} selected="selected" {% endif %}>{{county}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">推薦景點</button>
+        </div>
     </form>
-    {% if attractions or food_places %}
-    <div class="container">
-        <div class="column">
-            <h2>景點</h2>
-            {% for attraction in attractions %}
+
+        <!-- Region 2: Optimal_route -->
+        <div class="Optimal_route">
+            <div>
+                <!-- 起點 + (規劃好順序的 景點 + 美食 WayPoints) + 終點 -->
+                <input id="Start_Point" name="Start_Point"><input id="OP_rote" name="OP_rote"><input id="Destination" name="Destination">
+            </div>
+            <button>規劃路線</button>
+        </div>
+
+        <!-- Region 3: Recommend Hotspot -->
+        <div class="container">
+            <div class="column">
+                <h3>選擇景點</h3>
+
+                <h3>景點資訊</h3>
+                {% for attraction in attractions %}
                 <div class="result">
+                    <input type="checkbox" id="hotSpot_5" name="hotSpot_1">
+                    <label for="hotSpot_5">{{ attraction.title }}</label><br>
                     <h3>{{ attraction.title }}</h3>
                     <img src="{{ attraction.image }}" alt="{{ attraction.title }}">
                     <p>地址: {{ attraction.address }}</p>
                     <p>電話: {{ attraction.phone }}</p>
                 </div>
-            {% endfor %}
+                {% endfor %}
+                <button class="Insert_To_WayPoints">加入景點行程</button>
+
+            </div>
+
         </div>
-        <div class="column">
-            <h2>美食</h2>
-            {% for food in food_places %}
+
+        <!-- Region 4: Recommend Food -->
+        <div class="container">
+            <div class="column">
+                <h3>選擇美食</h3>
+                <input type="checkbox" id="food_1" name="food_1">
+
+                <h3>美食資訊</h3>
+                {% for food in food_places %}
                 <div class="result">
+                    <input type="checkbox" id="food_2" name="food_2">
+                    <label for="food_2">{{ food.title }}</label><br>
                     <h3>{{ food.title }}</h3>
                     <img src="{{ food.image }}" alt="{{ food.title }}">
                     <p>評價: {{ food.rating }}</p>
@@ -58,12 +104,13 @@
                     <p>營業時間: {{ food.openhour }}</p>
                     <p>平均消費: {{ food.price }}</p>
                 </div>
-            {% endfor %}
+                {% endfor %}
+                <button class="Insert_To_WayPoints">加入美食行程</button>
+
+            </div>
+
         </div>
     </div>
-    {% endif %}
-
-
 
 </body>
 </html>
