@@ -197,3 +197,54 @@ GEOCODE_ZH = [{
     'place_id': 'ChIJnzZlOoCpQjQRH-WG9egh-2E', 
     'plus_code': {'compound_code': '2GHP+VG 台灣台北市大安區龍門里', 'global_code': '7QQ32GHP+VG'}, 
     'types': ['establishment', 'park', 'point_of_interest', 'tourist_attraction']}]
+
+GEOCODE_ZH_1 = [{
+    'address_components': [
+        {'long_name': '386', 'short_name': '386', 'types': ['street_number']}, 
+        {'long_name': '建國路', 'short_name': '建國路', 'types': ['route']}, 
+        {'long_name': '瑞興里', 'short_name': '瑞興里', 'types': ['administrative_area_level_3', 'political']}, 
+        {'long_name': '八德區', 'short_name': '八德區', 'types': ['administrative_area_level_2', 'political']}, 
+        {'long_name': '桃園市', 'short_name': '桃園市', 'types': ['administrative_area_level_1', 'political']}, 
+        {'long_name': '台灣', 'short_name': 'TW', 'types': ['country', 'political']}, 
+        {'long_name': '334', 'short_name': '334', 'types': ['postal_code']}], 
+    'formatted_address': '334台灣桃園市八德區建國路386號', 
+    'geometry': {'location': {'lat': 24.9401104, 'lng': 121.2882407}, 
+                 'location_type': 'ROOFTOP', 
+                 'viewport': {'northeast': {'lat': 24.9414507802915, 'lng': 121.2895322302915}, 
+                              'southwest': {'lat': 24.9387528197085, 'lng': 121.2868342697085}}}, 
+    'place_id': 'ChIJ96H7-OoYaDQR5ez5vbPTTnc', 
+    'plus_code': {'compound_code': 'W7RQ+27 台灣桃園市八德區瑞興里', 'global_code': '7QP3W7RQ+27'}, 
+    'types': ['street_address']}]
+
+GEOCODE_ZH_2 = [{
+    'address_components': [
+        {'long_name': '55', 'short_name': '55', 'types': ['street_number']}, 
+        {'long_name': '文化一路', 'short_name': '文化一路', 'types': ['route']},
+        {'long_name': '樂善里', 'short_name': '樂善里', 'types': ['administrative_area_level_3', 'political']}, 
+        {'long_name': '龜山區', 'short_name': '龜山區', 'types': ['administrative_area_level_2', 'political']}, 
+        {'long_name': '桃園市', 'short_name': '桃園市', 'types': ['administrative_area_level_1', 'political']}, 
+        {'long_name': '台灣', 'short_name': 'TW', 'types': ['country', 'political']}, 
+        {'long_name': '333', 'short_name': '333', 'types': ['postal_code']}], 
+    'formatted_address': '333台灣桃園市龜山區文化一路55號', 
+    'geometry': {'location': {'lat': 25.0564006, 'lng': 121.3751299}, 
+                 'location_type': 'ROOFTOP', 
+                 'viewport': {'northeast': {'lat': 25.05765158029151, 'lng': 121.3764402802915}, 
+                              'southwest': {'lat': 25.0549536197085, 'lng': 121.3737423197085}}}, 
+    'place_id': 'ChIJibXZuD2nQjQRnOTgxi2az-w', 
+    'plus_code': {'compound_code': '394G+H3 台灣桃園市龜山區樂善里', 'global_code': '7QQ3394G+H3'}, 
+    'types': ['street_address']}]
+
+GEOCODE_ZH_2 = [{
+    'address_components': [
+        {'long_name': '27', 'short_name': '27', 'types': ['street_number']}, 
+        {'long_name': '浯江街', 'short_name': '浯江街', 'types': ['route']}, 
+        {'long_name': '893', 'short_name': '893', 'types': ['postal_code']}], 
+    'formatted_address': '893浯江街27', 
+    'geometry': {'bounds': {'northeast': {'lat': 24.4328786, 'lng': 118.3179771}, 
+                            'southwest': {'lat': 24.4326281, 'lng': 118.3177942}}, 
+                 'location': {'lat': 24.43276, 'lng': 118.3178872}, 
+                 'location_type': 'ROOFTOP', 
+                 'viewport': {'northeast': {'lat': 24.4340838302915, 'lng': 118.3191920302915}, 
+                              'southwest': {'lat': 24.4313858697085, 'lng': 118.3164940697085}}}, 
+    'place_id': 'ChIJjYeq42uiFDQREdi7jUBZgRQ', 
+    'types': ['premise']}]

@@ -509,10 +509,14 @@ class Attraction:
 
     def _reorganize_data(self):
         """This method is used to take out the duplicated data"""
-
+        
+        # Import Geocode from maps.py to avoid circular import
+        Geocode = getattr(__import__("maps"), "Geocode")
+        
         check = 0
         longitude_check = 0
         latitude_check = 0
+        count = 0
         self._data = []
         for i in range(len(self._name)):
             if self._name[i] == check:
@@ -522,16 +526,24 @@ class Attraction:
                     longitude_check = self._longitudes[i]
                     latitude_check = self._latitudes[i]
             else:
+                count += 1
+                # if count <= 3:
+                #     continue
                 check = self._name[i]
+                geocode = Geocode(address=(self._latitudes[i], self._longitudes[i]))
+                
                 self._data.append([
                     self._name[i],
-                    self._latitudes[i],
-                    self._longitudes[i],
-                    self._area_1[i],
-                    self._area_2[i],
-                    self._address[i],
+                    geocode.latitude,
+                    geocode.longitude,
+                    geocode.area_1,
+                    geocode.area_2,
+                    geocode.address[5:],
                     self._image[i],
                 ])
+                if count == 10:
+                    break
+
         self.data = pd.DataFrame(self._data, columns=[
             "name",
             "latitude",
@@ -591,12 +603,7 @@ class Attraction:
             return self._area_2s[id]
         else:
             return self._area_2s
-
-class FormattedAttraction(Attraction):
-    def __init__(self, index=1):
-        super().__init__(index)
-        for i in range(self.size):
-            geocode = None
+        
 
 ### SQLController ###
 
@@ -965,11 +972,13 @@ def test_CarAccident():
     pass
 
 def test_Attraction():
-    # attraction = Attraction()
-    # attr_id = None
-    # print(attraction.address(attr_id))
-    formatted_attr = FormattedAttraction()
-    formatted_attr.data
+    attraction = Attraction()
+    attr_id = None
+    print(attraction.address(attr_id))
+    # print(attraction.latitude(attr_id))
+    return attraction.data
+    pass
+
 
 def test_TrafficAccident():
     controller = TrafficAccidentSQLController()
@@ -997,7 +1006,7 @@ def test_Earthquake():
 if __name__ == "__main__":
     # test_Coordinate()
     # test_CarAccident()
-    test_Attraction()
+    data = test_Attraction()
     # test_TrafficAccident()
     # test_Earthquake()
     pass
