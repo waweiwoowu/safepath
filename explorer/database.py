@@ -132,6 +132,15 @@ class InvalidRangeError(Exception):
         self.message = message
         super().__init__(self.message)
 
+def strip_area_2(string):
+    if string[2] not in "鄉鎮市區":
+        if string[1] in "鄉鎮市區":
+            # If the condition is met, truncate the string to the first two characters
+            string = string[:2]
+    else:
+        string = string[:3]
+    return string
+
 class CarAccident:
     def __init__(self, year, month=None, rank=2):
         """This class is used to get data from car accident csv files.
@@ -221,12 +230,7 @@ class CarAccident:
         self._area_2 = [loc[3:7] for loc in self._location]
         # Check if the third character of the string is not one of "鄉", "鎮", "市", or "區"
         for i in range(len(self._area_2)):
-            if self._area_2[i][2] not in "鄉鎮市區":
-                if self._area_2[i][1] in "鄉鎮市區":
-                    # If the condition is met, truncate the string to the first two characters
-                    self._area_2[i] = self._area_2[i][:2]
-            else:
-                self._area_2[i] = self._area_2[i][:3]
+            self._area_2[i] =  strip_area_2(self._area_2[i])
         self._includes_pedestrian = self._df["事故類型及型態大類別名稱"].str.contains('人')
 
         self._reorganize_data()
@@ -511,12 +515,11 @@ class Attraction:
         """This method is used to take out the duplicated data"""
         
         # Import Geocode from maps.py to avoid circular import
-        Geocode = getattr(__import__("maps"), "Geocode")
+        # Geocode = getattr(__import__("maps"), "Geocode")
         
         check = 0
         longitude_check = 0
         latitude_check = 0
-        count = 0
         self._data = []
         for i in range(len(self._name)):
             if self._name[i] == check:
@@ -526,23 +529,38 @@ class Attraction:
                     longitude_check = self._longitudes[i]
                     latitude_check = self._latitudes[i]
             else:
-                count += 1
-                # if count <= 3:
-                #     continue
                 check = self._name[i]
-                geocode = Geocode(address=(self._latitudes[i], self._longitudes[i]))
-                
-                self._data.append([
-                    self._name[i],
-                    geocode.latitude,
-                    geocode.longitude,
-                    geocode.area_1,
-                    geocode.area_2,
-                    geocode.address[5:],
-                    self._image[i],
-                ])
-                if count == 10:
-                    break
+                # Fix the issue where area_1 and area_2 are None values
+                if pd.isna(self._area_1[i]) or pd.isna(self._area_2[i]):
+                    try:
+                        # Check if the 4th letter of the address is an integer (postal code)
+                        int(self._address[i][3])
+                        # If so, truncate the first 6 letters
+                        area_2 = self._address[i][6:]
+                    except:
+                        # If not, truncate the first 3 letters (those are area_1)
+                        area_2 = self._address[i][3:]
+                    area_2 = strip_area_2(area_2)
+                    self._data.append([
+                        self._name[i],
+                        self._latitudes[i],
+                        self._longitudes[i],
+                        # Truncate the first 3 letters from address
+                        self._address[i][:3],
+                        area_2,
+                        self._address[i],
+                        self._image[i],
+                    ])
+                else:
+                    self._data.append([
+                        self._name[i],
+                        self._latitudes[i],
+                        self._longitudes[i],
+                        self._area_1[i],
+                        self._area_2[i],
+                        self._address[i],
+                        self._image[i],
+                    ])
 
         self.data = pd.DataFrame(self._data, columns=[
             "name",
@@ -640,6 +658,17 @@ class SQLController:
     def select_from_coordinate(self, latitude, longitude):
         sql = f"""SELECT * FROM {self.table_name}
                 WHERE latitude={latitude} AND longitude={longitude}"""
+        self.cursor.execute(sql)
+        data = self.cursor.fetchall()
+        if data:
+            return data
+        else:
+            return None
+    
+    def select_by_order(self, ordered_column, is_ascending=True):
+        sql = f"SELECT * FROM {self.table_name} ORDER BY {ordered_column}"
+        if not is_ascending:
+            sql + " DESC"
         self.cursor.execute(sql)
         data = self.cursor.fetchall()
         if data:
@@ -950,14 +979,14 @@ def test_Coordinate():
 
 def test_CarAccident():
     accident = CarAccident(year=111, month=2, rank=2)
-    print(accident.date())
+    # print(accident.date())
     # print(accident.time())
     # print(accident.latitude())
     # print(accident.longitude())
     # print(accident.fatality())
     # print(accident.injury())
     # print(accident.area_1())
-    # print(accident.area_2())
+    print(accident.area_2())
     # print(accident.includes_pedestrian())
     # print(accident.includes_pedestrian().sum())
     # data_id = 1
@@ -969,16 +998,16 @@ def test_CarAccident():
     # print(accident.injury(data_id))
     # print(accident.area_1(data_id))
     # print(accident.area_2(data_id))
+    return accident.area_2()
     pass
 
 def test_Attraction():
     attraction = Attraction()
-    attr_id = None
-    print(attraction.address(attr_id))
+    attr_id = 0
+    # print(attraction.address(attr_id))
     # print(attraction.latitude(attr_id))
     return attraction.data
     pass
-
 
 def test_TrafficAccident():
     controller = TrafficAccidentSQLController()
@@ -1005,7 +1034,7 @@ def test_Earthquake():
 
 if __name__ == "__main__":
     # test_Coordinate()
-    # test_CarAccident()
+    # area_2 = test_CarAccident()
     data = test_Attraction()
     # test_TrafficAccident()
     # test_Earthquake()

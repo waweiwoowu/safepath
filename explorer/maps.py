@@ -7,12 +7,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ### runserver
 # from explorer.test_data import *
-# from explorer.database import Coordinate
+# from explorer.database import Coordinate, PedestrianHellSQLController
 # KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 
 ### run python file
 from test_data import *
-from database import Coordinate
+from database import Coordinate, PedestrianHellSQLController
 KEY_PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
@@ -300,6 +300,15 @@ class Geocode():
     @property
     def coordinate(self):
         return (self.latitude, self.longitude)
+
+
+class Taiwan():
+    def __init__(self):
+        self.traffic_accident = _TrafficAccidentData()
+
+class _TrafficAccidentData():
+    def __init__(self):
+        controller = PedestrianHellSQLController()
 
 def test_Direction():
     direction = Direction()
