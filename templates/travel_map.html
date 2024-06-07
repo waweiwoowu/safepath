@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Map with Route</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFzApqD1tGY615APaue-nIwjC6Lx5pOp0&libraries=places"></script>
+    <script>
+        function initMap() {
+            var directionsService = new google.maps.DirectionsService();
+            var directionsRenderer = new google.maps.DirectionsRenderer();
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 7,
+                center: {lat: 25.0330, lng: 121.5654} // Default center (Taipei)
+            });
+            directionsRenderer.setMap(map);
+
+            var waypoints = [
+                {% for waypoint in waypoints %}
+                {
+                    location: '{{ waypoint }}',
+                    stopover: true
+                },
+                {% endfor %}
+            ];
+
+            var request = {
+                origin: '{{ start }}',
+                destination: '{{ end }}',
+                waypoints: waypoints,
+                travelMode: 'DRIVING'
+            };
+
+            directionsService.route(request, function(result, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result);
+                } else {
+                    window.alert('Directions request failed due to ' + status);
+                }
+            });
+        }
+    </script>
+</head>
+<body onload="initMap()">
+    <div id="map" style="height: 500px; width: 100%;"></div>
+</body>
+</html>

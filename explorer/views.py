@@ -100,13 +100,13 @@ def travel(request):
         # if city == "臺北市" and area == "文山區":
         attractions = [
             {
-                'title': '景點A',
+                'title': '台北小巨蛋',
                 'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
                 'address': '地址A',
                 'phone': '電話A',
             },
             {
-                'title': '景點B',
+                'title': '木柵動物園',
                 'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
                 'address': '地址B',
                 'phone': '電話B',
@@ -114,7 +114,7 @@ def travel(request):
         ]
         food_places = [
             {
-                'title': '美食A',
+                'title': '梅子鰻蒲燒屋日本料理',
                 'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
                 'rating': '5星',
                 'address': '地址B',
@@ -123,7 +123,7 @@ def travel(request):
                 'price':'800-1000'
             },
             {
-                'title': '美食B',
+                'title': '紫艷中餐廳',
                 'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
                 'rating': '4星',
                 'address': '地址B',
@@ -138,6 +138,18 @@ def travel(request):
 
         return render(request, 'travel.html')
 
+def travel_map(request):
+    start = request.GET.get('start', '')
+    end = request.GET.get('end', '')
+    waypoints = request.GET.get('waypoints', '')
+
+    context = {
+        'start': start,
+        'end': end,
+        'waypoints': waypoints.split('|') if waypoints else []
+    }
+
+    return render(request, 'travel_map.html', context)
 
 async def home(request):
     if request.method == 'POST':
