@@ -34,7 +34,6 @@
             <div class="Area">
                 <div>
                     {% csrf_token %}
-
                     <label for="city">城市:</label>
                     <!-- City selection triggers area dropdown refresh -->
                     <select id="city" name="city">
@@ -58,138 +57,29 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="{% static 'js/travel.js' %}"></script>
-
         <!-- Region 2: Optimal_route -->
         <div class="Optimal_route">
-            {% comment %} <div>
-                <!-- 起點 + (規劃好順序的 景點 + 美食 WayPoints) + 終點 -->
-                <input style="display:none" id="Start_Point" name="Start_Point"><input id="OP_rote" name="OP_rote"><input id="Destination" name="Destination">
-            </div> {% endcomment %}
-
+            <button class="Insert_To_WayPoints">加入行程</button>
             <div id="routeContainer">
-
                 <!-- 選中的行程將顯示在這裡 -->
             </div>
 
             <button id="planRouteButton">規劃路線</button>
         </div>
-
         <!-- Region 3: Recommend Hotspot -->
+
         <div class="Recommend_spot">
             <div class="columnatrraction">
             </div>
-
-                <button class="Insert_To_WayPoints">加入景點行程</button>
-
-
         </div>
         <!-- Region 4: Recommend Food -->
         <div class="Recommend_food">
             <div class="columfood">
             </div>
-
-                <button class="Insert_To_WayPoints">加入美食行程</button>
-
+                <button style="display:none" class="Insert_To_food">加入美食行程</button>
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="{% static 'js/travel.js' %}"></script>
 </body>
 </html>
-
-{% comment %} 上面原版 {% endcomment %}
-
-{% comment %} <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Map Project</title>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/travel.css' %}">
-</head>
-<body>
-
-    <!-- Region 1: Pick an Area -->
-    <div class="Area">
-        <div>
-            <label for="area_1">城市:</label>
-            <select id="area_1">
-                <option value="area_1">City 1</option>
-                <option value="area_1">City 2</option>
-            </select>
-        </div>
-        <div>
-            <label for="area_2">鄉鎮:</label>
-            <select id="area_2">
-                <option value="area_2">Town 1</option>
-                <option value="area_2">Town 2</option>
-            </select>
-        </div>
-        <button>推薦景點</button>
-    </div>
-
-    <!-- Region 2: Optimal_route -->
-    <div class="Optimal_route">
-        <div>
-            <input id="OP_rote" name="OP_rote">
-        </div>
-        <button>規劃路線</button>
-    </div>
-
-    <!-- Region 3: Recommend Hotspot -->
-    <div class="Recommend_spot">
-        <div class="left">
-            <h3>選擇景點</h3>
-            <input type="checkbox" id="hotSpot_1" name="hotSpot_1">
-            <label for="hotSpot_1">景點1</label><br>
-            <input type="checkbox" id="hotSpot_2" name="hotSpot_2">
-            <label for="hotSpot_2">景點2</label><br>
-            <input type="checkbox" id="hotSpot_3" name="hotSpot_3">
-            <label for="hotSpot_3">景點3</label><br>
-            <input type="checkbox" id="hotSpot_4" name="hotSpot_4">
-            <label for="hotSpot_4">景點4</label><br>
-            <input type="checkbox" id="hotSpot_5" name="hotSpot_5">
-            <label for="hotSpot_5">景點5</label><br>
-            <button>規劃路線</button>
-        </div>
-        <div class="middle">
-            <h3>景點資訊</h3>
-            <p id="St"><strong>景點:</strong> 景點名稱</p>
-            <p id="St_Addr"><strong>地址:</strong> 地址內容</p>
-            <p id="St_Tel"><strong>電話:</strong> 電話號碼</p>
-        </div>
-        <div class="right">
-            <img src="{% static 'images/HotSpot_Picture.png' %}" alt="Hotspot Picture">
-        </div>
-    </div>
-
-    <!-- Region 4: Recommend Food -->
-    <div class="Recommend_food">
-        <div class="left">
-            <h3>選擇美食</h3>
-            <input type="checkbox" id="food_1" name="food_1">
-            <label for="food_1">美食1</label><br>
-            <input type="checkbox" id="food_2" name="food_2">
-            <label for="food_2">美食2</label><br>
-            <input type="checkbox" id="food_3" name="food_3">
-            <label for="food_3">美食3</label><br>
-            <input type="checkbox" id="food_4" name="food_4">
-            <label for="food_4">美食4</label><br>
-            <input type="checkbox" id="food_5" name="food_5">
-            <label for="food_5">美食5</label><br>
-            <button>規劃路線</button>
-        </div>
-        <div class="middle">
-            <h3>美食資訊</h3>
-            <p id="Fd"><strong>美食:</strong> 美食名稱</p>
-            <p id="Fd_addr"><strong>地址:</strong> 地址內容</p>
-            <p id="Fd_Tel"><strong>電話:</strong> 電話號碼</p>
-        </div>
-        <div class="right">
-            <img src="{% static 'images/Food_Picture.png' %}" alt="Food Picture">
-        </div>
-    </div>
-
-</body>
-</html> {% endcomment %}
