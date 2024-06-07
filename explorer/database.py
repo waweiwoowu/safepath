@@ -537,6 +537,7 @@ class Attraction:
                 area_2 = strip_area_2(area_2)
             
             if pd.isna(address):
+                # Avoid circular import from maps.py
                 Geocode = getattr(__import__('maps'), 'Geocode')
                 geocode = Geocode(name)
                 if geocode.data:
@@ -622,7 +623,185 @@ class Attraction:
         else:
             return self._images
 
+class OpeningHours:
+    def __init__(self, opening_hours):
+        self.all = json.loads(opening_hours)
+        try:
+            self.mon = self.all[0]
+            self.tue = self.all[1]
+            self.wed = self.all[2]
+            self.thu = self.all[3]
+            self.fri = self.all[4]
+            self.sat = self.all[5]
+            self.sun = self.all[6]
+        except:
+            self.mon = None
+            self.tue = None
+            self.wed = None
+            self.thu = None
+            self.fri = None
+            self.sat = None
+            self.sun = None
         
+class Restaurant:
+    def __init__(self):
+        self._df = pd.DataFrame()
+        self._read_csv_file()
+        self._get_data()
+
+    def _read_csv_file(self):
+        """This method is used to read and get data from the csv files."""
+
+        dtype_mapping = {
+            "name": str,
+            "latitude": float,
+            "longitude": float,
+            "area_1": str,
+            "area_2": str,
+            "address": str,
+            "phone": str,
+            "opening_hours_all": str,
+            "rating": float,
+            "avg_price": int,
+            "image": str
+        }
+        path = "./data/restaurants/Taiwan_food.csv"
+        self._df = pd.read_csv(path, dtype=dtype_mapping, low_memory=False)
+
+    def _get_data(self):
+        """This method is used to take the data of interest"""
+
+        self._name = self._df["name"]
+        self._latitude = self._df["latitude"]
+        self._longitude = self._df["longitude"]
+        self._area_1 = self._df["area_1"]
+        self._area_2 = self._df["area_2"]
+        self._address = self._df["address"]
+        self._phone = self._df["phone"]
+        self._opening_hours = self._df["opening_hours_all"]
+        self._rating = self._df["rating"]
+        self._avg_price = self._df["avg_price"]
+        self._image = self._df["image"]
+
+        self._reorganize_data()
+    
+    def _reorganize_data(self):
+        data = []
+        for i in range(len(self._name)):
+            name = self._name[i].replace("_", " ")
+            latitude = rounding(self._latitude[i], 0.00001)
+            longitude = rounding(self._longitude[i], 0.00001)
+            area_1 = self._area_1[i]
+            area_2 = self._area_2[i]
+            address = self._address[i]
+            phone = self._phone[i]
+            opening_hours = OpeningHours(self._opening_hours[i])
+            rating = self._rating[i]
+            avg_price = self._avg_price[i]
+            image = self._image[i]
+            
+            # Fix the issue where area_1 and area_2 are None values
+            if pd.isna(area_1) or pd.isna(area_2):
+                try:
+                    # Check if the 4th letter of the address is an integer (postal code)
+                    int(address[3])
+                    # If so, truncate the first 6 letters
+                    area_2 = address[6:]
+                except:
+                    # If not, truncate the first 3 letters (those are area_1)
+                    area_2 = address[3:]
+                # Truncate the first 3 letters from address
+                area_1 = address[:3]
+                area_2 = strip_area_2(area_2)
+            
+            if pd.isna(address):
+                # Avoid circular import from maps.py
+                Geocode = getattr(__import__('maps'), 'Geocode')
+                geocode = Geocode(name)
+                if geocode.data:
+                    address = geocode.address
+                    latitude = rounding(geocode.latitude, 0.00001)
+                    longitude = rounding(geocode.longitude, 0.00001)
+                    if geocode.name:
+                        name = geocode.name
+                    if geocode.area_1:
+                        area_1 = geocode.area_1
+                    if geocode.area_2:
+                        area_2 = geocode.area_2
+                else:
+                    continue
+
+            data.append([
+                name,
+                latitude,
+                longitude,
+                area_1,
+                area_2,
+                address,
+                image,
+            ])
+
+        self.data = pd.DataFrame(data, columns=[
+            "name",
+            "latitude",
+            "longitude",
+            "area_1",
+            "area_2",
+            "address",
+            "image",
+        ])
+        self._names = self.data.iloc[:, 0]
+        self._latitudes = self.data.iloc[:, 1]
+        self._longitudes = self.data.iloc[:, 2]
+        self._area_1s = self.data.iloc[:, 3]
+        self._area_2s = self.data.iloc[:, 4]
+        self._addresses = self.data.iloc[:, 5]
+        self._images = self.data.iloc[:, 6]
+        self.size = len(self.data)
+
+    def name(self, id=None):
+        if id is not None:
+            return self._names[id]
+        else:
+            return self._names
+
+    def latitude(self, id=None):
+        if id is not None:
+            return self._latitudes[id]
+        else:
+            return self._latitudes
+
+    def longitude(self, id=None):
+        if id is not None:
+            return self._longitudes[id]
+        else:
+            return self._longitudes
+    
+    def area_1(self, id=None):
+        if id is not None:
+            return self._area_1s[id]
+        else:
+            return self._area_1s
+
+    def area_2(self, id=None):
+        if id is not None:
+            return self._area_2s[id]
+        else:
+            return self._area_2s
+    
+    def address(self,id=None):
+        if id is not None:
+            return self._addresses[id]
+        else:
+            return self._addresses
+        
+    def image(self, id=None):
+        if id is not None:
+            return self._images[id]
+        else:
+            return self._images
+    
+    
 
 ### SQLController ###
 
@@ -981,8 +1160,8 @@ class UpdateEarthquakeData:
             json.dump(self.tracking_data, file)
 
 class UpdateAttractionData:
-    def __init__(self):
-        self.attraction = Attraction()
+    def __init__(self, index=1):
+        self.attraction = Attraction(index)
         self.controller = AttractionSQLController()
         self.number_of_data = self.attraction.size
         for index in range(self.number_of_data):
@@ -995,6 +1174,7 @@ class UpdateAttractionData:
             image = self.attraction.image(index)
             self.controller.new(name, latitude, longitude, area_1, area_2, address, image)
         self.controller.close()
+
 
 def test_Coordinate():
     coordinate = (23.05, 120.19)
@@ -1031,15 +1211,6 @@ def test_CarAccident():
     return accident.area_2()
     pass
 
-def test_Attraction():
-    attraction = Attraction()
-    attr_id = None
-    # print(attraction.area_2(attr_id))
-    # print(attraction.latitude(attr_id))
-    # print(attraction.longitude(attr_id))
-    return attraction.data
-    pass
-
 def test_TrafficAccident():
     controller = TrafficAccidentSQLController()
     test_latitude = 24.4389
@@ -1063,12 +1234,27 @@ def test_Earthquake():
     # controller.new(area, intensity)
     pass
 
+def test_Attraction():
+    attraction = Attraction()
+    attr_id = None
+    # print(attraction.area_2(attr_id))
+    # print(attraction.latitude(attr_id))
+    # print(attraction.longitude(attr_id))
+    return attraction.data
+    pass
+
+def test_Restaurant():
+    restaurant = Restaurant()
+    return restaurant._df
+    pass
+
 if __name__ == "__main__":
     # test_Coordinate()
-    # area_2 = test_CarAccident()
-    data = test_Attraction()
+    # test_CarAccident()
+    # test_Attraction()
     # test_TrafficAccident()
     # test_Earthquake()
+    data = test_Restaurant()
     pass
 
 
