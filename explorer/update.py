@@ -1,5 +1,5 @@
 import time
-from database import UpdateTrafficAccidentData, UpdateEarthquakeData
+from database import UpdateTrafficAccidentData, UpdateEarthquakeData, UpdateAttractionData
 
 
 def update_traffic_accident_data(count=1):
@@ -44,9 +44,21 @@ def update_earthquake_data(count=1):
     print(f"{records} records were successfully added to the database!")
     print(f"Total Execution Time: {execution_time/60:.1f} minutes ({execution_time/60/60:.1f} hours)")
 
+def updata_hotspot_data():
+    print("Start updating Hotspot table.")
+    print("Collecting data...")
+    start_time = time.time()
+    update = UpdateAttractionData()
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print("----------------")
+    print("Update finished!")
+    print(f"{update.number_of_data} records were successfully added to the database!")
+    print(f"Total Execution Time: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
 
 if __name__ == "__main__":
-    update_traffic_accident_data()
-    print()
+    # update_traffic_accident_data()
+    # print()
     # update_earthquake_data(8)
+    updata_hotspot_data()
     pass

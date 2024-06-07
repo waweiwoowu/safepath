@@ -503,8 +503,8 @@ class Attraction:
 
         self._name = self._df["title"]
         self._image = self._df["image"]
-        self._latitudes = self._df["Latitude"]
-        self._longitudes = self._df["Longtitude"]
+        self._latitude = self._df["Latitude"]
+        self._longitude = self._df["Longtitude"]
         self._address = self._df["address"]
         self._area_1 = self._df["area_1"]
         self._area_2 = self._df["area_2"]
@@ -512,57 +512,57 @@ class Attraction:
         self._reorganize_data()
 
     def _reorganize_data(self):
-        """This method is used to take out the duplicated data"""
-        
-        # Import Geocode from maps.py to avoid circular import
-        # Geocode = getattr(__import__("maps"), "Geocode")
-        
-        check = 0
-        longitude_check = 0
-        latitude_check = 0
-        self._data = []
+        data = []
         for i in range(len(self._name)):
-            if self._name[i] == check:
-                if (self._longitudes[i] == longitude_check) and (self._latitudes[i] == latitude_check):
+            name = self._name[i].replace("_", " ")
+            latitude = rounding(self._latitude[i], 0.00001)
+            longitude = rounding(self._longitude[i], 0.00001)
+            area_1 = self._area_1[i]
+            area_2 = self._area_2[i]
+            address = self._address[i]
+            image = self._image[i]
+            
+            # Fix the issue where area_1 and area_2 are None values
+            if pd.isna(area_1) or pd.isna(area_2):
+                try:
+                    # Check if the 4th letter of the address is an integer (postal code)
+                    int(address[3])
+                    # If so, truncate the first 6 letters
+                    area_2 = address[6:]
+                except:
+                    # If not, truncate the first 3 letters (those are area_1)
+                    area_2 = address[3:]
+                # Truncate the first 3 letters from address
+                area_1 = address[:3]
+                area_2 = strip_area_2(area_2)
+            
+            if pd.isna(address):
+                Geocode = getattr(__import__('maps'), 'Geocode')
+                geocode = Geocode(name)
+                if geocode.data:
+                    address = geocode.address
+                    latitude = rounding(geocode.latitude, 0.00001)
+                    longitude = rounding(geocode.longitude, 0.00001)
+                    if geocode.name:
+                        name = geocode.name
+                    if geocode.area_1:
+                        area_1 = geocode.area_1
+                    if geocode.area_2:
+                        area_2 = geocode.area_2
+                else:
                     continue
-                else:
-                    longitude_check = self._longitudes[i]
-                    latitude_check = self._latitudes[i]
-            else:
-                check = self._name[i]
-                # Fix the issue where area_1 and area_2 are None values
-                if pd.isna(self._area_1[i]) or pd.isna(self._area_2[i]):
-                    try:
-                        # Check if the 4th letter of the address is an integer (postal code)
-                        int(self._address[i][3])
-                        # If so, truncate the first 6 letters
-                        area_2 = self._address[i][6:]
-                    except:
-                        # If not, truncate the first 3 letters (those are area_1)
-                        area_2 = self._address[i][3:]
-                    area_2 = strip_area_2(area_2)
-                    self._data.append([
-                        self._name[i],
-                        self._latitudes[i],
-                        self._longitudes[i],
-                        # Truncate the first 3 letters from address
-                        self._address[i][:3],
-                        area_2,
-                        self._address[i],
-                        self._image[i],
-                    ])
-                else:
-                    self._data.append([
-                        self._name[i],
-                        self._latitudes[i],
-                        self._longitudes[i],
-                        self._area_1[i],
-                        self._area_2[i],
-                        self._address[i],
-                        self._image[i],
-                    ])
 
-        self.data = pd.DataFrame(self._data, columns=[
+            data.append([
+                name,
+                latitude,
+                longitude,
+                area_1,
+                area_2,
+                address,
+                image,
+            ])
+
+        self.data = pd.DataFrame(data, columns=[
             "name",
             "latitude",
             "longitude",
@@ -578,19 +578,13 @@ class Attraction:
         self._area_2s = self.data.iloc[:, 4]
         self._addresses = self.data.iloc[:, 5]
         self._images = self.data.iloc[:, 6]
-        self.size = len(self._data)
+        self.size = len(self.data)
 
     def name(self, id=None):
         if id is not None:
             return self._names[id]
         else:
             return self._names
-
-    def image(self, id=None):
-        if id is not None:
-            return self._images[id]
-        else:
-            return self._images
 
     def latitude(self, id=None):
         if id is not None:
@@ -604,12 +598,6 @@ class Attraction:
         else:
             return self._longitudes
     
-    def address(self,id=None):
-        if id is not None:
-            return self._addresses[id]
-        else:
-            return self._addresses
-    
     def area_1(self, id=None):
         if id is not None:
             return self._area_1s[id]
@@ -621,6 +609,19 @@ class Attraction:
             return self._area_2s[id]
         else:
             return self._area_2s
+    
+    def address(self,id=None):
+        if id is not None:
+            return self._addresses[id]
+        else:
+            return self._addresses
+        
+    def image(self, id=None):
+        if id is not None:
+            return self._images[id]
+        else:
+            return self._images
+
         
 
 ### SQLController ###
@@ -829,6 +830,20 @@ class EarthquakeIntensitySQLController(SQLController):
         else:
             return None
 
+class AttractionSQLController(SQLController):
+    def __init__(self):
+        self.table_name = "map_hotspot"
+        super().__init__(self.table_name)
+    
+    def new(self, name, latitude, longitude, area_1, area_2, address, image):
+        if not self.select_from_coordinate(latitude, longitude):
+            sql = f"""INSERT INTO {self.table_name} (
+                    name, latitude, longitude, area_1, area_2,
+                    address, image) VALUES (?, ?, ?, ?, ?, ?, ?)"""
+            self.cursor.execute(sql, (name, latitude, longitude, area_1, area_2,
+                                      address, image))
+            self.conn.commit()
+
 class UpdateTrafficAccidentData:
     def __init__(self):
         self.get_tracking_data()
@@ -965,6 +980,21 @@ class UpdateEarthquakeData:
         with open(TRACKING_JSON_PATH, 'w') as file:
             json.dump(self.tracking_data, file)
 
+class UpdateAttractionData:
+    def __init__(self):
+        self.attraction = Attraction()
+        self.controller = AttractionSQLController()
+        self.number_of_data = self.attraction.size
+        for index in range(self.number_of_data):
+            name = self.attraction.name(index)
+            latitude = self.attraction.latitude(index)
+            longitude = self.attraction.longitude(index)
+            area_1 = self.attraction.area_1(index)
+            area_2 = self.attraction.area_2(index)
+            address = self.attraction.address(index)
+            image = self.attraction.image(index)
+            self.controller.new(name, latitude, longitude, area_1, area_2, address, image)
+        self.controller.close()
 
 def test_Coordinate():
     coordinate = (23.05, 120.19)
@@ -1003,9 +1033,10 @@ def test_CarAccident():
 
 def test_Attraction():
     attraction = Attraction()
-    attr_id = 0
-    # print(attraction.address(attr_id))
+    attr_id = None
+    # print(attraction.area_2(attr_id))
     # print(attraction.latitude(attr_id))
+    # print(attraction.longitude(attr_id))
     return attraction.data
     pass
 

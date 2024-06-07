@@ -6,13 +6,13 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ### runserver
-from explorer.test_data import *
-from explorer.database import Coordinate, PedestrianHellSQLController
+# from explorer.test_data import *
+# from explorer.database import Coordinate, PedestrianHellSQLController
 # KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 
 ### run python file
-# from test_data import *
-# from database import Coordinate, PedestrianHellSQLController
+from test_data import *
+from database import Coordinate, PedestrianHellSQLController
 KEY_PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
@@ -279,24 +279,87 @@ class _DirectionEarthquakeData():
 class Geocode():
     def __init__(self, address=None):
         language = "zh-TW"
-        language = None
-        if not address:
-            self.data = GEOCODE_ZH[0]
-            self.data = GEOCODE_ZH_2[0]
-        else:
-            self.data = _GoogleMap.gmaps.geocode(address=address, language=language)[0]
-        # print(self.data)
-        self.name = self.data["address_components"][0]["long_name"]
-        # self.postal_code = self.data["address_components"][-1]["long_name"]
-        # self.country = self.data["address_components"][-2]["long_name"]
-        # self.area_1 = self.data["address_components"][-3]["long_name"]
-        # self.area_2 = self.data["address_components"][-4]["long_name"]
-        # self.area_3 = self.data["address_components"][-5]["long_name"]
-        # self.address = self.data["formatted_address"]
-        # self.latitude = self.data["geometry"]["location"]["lat"]
-        # self.longitude = self.data["geometry"]["location"]["lng"]
-        # self.place_id = self.data["place_id"]
+        # language = None
+        self.data = None
+        self.latitude = None
+        self.longitude = None
+        self.name = None
+        self.formatted_address = None
+        self.address = None
+        self.postal_code = None
+        self.country = None
+        self.area_1 = None
+        self.area_2 = None
+        self.area_3 = None
+        self.neighborhood = None
+        self.route = None
+        self.street_number = None
+        self.place_id = None
+        try:
+            if address:
+                self.data = _GoogleMap.gmaps.geocode(address=address, language=language)[0]
+            else:
+                # self.data = GEOCODE_ZH[0]
+                self.data = GEOCODE_ZH_1[0]
+                # self.data = GEOCODE_ZH_2[0]
+                # self.data = GEOCODE_ZH_3[0]
+            self._get_attributes()
+        except:
+            pass
+        
+    def _get_attributes(self):
+        self.latitude = self.data["geometry"]["location"]["lat"]
+        self.longitude = self.data["geometry"]["location"]["lng"]
+        self.formatted_address = self.data["formatted_address"]
+        self.address = self.formatted_address
+        self.place_id = self.data["place_id"]
 
+        for address_component in self.data["address_components"]:
+            types = address_component["types"]
+            if "postal_code" in types:
+                self.postal_code = address_component["long_name"]
+            elif "country" in types:
+                self.country = address_component["long_name"]
+            elif "administrative_area_level_1" in types:
+                self.area_1 = address_component["long_name"]
+                if "台" in self.area_1:
+                    self.area_1 = self.area_1.replace("台", "臺")
+            elif "administrative_area_level_2" in types:
+                self.area_2 = address_component["long_name"]
+                if "台" in self.area_2:
+                    self.area_2 = self.area_2.replace("台", "臺")
+            elif "administrative_area_level_3" in types:
+                self.area_3 = address_component["long_name"]
+            elif "neighborhood" in types:
+                self.neighborhood = address_component["long_name"]
+            elif "route" in types:
+                self.route = address_component["long_name"]
+            elif "street_number" in types:
+                self.street_number = address_component["long_name"]
+        
+        if self.postal_code:
+            if self.postal_code in self.address:
+                self.address = self.address[3:]
+        if self.country:
+            if self.country in self.address:
+                self.address = self.address[2:]
+        
+        # Format address and truncate texts not needed
+        types = ["street_number", "route", "political", "postal_code"]
+        is_name = True
+        for t in types:
+            if t in self.data["address_components"][0]["types"]:
+                is_name = False
+                break
+        if is_name:
+            self.name = self.data["address_components"][0]["long_name"]
+            if len(self.address) > 7:
+                if self.name in self.address:
+                    self.address = self.address[:-1 * len(self.name)] 
+        if "台" in self.address[:6]:
+            self.address = self.address[:6].replace("台", "臺") + self.address[6:]
+        
+        
     @property
     def coordinate(self):
         return (self.latitude, self.longitude)
@@ -359,22 +422,26 @@ def test_Direction():
     pass
 
 def test_Geocode():
-    # address = "邱良功古厝"
-    # address = "金門縣893金城鎮浯江街27號"
+    # address = "大稻埕碼頭"
+    # address = "大稻埕碼頭_大稻埕碼頭貨櫃市集"
+    # address = "陽明書屋"
     # geocode = Geocode(address)
     geocode = Geocode()
-    # print(geocode.data)
-    print(geocode.name)
-    # print(geocode.postal_code)
-    # print(geocode.country)
-    # print(geocode.area_1)
-    # print(geocode.area_2)
-    # print(geocode.area_3)
-    # print(geocode.address)
-    # print(geocode.latitude)
-    # print(geocode.longitude)
-    # print(geocode.coordinate)
-    # print(geocode.place_id)
+    print(geocode.data)
+    print()
+    print("name:", geocode.name)
+    print("postal_code:", geocode.postal_code)
+    print("country:", geocode.country)
+    print("area_1:", geocode.area_1)
+    print("area_2:", geocode.area_2)
+    print("area_3:", geocode.area_3)
+    print("neighborhood:", geocode.neighborhood)
+    print("formatted_address:", geocode.formatted_address)
+    print("address:", geocode.address)
+    print("latitude:", geocode.latitude)
+    print("longitude:", geocode.longitude)
+    print("coordinate:", geocode.coordinate)
+    print("place_id:", geocode.place_id)
     pass
 
 def test_Taiwan():
@@ -411,11 +478,11 @@ def test_Taiwan():
     print(f"全 國: {total_injury_sum}人 (每月{total_injury_sum//12}人)")
     for i in range(number_of_data):
         print(f"第{i+1}名:", end=" ")
-        print(f" {total_injury[i][1]} {total_injury[i][2]} {total_injury[i][5]}")
+        print(f"{total_injury[i][1]} {total_injury[i][2]} {total_injury[i][5]}")
     pass
 
 if __name__ == "__main__":
     # test_Direction()
-    # test_Geocode()
-    test_Taiwan()
+    test_Geocode()
+    # test_Taiwan()
     pass

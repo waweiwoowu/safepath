@@ -200,21 +200,24 @@ GEOCODE_ZH = [{
 
 GEOCODE_ZH_1 = [{
     'address_components': [
-        {'long_name': '386', 'short_name': '386', 'types': ['street_number']}, 
-        {'long_name': '建國路', 'short_name': '建國路', 'types': ['route']}, 
-        {'long_name': '瑞興里', 'short_name': '瑞興里', 'types': ['administrative_area_level_3', 'political']}, 
-        {'long_name': '八德區', 'short_name': '八德區', 'types': ['administrative_area_level_2', 'political']}, 
-        {'long_name': '桃園市', 'short_name': '桃園市', 'types': ['administrative_area_level_1', 'political']}, 
+        {'long_name': '二二八和平公園', 'short_name': '二二八和平公園', 'types': ['establishment', 'park', 'point_of_interest', 'tourist_attraction']}, 
+        {'long_name': '3號', 'short_name': '3號', 'types': ['street_number']}, 
+        {'long_name': '凱達格蘭大道', 'short_name': '凱達格蘭大道', 'types': ['route']}, 
+        {'long_name': '博愛特區', 'short_name': '博愛特區', 'types': ['neighborhood', 'political']}, 
+        {'long_name': '黎明里', 'short_name': '黎明里', 'types': ['administrative_area_level_3', 'political']}, 
+        {'long_name': '中正區', 'short_name': '中正區', 'types': ['administrative_area_level_2', 'political']}, 
+        {'long_name': '台北市', 'short_name': '台北市', 'types': ['administrative_area_level_1', 'political']}, 
         {'long_name': '台灣', 'short_name': 'TW', 'types': ['country', 'political']}, 
-        {'long_name': '334', 'short_name': '334', 'types': ['postal_code']}], 
-    'formatted_address': '334台灣桃園市八德區建國路386號', 
-    'geometry': {'location': {'lat': 24.9401104, 'lng': 121.2882407}, 
+        {'long_name': '100', 'short_name': '100', 'types': ['postal_code']}], 
+    'formatted_address': '100台灣台北市中正區凱達格蘭大道3號二二八和平公園', 
+    'geometry': {'location': {'lat': 25.0402983, 'lng': 121.5155445}, 
                  'location_type': 'ROOFTOP', 
-                 'viewport': {'northeast': {'lat': 24.9414507802915, 'lng': 121.2895322302915}, 
-                              'southwest': {'lat': 24.9387528197085, 'lng': 121.2868342697085}}}, 
-    'place_id': 'ChIJ96H7-OoYaDQR5ez5vbPTTnc', 
-    'plus_code': {'compound_code': 'W7RQ+27 台灣桃園市八德區瑞興里', 'global_code': '7QP3W7RQ+27'}, 
-    'types': ['street_address']}]
+                 'viewport': {'northeast': {'lat': 25.0416278802915, 'lng': 121.5169748302915}, 
+                              'southwest': {'lat': 25.0389299197085, 'lng': 121.5142768697085}}}, 
+    'partial_match': True, 
+    'place_id': 'ChIJKX1kH3WpQjQRcyy76pvtt-s', 
+    'plus_code': {'compound_code': '2GR8+46 台灣台北市中正區黎明里', 'global_code': '7QQ32GR8+46'}, 
+    'types': ['establishment', 'park', 'point_of_interest', 'tourist_attraction']}]
 
 GEOCODE_ZH_2 = [{
     'address_components': [
@@ -234,7 +237,7 @@ GEOCODE_ZH_2 = [{
     'plus_code': {'compound_code': '394G+H3 台灣桃園市龜山區樂善里', 'global_code': '7QQ3394G+H3'}, 
     'types': ['street_address']}]
 
-GEOCODE_ZH_2 = [{
+GEOCODE_ZH_3 = [{
     'address_components': [
         {'long_name': '27', 'short_name': '27', 'types': ['street_number']}, 
         {'long_name': '浯江街', 'short_name': '浯江街', 'types': ['route']}, 

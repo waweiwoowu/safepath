@@ -61,6 +61,21 @@ class PedestrianHell(models.Model):
                     Pedestrian Fatality: {self.pedestrian_fatality},
                     Pedestrian Total Injure: {self.pedestrian_injury}"""
 
+class Hotspot(models.Model):
+    name = models.TextField(max_length=30)
+    latitude = models.DecimalField(max_digits=10, decimal_places=6)
+    longitude = models.DecimalField(max_digits=10, decimal_places=6)
+    area_1 = models.TextField(max_length=5)
+    area_2 = models.TextField(max_length=5)
+    address = models.TextField(max_length=50)
+    image = models.TextField(max_length=100)
+
+    class Meta:
+        db_table = "map_hotspot"
+
+    def __str__(self):
+        return f"{self.name} ({self.latitude}, {self.longitude}) {self.address}"
+
 class UserInfo(models.Model):
     username = models.CharField(max_length=50)
     fullname = models.CharField(max_length=50)
