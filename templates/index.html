@@ -7,12 +7,10 @@
     <title>測試頁面</title>
     </head>
 <body>
-    {% if request.user.is_authenticated %}
-        <h1>Hi, {{request.user}}</h1>
+    <h1>Hi, {{user}}</h1>
 
-    {% else %}
-        <h1>您尚未登入喔~<a href="/explorer/signin/">登入</a></h1>
-    {% endif %}
+    <a href = "/explorer/signin/">登入</a>
+    <br>
     <a href = "/explorer/signup/">註冊</a>
     <br>
     <a href = "/explorer/home/">地獄路線圖</a>

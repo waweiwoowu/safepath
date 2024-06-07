@@ -9,7 +9,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import auth
 
 def index(request):
-    return render(request, "index.html")
+    if 'username' in request.session:
+        user = request.session['username']
+        return render(request, "index.html", {'user':user})
+
+    return render(request, "index.html", {'user':"您尚未登入"})
 
 
 def signin(request):
@@ -31,15 +35,16 @@ def signin(request):
             return render(request, "signin.html", {"error": "Invalid username or password."})
 
         if user.password == password:
-            user = auth.authenticate(username=username, password=password)
-            auth.login(request, user)
+            request.session['username'] = username
             return redirect('/explorer//')
         else:
             return redirect('/explorer/signin/')
 
 def logout(request):
-    auth.logout(request)
-    return HttpResponseRedirect('/explorer//')
+    if 'username' in request.session:
+        del request.session['username']
+        return render(request, "index.html", {"user":"您已登出!!"})
+    return render(request, "index.html", {"user":"您尚未登入!!"})
 
 def signup(request):
     if request.method == "GET":
