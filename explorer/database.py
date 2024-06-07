@@ -625,6 +625,7 @@ class Attraction:
 
 class OpeningHours:
     def __init__(self, opening_hours):
+        opening_hours = opening_hours.replace("'", '"')
         self.all = json.loads(opening_hours)
         try:
             self.mon = self.all[0]
@@ -678,7 +679,7 @@ class Restaurant:
         self._area_2 = self._df["area_2"]
         self._address = self._df["address"]
         self._phone = self._df["phone"]
-        self._opening_hours = self._df["opening_hours_all"]
+        self._opening_hours_all = self._df["opening_hours_all"]
         self._rating = self._df["rating"]
         self._avg_price = self._df["avg_price"]
         self._image = self._df["image"]
@@ -695,41 +696,11 @@ class Restaurant:
             area_2 = self._area_2[i]
             address = self._address[i]
             phone = self._phone[i]
-            opening_hours = OpeningHours(self._opening_hours[i])
+            # opening_hours = OpeningHours(self._opening_hours_all[i])
+            opening_hours = self._opening_hours_all[i]
             rating = self._rating[i]
-            avg_price = self._avg_price[i]
+            avg_price = self._avg_price[i].astype(int)
             image = self._image[i]
-            
-            # Fix the issue where area_1 and area_2 are None values
-            if pd.isna(area_1) or pd.isna(area_2):
-                try:
-                    # Check if the 4th letter of the address is an integer (postal code)
-                    int(address[3])
-                    # If so, truncate the first 6 letters
-                    area_2 = address[6:]
-                except:
-                    # If not, truncate the first 3 letters (those are area_1)
-                    area_2 = address[3:]
-                # Truncate the first 3 letters from address
-                area_1 = address[:3]
-                area_2 = strip_area_2(area_2)
-            
-            if pd.isna(address):
-                # Avoid circular import from maps.py
-                Geocode = getattr(__import__('maps'), 'Geocode')
-                geocode = Geocode(name)
-                if geocode.data:
-                    address = geocode.address
-                    latitude = rounding(geocode.latitude, 0.00001)
-                    longitude = rounding(geocode.longitude, 0.00001)
-                    if geocode.name:
-                        name = geocode.name
-                    if geocode.area_1:
-                        area_1 = geocode.area_1
-                    if geocode.area_2:
-                        area_2 = geocode.area_2
-                else:
-                    continue
 
             data.append([
                 name,
@@ -738,6 +709,10 @@ class Restaurant:
                 area_1,
                 area_2,
                 address,
+                phone,
+                opening_hours,
+                rating,
+                avg_price,
                 image,
             ])
 
@@ -748,6 +723,10 @@ class Restaurant:
             "area_1",
             "area_2",
             "address",
+            "phone",
+            "opening_hours",
+            "rating",
+            "avg_price",
             "image",
         ])
         self._names = self.data.iloc[:, 0]
@@ -756,7 +735,11 @@ class Restaurant:
         self._area_1s = self.data.iloc[:, 3]
         self._area_2s = self.data.iloc[:, 4]
         self._addresses = self.data.iloc[:, 5]
-        self._images = self.data.iloc[:, 6]
+        self._phones = self.data.iloc[:, 6]
+        self._opening_hours = self.data.iloc[:, 7]
+        self._ratings = self.data.iloc[:, 8]
+        self._avg_prices = self.data.iloc[:, 9]
+        self._images = self.data.iloc[:, 10]
         self.size = len(self.data)
 
     def name(self, id=None):
@@ -795,13 +778,36 @@ class Restaurant:
         else:
             return self._addresses
         
+    def phone(self, id=None):
+        if id is not None:
+            return self._phones[id]
+        else:
+            return self._phones
+    
+    def opening_hours(self, id=None):
+        if id is not None:
+            return self._opening_hours[id]
+        else:
+            return self._opening_hours
+
+    def rating(self, id=None):
+        if id is not None:
+            return self._ratings[id]
+        else:
+            return self._ratings
+    
+    def avg_price(self,id=None):
+        if id is not None:
+            return self._avg_prices[id]
+        else:
+            return self._avg_prices
+        
     def image(self, id=None):
         if id is not None:
             return self._images[id]
         else:
             return self._images
-    
-    
+        
 
 ### SQLController ###
 
@@ -1023,6 +1029,23 @@ class AttractionSQLController(SQLController):
                                       address, image))
             self.conn.commit()
 
+class RestaurantSQLController(SQLController):
+    def __init__(self):
+        self.table_name = "map_restaurant"
+        super().__init__(self.table_name)
+    
+    def new(self, name, latitude, longitude, area_1, area_2, address, phone, 
+                opening_hours, rating, avg_price, image):
+        if not self.select_from_coordinate(latitude, longitude):
+            sql = f"""INSERT INTO {self.table_name} (name, latitude, longitude, 
+                    area_1, area_2, address, phone, opening_hours, rating, 
+                    avg_price, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+            self.cursor.execute(sql, (name, latitude, longitude, area_1, area_2, 
+                                      address, phone, opening_hours, rating, 
+                                      avg_price, image))
+            self.conn.commit()
+
+
 class UpdateTrafficAccidentData:
     def __init__(self):
         self.get_tracking_data()
@@ -1175,6 +1198,28 @@ class UpdateAttractionData:
             self.controller.new(name, latitude, longitude, area_1, area_2, address, image)
         self.controller.close()
 
+class UpdateRestaurantData:
+    def __init__(self):
+        self.restaurant = Restaurant()
+        self.controller = RestaurantSQLController()
+        self.number_of_data = self.restaurant.size
+        for index in range(self.number_of_data):
+            name = self.restaurant.name(index)
+            latitude = self.restaurant.latitude(index)
+            longitude = self.restaurant.longitude(index)
+            area_1 = self.restaurant.area_1(index)
+            area_2 = self.restaurant.area_2(index)
+            address = self.restaurant.address(index)
+            phone = self.restaurant.phone(index)
+            opening_hours = self.restaurant.opening_hours(index)
+            rating = self.restaurant.rating(index)
+            avg_price = self.restaurant.avg_price(index)
+            image = self.restaurant.image(index)
+            self.controller.new(name, latitude, longitude, area_1, area_2, 
+                                address, phone, opening_hours, rating, 
+                                avg_price, image)
+        self.controller.close()
+
 
 def test_Coordinate():
     coordinate = (23.05, 120.19)
@@ -1245,7 +1290,7 @@ def test_Attraction():
 
 def test_Restaurant():
     restaurant = Restaurant()
-    return restaurant._df
+    print(restaurant.address())
     pass
 
 if __name__ == "__main__":
@@ -1254,7 +1299,7 @@ if __name__ == "__main__":
     # test_Attraction()
     # test_TrafficAccident()
     # test_Earthquake()
-    data = test_Restaurant()
+    test_Restaurant()
     pass
 
 

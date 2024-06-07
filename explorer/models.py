@@ -76,6 +76,25 @@ class Hotspot(models.Model):
     def __str__(self):
         return f"{self.name} ({self.latitude}, {self.longitude}) {self.address}"
 
+class Restaurant(models.Model):
+    name = models.TextField(max_length=30)
+    latitude = models.DecimalField(max_digits=10, decimal_places=6)
+    longitude = models.DecimalField(max_digits=10, decimal_places=6)
+    area_1 = models.TextField(max_length=5)
+    area_2 = models.TextField(max_length=5, null=True, blank=True)
+    address = models.TextField(max_length=50)
+    phone = models.TextField(max_length=15, null=True, blank=True)
+    opening_hours = models.TextField(max_length=200)
+    rating = models.DecimalField(max_digits=5, decimal_places=2)
+    avg_price = models.IntegerField()
+    image = models.TextField(max_length=100)
+
+    class Meta:
+        db_table = "map_restaurant"
+
+    def __str__(self):
+        return f"{self.name} ({self.latitude}, {self.longitude}) {self.address}"
+
 class UserInfo(models.Model):
     username = models.CharField(max_length=50)
     fullname = models.CharField(max_length=50)
