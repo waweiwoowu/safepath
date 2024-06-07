@@ -120,6 +120,10 @@ $(document).ready(function(){
     function addToRoute() {
         var selectedItems = [];
 
+        // Collect Start Point and Destination
+        var startPoint = $('#Start_Point').val();
+        var destination = $('#Destination').val();
+
         // Collect selected attractions
         $('.hotSpot:checked').each(function(){
             selectedItems.push($(this).data('title'));
@@ -131,12 +135,13 @@ $(document).ready(function(){
         });
 
         // Update the route container
-        var routeHtml = '';
+
+        var routeHtml = '<p>'+startPoint+'  ---  ';
         $.each(selectedItems, function(index, item) {
-            routeHtml += '<input name="OP_rote"'+ 'value="' + item + '"'+'>';
+            routeHtml += item +'  ---  ';
         });
 
-        $('#routeContainer').html(routeHtml);
+        $('#routeContainer').html(routeHtml + destination +'</p>');
     }
 
     // Event handler for the "加入景點行程" and "加入美食行程" button

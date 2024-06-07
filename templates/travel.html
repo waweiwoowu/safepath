@@ -28,8 +28,13 @@
         <!-- Region 1: Pick an Area -->
         <form id="recommendfrom">
             <div class="Area">
+                <label for="Start_Point">起點:<input id="Start_Point" name="Start_Point"></label>
+                <label for="Destination">終點:<input id="Destination" name="Destination"></label>
+            </div>
+            <div class="Area">
                 <div>
                     {% csrf_token %}
+
                     <label for="city">城市:</label>
                     <!-- City selection triggers area dropdown refresh -->
                     <select id="city" name="city">
@@ -56,10 +61,10 @@
 
         <!-- Region 2: Optimal_route -->
         <div class="Optimal_route">
-            <div>
+            {% comment %} <div>
                 <!-- 起點 + (規劃好順序的 景點 + 美食 WayPoints) + 終點 -->
-                {% comment %} <input style="display:none" id="Start_Point" name="Start_Point"><input id="OP_rote" name="OP_rote"><input id="Destination" name="Destination"> {% endcomment %}
-            </div>
+                <input style="display:none" id="Start_Point" name="Start_Point"><input id="OP_rote" name="OP_rote"><input id="Destination" name="Destination">
+            </div> {% endcomment %}
 
             <div id="routeContainer">
 
