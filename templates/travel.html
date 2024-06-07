@@ -11,7 +11,7 @@
             display: flex;
             justify-content: space-between;
         }
-        .column {
+        .columnatrraction .columfood {
             width: 45%;
         }
         .result {
@@ -26,7 +26,7 @@
 <body>
     <div class="MainPanel">
         <!-- Region 1: Pick an Area -->
-        <form method="POST">
+        <form id="recommendfrom">
             <div class="Area">
                 <div>
                     {% csrf_token %}
@@ -65,44 +65,24 @@
 
         <!-- Region 3: Recommend Hotspot -->
         <div class="Recommend_spot">
-            <div class="column">
+            <div class="columnatrraction">
+            </div>
 
-                <h3>景點資訊</h3>
-                {% for attraction in attractions %}
-                <div class="result">
-                    <input type="checkbox" id="hotSpot_5" name="hotSpot_1">
-                    <label for="hotSpot_5">{{ attraction.title }}</label><br>
-                    <h3>{{ attraction.title }}</h3>
-                    <img src="{{ attraction.image }}" alt="{{ attraction.title }}">
-                    <p>地址: {{ attraction.address }}</p>
-                    <p>電話: {{ attraction.phone }}</p>
-                </div>
-                {% endfor %}
                 <button class="Insert_To_WayPoints">加入景點行程</button>
 
-            </div>
+
         </div>
         <!-- Region 4: Recommend Food -->
         <div class="Recommend_food">
-            <div class="column">
-                <h3>美食資訊</h3>
-                {% for food in food_places %}
-                <div class="result">
-                    <input type="checkbox" id="food_2" name="food_2">
-                    <label for="food_2">{{ food.title }}</label><br>
-                    <h3>{{ food.title }}</h3>
-                    <img src="{{ food.image }}" alt="{{ food.title }}">
-                    <p>評價: {{ food.rating }}</p>
-                    <p>地址: {{ food.address }}</p>
-                    <p>電話: {{ food.phone }}</p>
-                    <p>營業時間: {{ food.openhour }}</p>
-                    <p>平均消費: {{ food.price }}</p>
-                </div>
-                {% endfor %}
-                <button class="Insert_To_WayPoints">加入美食行程</button>
+            <div class="columfood">
             </div>
+
+                <button class="Insert_To_WayPoints">加入美食行程</button>
+
         </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="{% static 'js/travel.js' %}"></script>
 </body>
 </html>
 

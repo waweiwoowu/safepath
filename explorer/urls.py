@@ -19,7 +19,9 @@ from django.urls import path, re_path as url
 from explorer import views
 
 urlpatterns = [
+    url(r'^/', views.index, name="index"),
     url(r'^signin/', views.signin, name="signin"),
+    url(r'^logout/', views.logout, name="logout"),
     url(r'^signup/', views.signup, name="signup"),
     url(r'^verify/', views.verify, name="verify"),
     url(r'^home/', views.home, name='home'),

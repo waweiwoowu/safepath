@@ -1,15 +1,23 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from .models import UserInfo
 from django.core.mail import send_mail
 from asgiref.sync import sync_to_async
 import random
 from .maps import Direction
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib import auth
+
+def index(request):
+    return render(request, "index.html")
+
 
 def signin(request):
     if request.method == "GET":
         return render(request, "signin.html", {})
     else:
+        if request.user.is_authenticated:
+            return HttpResponseRedirect('/explorer//')
         username = request.POST.get("username")
         password = request.POST.get("password")
 
@@ -23,9 +31,15 @@ def signin(request):
             return render(request, "signin.html", {"error": "Invalid username or password."})
 
         if user.password == password:
-            return redirect('/explorer/home/')
+            user = auth.authenticate(username=username, password=password)
+            auth.login(request, user)
+            return redirect('/explorer//')
         else:
             return redirect('/explorer/signin/')
+
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect('/explorer//')
 
 def signup(request):
     if request.method == "GET":
@@ -71,13 +85,14 @@ def verify(request):
         except:
             return HttpResponse("Failed")
 
+@csrf_exempt
 def travel(request):
     attractions = []
     food_places = []
     if request.method == 'POST':
-        location = request.POST.get('city')
-        area = request.POST.get('county')
-        # if location == "台北市" and area == "文山區":
+        city = request.POST.get('city')
+        area = request.POST.get('area')
+        # if city == "臺北市" and area == "文山區":
         attractions = [
             {
                 'title': '景點A',
@@ -113,7 +128,7 @@ def travel(request):
             }
         ]
 
-        return render(request, 'travel.html', {"attractions":attractions, "food_places":food_places})
+        return JsonResponse({"attractions": attractions, "food_places": food_places}, safe=False)
     else:
 
         return render(request, 'travel.html')
