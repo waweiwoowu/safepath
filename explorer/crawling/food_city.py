@@ -7,7 +7,6 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-
 class CrawlingFoods():
     def __init__(self, city):
         self.driver = webdriver.Chrome()
@@ -15,7 +14,6 @@ class CrawlingFoods():
         self.get_urls_from_page()
         self.crawling_pages()
         self.driver.quit()
-        self.write_to_csv()
         
     def get_urls_from_page(self):
         self.urls = []
@@ -30,47 +28,34 @@ class CrawlingFoods():
                 soup = BeautifulSoup(r.text, 'html.parser')
                 hrefs = soup.find_all('a', class_='jsx-320828271 title-text')
                 for h in hrefs:
-                    self.urls.append(f"https://ifoodie.tw{h.get('href')}")
+                    self.urls.append(f'https://ifoodie.tw{h.get("href")}')
                
     def crawling_pages(self):
         self.data = []
         for url in self.urls:
-            self.data.append(self.get_json_from_page(url))
+            self.data.append(self.get_json_from_web(url))
 
-    def get_json_from_page(self, url):
+    def get_json_from_web(self, url):
         self.driver.get(url)
-        # 使用显式等待，等待 <script id="__NEXT_DATA__"> 出现
+        # 使用顯式等待，等待 <script id="__NEXT_DATA__"> 出現
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//script[@id='__NEXT_DATA__']"))
         )
-        # 获取 <script id="__NEXT_DATA__"> 中的内容
+        # 獲取 <script id="__NEXT_DATA__"> 中的內容
         script_element = self.driver.find_element(By.XPATH, "//script[@id='__NEXT_DATA__']")
         script_content = script_element.get_attribute("innerHTML")
-        # 解析 JSON 数据
+        # 解析 JSON 數據
         return json.loads(script_content)
 
     def write_to_csv(self):
-        # 转换数据为 DataFrame
+        # 轉換數據為 DataFrame
         df = pd.DataFrame([self.extract_data(Restaurant(data)) for data in self.data])
         
-        dtype_mapping = {
-            "name": str,
-            "Longtitude": float,
-            "Latitude": float,
-            "area_1": str,
-            "area_2": str,
-            "address": str,
-            "phone": str,
-            "opening_hours": list,
-            "rating": float,
-            "avg_price": int
-        }
-
-        # 将数据写入 CSV 文件
-        df.to_csv(f"{self.city}.csv", index=False, dtype=dtype_mapping ,encoding='utf-8-sig')
+        # 將數據寫入 CSV 文件
+        df.to_csv(f"{self.city}.csv", index=False, encoding='utf-8-sig')
 
     def extract_data(self, restaurant):
-        # 提取 Restaurant 对象的数据为字典
+        # 提取 Restaurant 對象的數據為字典
         return {
             "name": restaurant.name,
             "latitude": restaurant.latitude,
@@ -78,11 +63,21 @@ class CrawlingFoods():
             "area_1": restaurant.area_1,
             "area_2": restaurant.area_2,
             "address": restaurant.address,
-            "phone": restaurant.phone,
-            "opening_hours": restaurant.opening_hours.all,
+            "phone": self.format_phone_number(restaurant.phone),  # 使用格式化函數
+            "opening_hours_all": restaurant.opening_hours.all,
             "rating": restaurant.rating,
             "avg_price": restaurant.avg_price
         }
+    
+    def format_phone_number(self, phone):
+        phone = str(phone)
+        if phone.startswith("0"):  # 區域號碼
+            if len(phone) == 10:  # 假設區域碼和號碼總長度為10
+                return f"{phone[:2]}-{phone[2:]}"
+            else:
+                return f"{phone[:3]}-{phone[3:]}"
+        else:
+            return phone
 
 class Restaurant:
     def __init__(self, json_data):
@@ -93,14 +88,14 @@ class Restaurant:
         self.area_1 = data.get("city")
         self.area_2 = data.get("adminName")
         self.address = data.get("address")
-        self.phone = str(data.get("phone"))  # 将 phone 转换为字符串
+        self.phone = str(data.get("phone"))  # 將 phone 轉換為字符串
         self.opening_hours = Week(data.get("openingHoursList"))
         self.rating = data.get("rating")
         self.avg_price = data.get("avgPrice")
 
 class Week:
     def __init__(self, weeks):
-        # 使用 try-except 处理可能的索引错误
+        # 使用 try-except 處理可能的索引錯誤
         try:
             self.all = weeks
             self.mon = weeks[0] if len(weeks) > 0 else ""
@@ -121,5 +116,24 @@ class Week:
             self.sun = ""
 
 if __name__ == "__main__":
-    city = "台北市"  # 示例城市
-    CrawlingFoods(city)
+    # city = "台北市"  # 示例城市
+    # city = "新北市"
+    # city = "桃園市"
+    # city = "台中市"
+    # city = "台南市"
+    # city = "高雄市"
+    # city = "新竹縣"
+    # city = "彰化縣"
+    # city = "雲林縣"
+    # city = "嘉義縣"
+    # city = "屏東縣"
+    # city = "宜蘭縣"
+    # city = "花蓮縣"
+    # city = "台東縣"
+    # city = "澎湖縣"
+    # city = "金門縣"
+    # city = "基隆市"
+    # city = "新竹市"
+    city = "嘉義市"
+    food = CrawlingFoods(city)
+    food.write_to_csv()
