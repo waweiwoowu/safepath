@@ -6,13 +6,13 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ### runserver
-# from explorer.test_data import *
-# from explorer.database import Coordinate, PedestrianHellSQLController
+from explorer.test_data import *
+from explorer.database import Coordinate, PedestrianHellSQLController
 # KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 
 ### run python file
-from test_data import *
-from database import Coordinate, PedestrianHellSQLController
+# from test_data import *
+# from database import Coordinate, PedestrianHellSQLController
 KEY_PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
@@ -306,7 +306,7 @@ class Geocode():
             self._get_attributes()
         except:
             pass
-        
+
     def _get_attributes(self):
         self.latitude = self.data["geometry"]["location"]["lat"]
         self.longitude = self.data["geometry"]["location"]["lng"]
@@ -336,14 +336,14 @@ class Geocode():
                 self.route = address_component["long_name"]
             elif "street_number" in types:
                 self.street_number = address_component["long_name"]
-        
+
         if self.postal_code:
             if self.postal_code in self.address:
                 self.address = self.address[3:]
         if self.country:
             if self.country in self.address:
                 self.address = self.address[2:]
-        
+
         # Format address and truncate texts not needed
         types = ["street_number", "route", "political", "postal_code"]
         is_name = True
@@ -355,11 +355,11 @@ class Geocode():
             self.name = self.data["address_components"][0]["long_name"]
             if len(self.address) > 7:
                 if self.name in self.address:
-                    self.address = self.address[:-1 * len(self.name)] 
+                    self.address = self.address[:-1 * len(self.name)]
         if "台" in self.address[:6]:
             self.address = self.address[:6].replace("台", "臺") + self.address[6:]
-        
-        
+
+
     @property
     def coordinate(self):
         return (self.latitude, self.longitude)

@@ -44,6 +44,29 @@ $(document).ready(function(){
         event.preventDefault(); // Prevent the form from submitting the traditional way
         var cityValue = $("#city").val();  // Get selected city value
         var areaValue = $("#area").val();  // Get selected area value
+
+        $.ajax({
+            url: 'https://raw.githubusercontent.com/donma/TaiwanAddressCityAreaRoadChineseEnglishJSON/master/CityCountyData.json',
+            type: "get",
+            dataType: "json",
+            success: function(data){
+                var cityName = data[cityValue].CityName;
+                var areaName = data[cityValue].AreaList[areaValue].AreaName;
+                $('#result').text(cityName + " - " + areaName);
+                $('#result')
+            },
+            error: function(){
+                alert("fail");
+            }
+        });
+    });
+
+
+    // Handle form submission
+    $("#recommendfrom").submit(function(event){
+        event.preventDefault(); // Prevent the form from submitting the traditional way
+        var cityValue = $("#city").val();  // Get selected city value
+        var areaValue = $("#area").val();  // Get selected area value
         var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();  // Get CSRF token
         console.log(csrftoken)
         $.ajax({
@@ -57,7 +80,7 @@ $(document).ready(function(){
             dataType: 'json',
             success: function(response){
                 var attractionsHtml='';
-                var foodPlacesHtml
+                var foodPlacesHtml='';
 
                 $.each(response.attractions, function(index, attraction){
                     attractionsHtml += '<div class="result">';
