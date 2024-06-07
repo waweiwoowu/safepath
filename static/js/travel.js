@@ -84,19 +84,20 @@ $(document).ready(function(){
 
                 $.each(response.attractions, function(index, attraction){
                     attractionsHtml += '<div class="result">';
-                    attractionsHtml += '<input type="checkbox" id="hotSpot_' + index + '" name="hotSpot_' + index + '">';
-                    attractionsHtml += '<label for="hotSpot_' + index + '">' + attraction.title + '</label><br>';
+                    attractionsHtml += '<input type="checkbox" class="hotSpot" id="hotSpot' + index + '" name="hotSpot' + index + '" data-title="' + attraction.title + '">';
+                    attractionsHtml += '<label for="hotSpot' + index + '">' + attraction.title + '</label><br>';
                     attractionsHtml += '<h3>'+ attraction.title + '</h3>';
                     attractionsHtml += '<img src="' + attraction.image +'" alt="' + attraction.title + '">';
-                    attractionsHtml += '<p>地址:' + attraction.address + '</p>'
-                    attractionsHtml += '<p>電話:'+ attraction.phone + '</p>'
+                    attractionsHtml += '<p>地址:' + attraction.address + '</p>';
+                    attractionsHtml += '<p>電話:'+ attraction.phone + '</p>';
                     attractionsHtml += '</div>';
                 });
+
                 $.each(response.food_places, function(index, food_place){
                     foodPlacesHtml += '<div class="result">';
-                    foodPlacesHtml += '<input type="checkbox" id="food_' + index + '" name="food_' + index + '">';
-                    foodPlacesHtml += '<label for="food_' + index + '">' + food_place.title + '</label><br>';
-                    foodPlacesHtml += '<h3>'+ food_place.title + '<h3>';
+                    foodPlacesHtml += '<input type="checkbox" class="foodPlace" id="foodPlace' + index + '" name="foodPlace' + index + '" data-title="' + food_place.title + '">';
+                    foodPlacesHtml += '<label for="foodPlace' + index + '">' + food_place.title + '</label><br>';
+                    foodPlacesHtml += '<h3>'+ food_place.title + '</h3>';
                     foodPlacesHtml += '<img src="' + food_place.image + '" alt="' + food_place.title + '">';
                     foodPlacesHtml += '<p>評價: ' + food_place.rating + '</p>';
                     foodPlacesHtml += '<p>地址: ' + food_place.address + '</p>';
@@ -104,16 +105,48 @@ $(document).ready(function(){
                     foodPlacesHtml += '<p>營業時間: ' + food_place.openhour + '</p>';
                     foodPlacesHtml += '<p>平均消費: ' + food_place.price + '</p>';
                     foodPlacesHtml += '</div>';
-                })
+                });
 
                 $('.Recommend_spot .columnatrraction').html('<h3>景點資訊</h3>'+ attractionsHtml);
                 $('.Recommend_food .columfood').html('<h3>美食資訊</h3>'+ foodPlacesHtml);
-
             },
             error: function(){
                 alert("fail");
-
-            },
+            }
+        });
     });
-});
+
+    // Function to handle adding selected items to the route
+    function addToRoute() {
+        var selectedItems = [];
+
+        // Collect selected attractions
+        $('.hotSpot:checked').each(function(){
+            selectedItems.push($(this).data('title'));
+        });
+
+        // Collect selected food places
+        $('.foodPlace:checked').each(function(){
+            selectedItems.push($(this).data('title'));
+        });
+
+        // Update the route container
+        var routeHtml = '';
+        $.each(selectedItems, function(index, item) {
+            routeHtml += '<input name="OP_rote"'+ 'value="' + item + '"'+'>';
+        });
+
+        $('#routeContainer').html(routeHtml);
+    }
+
+    // Event handler for the "加入景點行程" and "加入美食行程" button
+    $(document).on('click', '.Insert_To_WayPoints', function() {
+        addToRoute();
+    });
+
+    // Optional: Event handler for the "規劃路線" button
+    $('#planRouteButton').click(function() {
+        // Additional route planning logic can be added here
+        alert('規劃路線功能尚未實現');
+    });
 });

@@ -58,9 +58,15 @@
         <div class="Optimal_route">
             <div>
                 <!-- 起點 + (規劃好順序的 景點 + 美食 WayPoints) + 終點 -->
-                <input id="Start_Point" name="Start_Point"><input id="OP_rote" name="OP_rote"><input id="Destination" name="Destination">
+                {% comment %} <input style="display:none" id="Start_Point" name="Start_Point"><input id="OP_rote" name="OP_rote"><input id="Destination" name="Destination"> {% endcomment %}
             </div>
-            <button>規劃路線</button>
+
+            <div id="routeContainer">
+
+                <!-- 選中的行程將顯示在這裡 -->
+            </div>
+
+            <button id="planRouteButton">規劃路線</button>
         </div>
 
         <!-- Region 3: Recommend Hotspot -->

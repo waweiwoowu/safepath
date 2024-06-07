@@ -103,13 +103,14 @@ def travel(request):
                 'title': '景點A',
                 'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
                 'address': '地址A',
-                'phone': '電話A'
+                'phone': '電話A',
             },
             {
                 'title': '景點B',
                 'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
                 'address': '地址B',
                 'phone': '電話B'
+
             }
         ]
         food_places = [
