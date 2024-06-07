@@ -135,7 +135,6 @@ $(document).ready(function(){
         });
 
         // Update the route container
-
         var routeHtml = '<p>'+startPoint+'  ---  ';
         $.each(selectedItems, function(index, item) {
             routeHtml += item +'  ---  ';
