@@ -63,10 +63,6 @@ class Coordinates():
             self.grid.append((coord.latitude_grid, coord.longitude_grid))
         self.grid = list(set(self.grid))
 
-class _GoogleMap():
-    if GOOGLE_MAPS_API_KEY:
-        gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
-
 class Direction():
     """Get directions between an origin point and a destination point.
 
@@ -93,7 +89,8 @@ class Direction():
     """
     def __init__(self, origin=None, destination=None):
         if origin and destination and GOOGLE_MAPS_API_KEY:
-            self.data = _GoogleMap.gmaps.directions(origin, destination, )[0]
+            gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
+            self.data = gmaps.directions(origin, destination, )[0]
         else:
             self.data = DIRECTIONS[0]
         self._traffic_accident = None
@@ -138,142 +135,179 @@ class _DirectionTrafficAccidentData():
         self._coords = []
         for coordinate in coordinates:
             self._coords.append(Coordinate(coordinate))
+        self._data = None
+        self._number = None
+        self._total_fatality = None
+        self._total_injury = None
+        self._pedestrian_fatality = None
+        self._pedestrian_injury = None
 
     @property
     def data(self):
-        data = []
-        for coord in self._coords:
-            _data = coord.traffic_accident.data
-            if _data:
-                data.append(_data)
-        return data
+        if self._data is None:
+            self._data = []
+            for coord in self._coords:
+                data = coord.traffic_accident.data
+                if data:
+                    self._data.append(data)
+        return self._data
 
     @property
     def number(self):
-        total_number = 0
-        for coord in self._coords:
-            number = coord.traffic_accident.number
-            if number:
-                total_number += number
-        return total_number
+        if self._number is None:
+            self._number = 0
+            for coord in self._coords:
+                number = coord.traffic_accident.number
+                if number:
+                    self._number += number
+        return self._number
 
     @property
     def total_fatality(self):
-        total_fatality = 0
-        for coord in self._coords:
-            fatality = coord.traffic_accident.total_fatality
-            if fatality:
-                total_fatality += fatality
-        return total_fatality
+        if self._total_fatality is None:
+            self._total_fatality = 0
+            for coord in self._coords:
+                fatality = coord.traffic_accident.total_fatality
+                if fatality:
+                    self._total_fatality += fatality
+        return self._total_fatality
 
     @property
     def total_injury(self):
-        total_injury = 0
-        for coord in self._coords:
-            injury = coord.traffic_accident.total_injury
-            if injury:
-                total_injury += injury
-        return total_injury
+        if self._total_injury is None:
+            self._total_injury = 0
+            for coord in self._coords:
+                injury = coord.traffic_accident.total_injury
+                if injury:
+                    self._total_injury += injury
+        return self._total_injury
 
     @property
     def pedestrian_fatality(self):
-        pedestrian_fatality = 0
-        for coord in self._coords:
-            fatality = coord.traffic_accident.pedestrian_fatality
-            if fatality:
-                pedestrian_fatality += fatality
-        return pedestrian_fatality
+        if self._pedestrian_fatality is None:
+            self._pedestrian_fatality = 0
+            for coord in self._coords:
+                fatality = coord.traffic_accident.pedestrian_fatality
+                if fatality:
+                    self._pedestrian_fatality += fatality
+        return self._pedestrian_fatality
 
     @property
     def pedestrian_injury(self):
-        pedestrian_injury = 0
-        for coord in self._coords:
-            injury = coord.traffic_accident.pedestrian_injury
-            if injury:
-                pedestrian_injury += injury
-        return pedestrian_injury
+        if self._pedestrian_injury is None:
+            self._pedestrian_injury = 0
+            for coord in self._coords:
+                injury = coord.traffic_accident.pedestrian_injury
+                if injury:
+                    self._pedestrian_injury += injury
+        return self._pedestrian_injury
 
 class _DirectionEarthquakeData():
     def __init__(self, coordinates):
         self._coords = []
         for coordinate in coordinates:
             self._coords.append(Coordinate(coordinate))
+        self._data = None
+        self._date = None
+        self._time = None
+        self._latitude = None
+        self._longitude = None
+        self._coordinate = None
+        self._magnitude = None
+        self._depth = None
 
     @property
     def data(self):
-        data = []
-        for coord in self._coords:
-            elements = coord.earthquake.data
-            if elements:
-                for element in elements:
-                    data.append(element)
-        if len(data) == 0:
-            return None
-        else:
-            return list(set(data))
+        if self._data is None:
+            data = []
+            for coord in self._coords:
+                elements = coord.earthquake.data
+                if elements:
+                    for element in elements:
+                        data.append(element)
+            if len(data) == 0:
+                return None
+            else:
+                self._data = list(set(data))
+                self.number = len(self._data)
+        return self._data
 
     @property
     def date(self):
-        if self.data:
-            date = []
-            for data in self.data:
-                date.append(data[1])
-            return date
-        return None
+        if self._date is None:
+            if not self.data:
+                return None
+            else:
+                self._date = []
+                for data in self.data:
+                    self._date.append(data[1])
+        return self._date
 
     @property
     def time(self):
-        if self.data:
-            time = []
-            for data in self.data:
-                time.append(data[2])
-            return time
-        return None
+        if self._time is None:
+            if not self.data:
+                return None
+            else:
+                self._time = []
+                for data in self.data:
+                    self._time.append(data[2])
+        return self._time
 
     @property
     def latitude(self):
-        if self.data:
-            latitude = []
-            for data in self.data:
-                latitude.append(data[3])
-            return latitude
-        return None
+        if self._latitude is None:
+            if not self.data:
+                return None
+            else:
+                self._latitude = []
+                for data in self.data:
+                    self._latitude.append(data[3])
+        return self._latitude
 
     @property
     def longitude(self):
-        if self.data:
-            longitude = []
-            for data in self.data:
-                longitude.append(data[4])
-            return longitude
-        return None
+        if self._longitude is None:
+            if not self.data:
+                return None
+            else:
+                self._longitude = []
+                for data in self.data:
+                    self._longitude.append(data[4])
+        return self._longitude
 
     @property
     def coordinate(self):
-        if self.data:
-            coordinate = []
-            for data in self.data:
-                coordinate.append((data[3], data[4]))
-            return coordinate
-        return None
+        if self._coordinate is None:
+            if not self.data:
+                return None
+            else:
+                self._coordinate = []
+                for data in self.data:
+                    self._coordinate.append((data[3], data[4]))
+        return self._coordinate
 
     @property
     def magnitude(self):
-        if self.data:
-            magnitude = []
-            for data in self.data:
-                magnitude.append(data[5])
-            return magnitude
-        return None
+        if self._magnitude is None:
+            if not self.data:
+                return None
+            else:
+                self._magnitude = []
+                for data in self.data:
+                    self._magnitude.append(data[5])
+        return self._magnitude
 
     @property
     def depth(self):
-        if self.data:
-            depth = []
-            for data in self.data:
-                depth.append(data[6])
-            return depth
-        return None
+        if self._depth is None:
+            if not self.data:
+                return None
+            else:
+                self._depth = []
+                for data in self.data:
+                    self._depth.append(data[6])
+        return self._depth
 
 
 class Geocode():
@@ -297,7 +331,8 @@ class Geocode():
         self.place_id = None
         try:
             if address:
-                self.data = _GoogleMap.gmaps.geocode(address=address, language=language)[0]
+                gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
+                self.data = gmaps.geocode(address=address, language=language)[0]
             else:
                 # self.data = GEOCODE_ZH[0]
                 self.data = GEOCODE_ZH_1[0]
@@ -404,21 +439,27 @@ class GetSQLData:
 
 def test_Direction():
     direction = Direction()
+    # start = "台北車站"
+    # destination = "台灣大學"
+    # direction = Direction(start, destination)
     # print(direction.coordinates)
-    print(direction.traffic_accident.data)
-    print(direction.traffic_accident.number)
-    print(direction.traffic_accident.total_fatality)
-    print(direction.traffic_accident.total_injury)
-    print(direction.traffic_accident.pedestrian_fatality)
-    print(direction.traffic_accident.pedestrian_injury)
-    print(direction.earthquake.data)
-    print(direction.earthquake.date)
-    print(direction.earthquake.time)
-    print(direction.earthquake.latitude)
-    print(direction.earthquake.longitude)
-    print(direction.earthquake.coordinate)
-    print(direction.earthquake.magnitude)
-    print(direction.earthquake.depth)
+    print("[Traffic Accident Data]")
+    print("data:", direction.traffic_accident.data)
+    print("number:", direction.traffic_accident.number)
+    print("total_fatality:", direction.traffic_accident.total_fatality)
+    print("total_injury:", direction.traffic_accident.total_injury)
+    print("pedestrian_fatality:", direction.traffic_accident.pedestrian_fatality)
+    print("pedestrian_injury:", direction.traffic_accident.pedestrian_injury)
+    print("[Earthquake Data]")
+    print("data:", direction.earthquake.data)
+    print("number:", direction.earthquake.number)
+    print("date:", direction.earthquake.date)
+    print("time:", direction.earthquake.time)
+    print("latitude:", direction.earthquake.latitude)
+    print("longitude:", direction.earthquake.longitude)
+    print("coordinate:", direction.earthquake.coordinate)
+    print("magnitude:", direction.earthquake.magnitude)
+    print("depth:", direction.earthquake.depth)
     pass
 
 def test_Geocode():
@@ -482,7 +523,7 @@ def test_Taiwan():
     pass
 
 if __name__ == "__main__":
-    # test_Direction()
-    test_Geocode()
+    test_Direction()
+    # test_Geocode()
     # test_Taiwan()
     pass

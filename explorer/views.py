@@ -148,7 +148,7 @@ async def home(request):
         # Assuming `Direction` class methods are synchronous
         direction = Direction()
         # or Direction(start, destination) if you need to pass arguments
-        # direction = Direction(origin=start, destination=destination)
+        direction = Direction(origin=start, destination=destination)
 
         # coordinates = direction.coordinates
         # fatality = await direction.traffic_accident.total_fatality
