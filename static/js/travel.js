@@ -125,32 +125,50 @@ $(document).ready(function(){
         var destination = $('#Destination').val();
 
         // Collect selected attractions
-        $('.hotSpot:checked').each(function(){
+        $('.hotSpot:checked').each(function() {
             selectedItems.push($(this).data('title'));
         });
 
         // Collect selected food places
-        $('.foodPlace:checked').each(function(){
+        $('.foodPlace:checked').each(function() {
             selectedItems.push($(this).data('title'));
         });
 
         // Update the route container
-        var routeHtml = '<p>'+startPoint+'  ---  ';
+        var routeHtml = '<p>' + startPoint + '  ---  ';
         $.each(selectedItems, function(index, item) {
-            routeHtml += item +'  ---  ';
+            routeHtml += item + '  ---  ';
         });
 
-        $('#routeContainer').html(routeHtml + destination +'</p>');
+        $('#routeContainer').html(routeHtml + destination + '</p>');
     }
 
-    // Event handler for the "加入景點行程" and "加入美食行程" button
+    // Event handler for the "加入景點行程" and "加入美食行程" buttons
     $(document).on('click', '.Insert_To_WayPoints', function() {
         addToRoute();
     });
 
-    // Optional: Event handler for the "規劃路線" button
+    // Event handler for the "規劃路線" button
     $('#planRouteButton').click(function() {
-        // Additional route planning logic can be added here
-        alert('規劃路線功能尚未實現');
+        var selectedItems = [];
+
+        // Collect Start Point and Destination
+        var startPoint = $('#Start_Point').val();
+        var destination = $('#Destination').val();
+
+        // Collect selected attractions
+        $('.hotSpot:checked').each(function() {
+            selectedItems.push($(this).data('title'));
+        });
+
+        // Collect selected food places
+        $('.foodPlace:checked').each(function() {
+            selectedItems.push($(this).data('title'));
+        });
+
+        // Redirect to travel_map with the selected data
+        var waypoints = selectedItems.join('|');
+        var url = '/explorer/travel_map/?start=' + encodeURIComponent(startPoint) + '&end=' + encodeURIComponent(destination) + '&waypoints=' + encodeURIComponent(waypoints);
+        window.location.href = url;
     });
 });

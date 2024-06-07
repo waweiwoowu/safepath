@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^verify/', views.verify, name="verify"),
     url(r'^home/', views.home, name='home'),
     url(r'^travel/', views.travel, name='travel'),
+    url(r'^travel_map/', views.travel_map, name='travel_map'),
 ]
