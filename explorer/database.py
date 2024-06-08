@@ -81,6 +81,32 @@ class Coordinate:
             self._earthquake = EarthquakeData(self.latitude_grid, self.longitude_grid)
         return self._earthquake
 
+class Hotspot():
+    def __init__(self, area_1, area_2=None):
+        self._area_1 = area_1
+        self._area_2 = area_2
+        self.controller = AttractionSQLController()
+        self.id = []
+        self.latitude = []
+        self.longitude = []
+        self.coordinate = []
+        self.name = []
+
+
+        self._get_data_from_area()
+
+
+    def _get_data_from_area(self):
+        self.data = self.controller.get_data_from_area(self._area_1, self._area_2)
+
+
+        for data in self.data:
+            self.id.append(data[0])
+            self.name.append(data[1])
+            self.latitude.append(data[2])
+            self.longitude.append(data[3])
+            self.coordinate.append((data[2], data[3]))
+
 class TrafficAccidentData():
     def __init__(self, latitude, longitude):
         controller = TrafficAccidentSQLController()
@@ -1028,6 +1054,16 @@ class AttractionSQLController(SQLController):
             self.cursor.execute(sql, (name, latitude, longitude, area_1, area_2,
                                       address, image))
             self.conn.commit()
+    def get_data_from_area(self, area_1, area_2=None):
+        sql = f"SELECT * FROM {self.table_name} WHERE area_1 = '{area_1}'"
+        # sql = f"SELECT * FROM {self.table_name}"
+        if area_2:
+            sql += f" AND area_2 = '{area_2}'"
+
+        print("CC --> "+sql+" <-- DD")
+        self.cursor.execute(sql)
+        self.conn.commit()
+        return self.cursor.fetchall()
 
 class RestaurantSQLController(SQLController):
     def __init__(self):
@@ -1198,6 +1234,8 @@ class UpdateAttractionData:
             self.controller.new(name, latitude, longitude, area_1, area_2, address, image)
         self.controller.close()
 
+
+
 class UpdateRestaurantData:
     def __init__(self):
         self.restaurant = Restaurant()
@@ -1293,6 +1331,15 @@ def test_Restaurant():
     print(restaurant.address())
     pass
 
+def test_hotspot():
+    area_1 = "臺北市"
+    area_2 = "信義區"
+    hotspot=Hotspot(area_1, area_2)
+    print(hotspot.id)
+    print(hotspot.name)
+    print(hotspot.latitude)
+    print(hotspot.longitude)
+
 if __name__ == "__main__":
     # test_Coordinate()
     # test_CarAccident()
@@ -1300,6 +1347,7 @@ if __name__ == "__main__":
     # test_TrafficAccident()
     # test_Earthquake()
     # test_Restaurant()
+    test_hotspot()
     pass
 
 

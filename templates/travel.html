@@ -26,7 +26,7 @@
 <body>
     <div class="MainPanel">
         <!-- Region 1: Pick an Area -->
-        <form id="recommendfrom">
+        <form id="recommendfrom" method="POST"  action="{% url 'travel' %}">  <!-- 0608 DAvid -->
             <div class="Area">
                 <label for="Start_Point">起點:<input id="Start_Point" name="Start_Point"></label>
                 <label for="Destination">終點:<input id="Destination" name="Destination"></label>

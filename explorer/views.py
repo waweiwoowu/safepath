@@ -24,7 +24,6 @@ def signin(request):
             return HttpResponseRedirect('/explorer//')
         username = request.POST.get("username")
         password = request.POST.get("password")
-
         if not username or not password:
             return render(request, "signin.html", {"error": "Username and password are required."})
 
@@ -97,6 +96,9 @@ def travel(request):
     if request.method == 'POST':
         city = request.POST.get('city')
         area = request.POST.get('area')
+        print("--> " + city + " <--")
+        # print(area)
+        # return HttpResponse(str(city))
         # if city == "臺北市" and area == "文山區":
         attractions = [
             {
