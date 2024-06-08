@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ### runserver
 from explorer.test_data import *
-from explorer.database import Coordinate, PedestrianHellSQLController, AttractionSQLController
+from explorer.database import Coordinate, PedestrianHellSQLController, AttractionSQLController, RestaurantSQLController
 # KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
 
 ### run python file
@@ -450,7 +450,31 @@ class Hotspot():
             self.longitude.append(data[3])
             self.coordinate.append((data[2], data[3]))
 
-# class Hotspot():
+class Foodspot():
+    def __init__(self, area_1, area_2=None):
+        self._area_1 = area_1
+        self._area_2 = area_2
+        self.controller = RestaurantSQLController()
+        self.id = []
+        self.latitude = []
+        self.longitude = []
+        self.coordinate = []
+        self.name = []
+
+
+        self._get_data_from_area()
+
+
+    def _get_data_from_area(self):
+        self.data = self.controller.get_data_from_area(self._area_1, self._area_2)
+
+
+        for data in self.data:
+            self.id.append(data[0])
+            self.name.append(data[1])
+            self.latitude.append(data[2])
+            self.longitude.append(data[3])
+            self.coordinate.append((data[2], data[3]))
 
 class _TrafficAccidentData():
     def __init__(self):
@@ -580,11 +604,20 @@ def test_hotspot():
     print(hotspot.latitude)
     print(hotspot.longitude)
 
+def test_foodspot():
+    area_1 = "台北市"
+    area_2 = "信義區"
+    foodspot=Foodspot(area_1, area_2)
+    print(foodspot.id)
+    print(foodspot.name)
+    print(foodspot.latitude)
+    print(foodspot.longitude)
+
 if __name__ == "__main__":
     # test_Direction()
     # test_Geocode()
     # test_Taiwan()
 
-    test_hotspot()
-
+    # test_hotspot()
+    test_foodspot()
     pass

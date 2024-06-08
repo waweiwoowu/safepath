@@ -4,7 +4,9 @@ from .models import UserInfo
 from django.core.mail import send_mail
 from asgiref.sync import sync_to_async
 import random
-from .maps import Direction, DirectionAPI, Hotspot
+from .maps import Direction, DirectionAPI, Hotspot, Foodspot
+from explorer.database import AttractionSQLController, RestaurantSQLController
+
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import auth
 
@@ -99,14 +101,11 @@ def travel(request):
         # print("--> " + city + " <--")
         # print("--> " + area + " <--")
         hotspot = Hotspot(city, area)
-        # print("=====================AAA")
-        # print(hotspot.id)
-        # print("=====================BBB")
-        # print(area)
-        # ids = hotspot.id
-        # for id in ids:
-        #     print(id)
-        #     pass
+        foodspot = Foodspot(city, area)
+
+        AA = foodspot.name
+        for A in AA:
+            print(A)
 
         name_list = hotspot.name
         # 所有的景點

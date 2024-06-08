@@ -1060,7 +1060,7 @@ class AttractionSQLController(SQLController):
         if area_2:
             sql += f" AND area_2 = '{area_2}'"
 
-        print("CC --> "+sql+" <-- DD")
+        print("CC --> " + sql + " <-- DD")
         self.cursor.execute(sql)
         self.conn.commit()
         return self.cursor.fetchall()
@@ -1080,6 +1080,17 @@ class RestaurantSQLController(SQLController):
                                       address, phone, opening_hours, rating,
                                       avg_price, image))
             self.conn.commit()
+
+    def get_data_from_area(self, area_1, area_2=None):
+        sql = f"SELECT * FROM {self.table_name} WHERE area_1 = '{area_1}'"
+        # sql = f"SELECT * FROM {self.table_name}"
+        if area_2:
+            sql += f" AND area_2 = '{area_2}'"
+
+        print("EE --> " + sql + " <-- FF")
+        self.cursor.execute(sql)
+        self.conn.commit()
+        return self.cursor.fetchall()
 
 
 class UpdateTrafficAccidentData:
