@@ -4,7 +4,7 @@ from .models import UserInfo
 from django.core.mail import send_mail
 from asgiref.sync import sync_to_async
 import random
-from .maps import Direction, DirectionAPI
+from .maps import Direction, DirectionAPI, Hotspot
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import auth
 
@@ -94,12 +94,30 @@ def travel(request):
     attractions = []
     food_places = []
     if request.method == 'POST':
-        city = request.POST.get('city')
-        area = request.POST.get('area')
-        print("--> " + city + " <--")
+        city = request.POST.get('city')  # 選擇的縣市
+        area = request.POST.get('area')  # 選擇的縣市行政區內鄉鎮
+        # print("--> " + city + " <--")
+        # print("--> " + area + " <--")
+        hotspot = Hotspot(city, area)
+        # print("=====================AAA")
+        # print(hotspot.id)
+        # print("=====================BBB")
         # print(area)
+        # ids = hotspot.id
+        # for id in ids:
+        #     print(id)
+        #     pass
+
+        name_list = hotspot.name
+        # 所有的景點
+        for name in name_list:
+            print(name)
+            pass
+
         # return HttpResponse(str(city))
         # if city == "臺北市" and area == "文山區":
+
+        # 網推薦景點填入
         attractions = [
             {
                 'title': '台北小巨蛋',

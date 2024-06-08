@@ -450,6 +450,8 @@ class Hotspot():
             self.longitude.append(data[3])
             self.coordinate.append((data[2], data[3]))
 
+# class Hotspot():
+
 class _TrafficAccidentData():
     def __init__(self):
         self._controller = PedestrianHellSQLController()
