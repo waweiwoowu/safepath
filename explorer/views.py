@@ -4,7 +4,7 @@ from .models import UserInfo
 from django.core.mail import send_mail
 from asgiref.sync import sync_to_async
 import random
-from .maps import Direction
+from .maps import Direction, DirectionAPI
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import auth
 
@@ -151,19 +151,29 @@ def travel_map(request):
 
     return render(request, 'travel_map.html', context)
 
-async def home(request):
+import json
+
+def home(request):
     if request.method == 'POST':
         start = request.POST.get('start', '')
         destination = request.POST.get('destination', '')
+        coordinates = request.POST.get('coordinates', '')
 
-        # Assuming `Direction` class methods are synchronous
-        direction = Direction()
-        # or Direction(start, destination) if you need to pass arguments
-        direction = Direction(origin=start, destination=destination)
+        try:
+            if not coordinates:
+                raise ValueError('No coordinates provided')
+            coordinates = json.loads(coordinates)
+            print('Parsed coordinates:', coordinates)
+        except (json.JSONDecodeError, ValueError) as e:
+            print('Error:', str(e))
+            return JsonResponse({'error': 'Invalid coordinates format or no coordinates provided'}, status=400)
+
+        direction = Direction(coordinates)
+        # direction = DirectionAPI()
+        # direction = DirectionAPI(origin=start, destination=destination) # This will spend googlemaps api quotas
 
         # coordinates = direction.coordinates
-        # fatality = await direction.traffic_accident.total_fatality
-        # injury = await direction.traffic_accident.total_injury
+
         fatality = direction.traffic_accident.total_fatality
         if fatality == 0:
             fatality = "無死亡"
@@ -176,7 +186,6 @@ async def home(request):
             magnitude = "無地震"
         else:
             magnitude = direction.earthquake.magnitude[0]
-
 
         # return render(request, 'home.html', {
         #     'start': start,
@@ -192,6 +201,59 @@ async def home(request):
     })
     else:
         return render(request, 'home.html', {})
+
+
+# def home(request):
+#     if request.method == 'POST':
+#         start = request.POST.get('start', '')
+#         destination = request.POST.get('destination', '')
+#         coordinates = request.POST.get('coordinates', '')
+
+#         print('Received start:', start)
+#         print('Received destination:', destination)
+#         print('Received coordinates:', coordinates)
+
+#         try:
+#             coordinates = json.loads(coordinates)
+#             print('Parsed coordinates:', coordinates)
+#         except json.JSONDecodeError:
+#             return JsonResponse({'error': 'Invalid coordinates format'}, status=400)
+
+#         # direction = DirectionAPI()
+#         # direction = DirectionAPI(origin=start, destination=destination) # This will spend googlemaps api quotas
+#         direction = Direction(coordinates)
+
+#         # coordinates = direction.coordinates
+#         # fatality = await direction.traffic_accident.total_fatality
+#         # injury = await direction.traffic_accident.total_injury
+#         fatality = direction.traffic_accident.total_fatality
+#         if fatality == 0:
+#             fatality = "無死亡"
+#         injury = direction.traffic_accident.total_injury
+#         if injury == 0:
+#             injury = "無受傷"
+
+#         magnitude = direction.earthquake.magnitude
+#         if magnitude is None:
+#             magnitude = "無地震"
+#         else:
+#             magnitude = direction.earthquake.magnitude[0]
+
+#         # return render(request, 'home.html', {
+#         #     'start': start,
+#         #     'destination': destination,
+#         #     'coordinates': coordinates,
+#         #     'fatality': fatality,
+#         #     'injury': injury
+#         # })
+#         return JsonResponse({
+#         'fatality': fatality,
+#         'injury': injury,
+#         'magnitude': magnitude
+#         # 'magnitude': coordinates
+#     })
+#     else:
+#         return render(request, 'home.html', {})
 
 # from django.http import JsonResponse
 # import json

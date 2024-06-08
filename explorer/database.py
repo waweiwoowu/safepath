@@ -521,7 +521,7 @@ class Attraction:
             area_2 = self._area_2[i]
             address = self._address[i]
             image = self._image[i]
-            
+
             # Fix the issue where area_1 and area_2 are None values
             if pd.isna(area_1) or pd.isna(area_2):
                 try:
@@ -535,7 +535,7 @@ class Attraction:
                 # Truncate the first 3 letters from address
                 area_1 = address[:3]
                 area_2 = strip_area_2(area_2)
-            
+
             if pd.isna(address):
                 # Avoid circular import from maps.py
                 Geocode = getattr(__import__('maps'), 'Geocode')
@@ -598,7 +598,7 @@ class Attraction:
             return self._longitudes[id]
         else:
             return self._longitudes
-    
+
     def area_1(self, id=None):
         if id is not None:
             return self._area_1s[id]
@@ -610,13 +610,13 @@ class Attraction:
             return self._area_2s[id]
         else:
             return self._area_2s
-    
+
     def address(self,id=None):
         if id is not None:
             return self._addresses[id]
         else:
             return self._addresses
-        
+
     def image(self, id=None):
         if id is not None:
             return self._images[id]
@@ -643,7 +643,7 @@ class OpeningHours:
             self.fri = None
             self.sat = None
             self.sun = None
-        
+
 class Restaurant:
     def __init__(self):
         self._df = pd.DataFrame()
@@ -685,7 +685,7 @@ class Restaurant:
         self._image = self._df["image"]
 
         self._reorganize_data()
-    
+
     def _reorganize_data(self):
         data = []
         for i in range(len(self._name)):
@@ -759,7 +759,7 @@ class Restaurant:
             return self._longitudes[id]
         else:
             return self._longitudes
-    
+
     def area_1(self, id=None):
         if id is not None:
             return self._area_1s[id]
@@ -771,19 +771,19 @@ class Restaurant:
             return self._area_2s[id]
         else:
             return self._area_2s
-    
+
     def address(self,id=None):
         if id is not None:
             return self._addresses[id]
         else:
             return self._addresses
-        
+
     def phone(self, id=None):
         if id is not None:
             return self._phones[id]
         else:
             return self._phones
-    
+
     def opening_hours(self, id=None):
         if id is not None:
             return self._opening_hours[id]
@@ -795,19 +795,19 @@ class Restaurant:
             return self._ratings[id]
         else:
             return self._ratings
-    
+
     def avg_price(self,id=None):
         if id is not None:
             return self._avg_prices[id]
         else:
             return self._avg_prices
-        
+
     def image(self, id=None):
         if id is not None:
             return self._images[id]
         else:
             return self._images
-        
+
 
 ### SQLController ###
 
@@ -850,7 +850,7 @@ class SQLController:
             return data
         else:
             return None
-    
+
     def select_by_order(self, ordered_column, is_ascending=True):
         sql = f"SELECT * FROM {self.table_name} ORDER BY {ordered_column}"
         if not is_ascending:
@@ -1019,7 +1019,7 @@ class AttractionSQLController(SQLController):
     def __init__(self):
         self.table_name = "map_hotspot"
         super().__init__(self.table_name)
-    
+
     def new(self, name, latitude, longitude, area_1, area_2, address, image):
         if not self.select_from_coordinate(latitude, longitude):
             sql = f"""INSERT INTO {self.table_name} (
@@ -1033,15 +1033,15 @@ class RestaurantSQLController(SQLController):
     def __init__(self):
         self.table_name = "map_restaurant"
         super().__init__(self.table_name)
-    
-    def new(self, name, latitude, longitude, area_1, area_2, address, phone, 
+
+    def new(self, name, latitude, longitude, area_1, area_2, address, phone,
                 opening_hours, rating, avg_price, image):
         if not self.select_from_coordinate(latitude, longitude):
-            sql = f"""INSERT INTO {self.table_name} (name, latitude, longitude, 
-                    area_1, area_2, address, phone, opening_hours, rating, 
+            sql = f"""INSERT INTO {self.table_name} (name, latitude, longitude,
+                    area_1, area_2, address, phone, opening_hours, rating,
                     avg_price, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
-            self.cursor.execute(sql, (name, latitude, longitude, area_1, area_2, 
-                                      address, phone, opening_hours, rating, 
+            self.cursor.execute(sql, (name, latitude, longitude, area_1, area_2,
+                                      address, phone, opening_hours, rating,
                                       avg_price, image))
             self.conn.commit()
 
@@ -1215,8 +1215,8 @@ class UpdateRestaurantData:
             rating = self.restaurant.rating(index)
             avg_price = self.restaurant.avg_price(index)
             image = self.restaurant.image(index)
-            self.controller.new(name, latitude, longitude, area_1, area_2, 
-                                address, phone, opening_hours, rating, 
+            self.controller.new(name, latitude, longitude, area_1, area_2,
+                                address, phone, opening_hours, rating,
                                 avg_price, image)
         self.controller.close()
 
@@ -1299,7 +1299,7 @@ if __name__ == "__main__":
     # test_Attraction()
     # test_TrafficAccident()
     # test_Earthquake()
-    test_Restaurant()
+    # test_Restaurant()
     pass
 
 

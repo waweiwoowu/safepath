@@ -63,7 +63,7 @@ class Coordinates():
             self.grid.append((coord.latitude_grid, coord.longitude_grid))
         self.grid = list(set(self.grid))
 
-class Direction():
+class DirectionAPI():
     """Get directions between an origin point and a destination point.
 
     This class uses googlemaps.directions and returns data with a list of
@@ -117,6 +117,26 @@ class Direction():
         for step in self.data['legs'][0]['steps']:
             route_instructions.append(step['html_instructions'])
         return route_instructions
+
+    @property
+    def traffic_accident(self):
+        if self._traffic_accident is None:
+            self._traffic_accident = _DirectionTrafficAccidentData(self.coordinates)
+        return self._traffic_accident
+
+    @property
+    def earthquake(self):
+        if self._earthquake is None:
+            self._earthquake = _DirectionEarthquakeData(self.coordinates)
+        return self._earthquake
+
+class Direction():
+    def __init__(self, coordinates):
+        self.coordinates = []
+        for coordinate in coordinates:
+            self.coordinates.append((coordinate["lat"], coordinate["lng"]))
+        self._traffic_accident = None
+        self._earthquake = None
 
     @property
     def traffic_accident(self):
@@ -438,10 +458,10 @@ class GetSQLData:
 
 
 def test_Direction():
-    direction = Direction()
-    # start = "台北車站"
-    # destination = "台灣大學"
-    # direction = Direction(start, destination)
+    # direction = Direction()
+    start = "台北車站"
+    destination = "台灣大學"
+    direction = Direction(start, destination)
     # print(direction.coordinates)
     print("[Traffic Accident Data]")
     print("data:", direction.traffic_accident.data)
@@ -523,7 +543,7 @@ def test_Taiwan():
     pass
 
 if __name__ == "__main__":
-    test_Direction()
+    # test_Direction()
     # test_Geocode()
-    # test_Taiwan()
+    test_Taiwan()
     pass
