@@ -36,10 +36,19 @@ def map(request):
             return JsonResponse({'error': 'Invalid coordinates format or no coordinates provided'}, status=400)
 
         direction = Direction(coordinates)
+
         traffic_accident_number = direction.traffic_accident.number
         traffic_accident_fatality = direction.traffic_accident.total_fatality
         traffic_accident_injury = direction.traffic_accident.total_injury
-        earthquake_number = len(direction.earthquake.data)
+
+        if direction.earthquake.data:
+            earthquake_number = direction.earthquake.number
+            earthquake_average_magnitude = f"{direction.earthquake.average_magnitude:.2f}"
+            earthquake_average_depth = f"{direction.earthquake.average_depth:.1f}"
+        else:
+            earthquake_number = 0
+            earthquake_average_magnitude = None
+            earthquake_average_depth = None
         earthquake_data = [{
             "date": direction.earthquake.date[i],
             "coordinate": direction.earthquake.coordinate[i],
@@ -50,11 +59,13 @@ def map(request):
         } for i in range(earthquake_number)]
 
         return JsonResponse({
-            'traffic_accident_number': str(traffic_accident_number) + "次",
-            'traffic_accident_fatality': str(traffic_accident_fatality) + "人",
-            'traffic_accident_injury': str(traffic_accident_injury) + "人",
-            'earthquake_number': str(earthquake_number) + "次",
-            'earthquake_data': earthquake_data
+            "traffic_accident_number": traffic_accident_number,
+            "traffic_accident_fatality": traffic_accident_fatality,
+            "traffic_accident_injury": traffic_accident_injury,
+            "earthquake_number": earthquake_number,
+            "earthquake_average_magnitude": earthquake_average_magnitude,
+            "earthquake_average_depth": earthquake_average_depth,
+            "earthquake_data": earthquake_data
     })
     else:
         return render(request, 'map.html', {})

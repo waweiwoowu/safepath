@@ -1,3 +1,4 @@
+import math
 
 SEISMIC_INTENSITY_SCALE = {
     # PGA, Peak Ground Acceleration (cm/sec^2), is a measure of the maximum acceleration experienced by the ground during an earthquake.
@@ -25,14 +26,14 @@ class SeismicIntensityScale:
             # self.pgv_upper = SEISMIC_INTENSITY_SCALE[intensity]["PGV"]["upper"]
             # self.pgv_average = (self.lower + self.upper) / 2
         elif intensity == "5級":
-            self.pga = (SEISMIC_INTENSITY_SCALE["5弱"]["PGA"]["lower"] + 
+            self.pga = (SEISMIC_INTENSITY_SCALE["5弱"]["PGA"]["lower"] +
                               SEISMIC_INTENSITY_SCALE["5強"]["PGA"]["lower"]) / 2
-            self.pgv = (SEISMIC_INTENSITY_SCALE["5弱"]["PGV"]["lower"] + 
+            self.pgv = (SEISMIC_INTENSITY_SCALE["5弱"]["PGV"]["lower"] +
                               SEISMIC_INTENSITY_SCALE["5強"]["PGV"]["lower"]) / 2
         elif intensity == "6級":
-            self.pga = (SEISMIC_INTENSITY_SCALE["6弱"]["PGA"]["lower"] + 
+            self.pga = (SEISMIC_INTENSITY_SCALE["6弱"]["PGA"]["lower"] +
                               SEISMIC_INTENSITY_SCALE["6強"]["PGA"]["lower"]) / 2
-            self.pgv = (SEISMIC_INTENSITY_SCALE["6弱"]["PGV"]["lower"] + 
+            self.pgv = (SEISMIC_INTENSITY_SCALE["6弱"]["PGV"]["lower"] +
                               SEISMIC_INTENSITY_SCALE["6強"]["PGV"]["lower"]) / 2
         else:
             self.pga = self.pgv = None
@@ -72,8 +73,18 @@ def pga_to_intensity(pga):
     else:
         return "error"
 
+def average_magnitude(magnitudes):
+    if magnitudes:
+        avg = 0
+        for magnitude in magnitudes:
+            avg += 10 ** magnitude
+        avg /= len(magnitudes)
+        return math.log10(avg)
+    else:
+        return None
 
-if __name__ == "__main__":
+
+def test_intensity():
     # intensity = "5級"
     # scale = SeismicIntensityScale(intensity)
     # print(scale.pgv)
@@ -82,5 +93,16 @@ if __name__ == "__main__":
     pgv = intensity_to_pga(intensity_list)
     print(pgv)
     print(pga_to_intensity(pgv))
+    pass
+
+def test_magnitude():
+    magnitudes = [1, 2, 3, 4, 5, 6]
+    avg = average_magnitude(magnitudes)
+    print(avg)
+
+if __name__ == "__main__":
+    # test_intensity()
+    test_magnitude()
+    pass
 
 

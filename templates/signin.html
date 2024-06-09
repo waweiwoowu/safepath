@@ -8,174 +8,184 @@
   <title>CodePen - Random Login Form</title>
 
     <style>
-@import url(http://fonts.googleapis.com/css?family=Exo:100,200,400);
-@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:700,400,300);
+        @import url(http://fonts.googleapis.com/css?family=Exo:100,200,400);
+        @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:700,400,300);
 
-body{
-	margin: 0;
-	padding: 0;
-	background: #fff;
+        body {
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            color: #fff;
+            font-family: Arial;
+            font-size: 12px;
+        }
 
-	color: #fff;
-	font-family: Arial;
-	font-size: 12px;
-}
+        .body {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -40px;
+            bottom: -40px;
+            width: auto;
+            height: auto;
+            background-image: url('/static/images/index/simple-color-sign-in-the-wall-background-material.jpg');
+            background-size: cover;
+            z-index: 0;
+        }
 
-.body{
-	position: absolute;
-	top: -20px;
-	left: -20px;
-	right: -40px;
-	bottom: -40px;
-	width: auto;
-	height: auto;
-	background-image: url(https://t3.ftcdn.net/jpg/06/17/08/62/360_F_617086272_rDe3izCcKb9wZlvm462Myd17uwLdqUNU.jpg);
-	background-size: cover;
-	-webkit-filter: blur(5px);
-	z-index: 0;
-}
+        .grad {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -40px;
+            bottom: -40px;
+            width: auto;
+            height: auto;
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.65)));
+            /* Chrome,Safari4+ */
+            z-index: 1;
+            opacity: 0.7;
+        }
 
-.grad{
-	position: absolute;
-	top: -20px;
-	left: -20px;
-	right: -40px;
-	bottom: -40px;
-	width: auto;
-	height: auto;
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.65))); /* Chrome,Safari4+ */
-	z-index: 1;
-	opacity: 0.7;
-}
+        .header {
+            position: absolute;
+            top: calc(50% - 35px);
+            left: calc(50% - 255px);
+            z-index: 2;
+        }
 
-.header{
-	position: absolute;
-	top: calc(50% - 35px);
-	left: calc(50% - 255px);
-	z-index: 2;
-}
+        .header div {
+            float: left;
+            color: #fff;
+            font-family: 'Exo', sans-serif;
+            font-size: 35px;
+            font-weight: 200;
+        }
 
-.header div{
-	float: left;
-	color: #fff;
-	font-family: 'Exo', sans-serif;
-	font-size: 35px;
-	font-weight: 200;
-}
+        .header div span {
+            color: #5379fa !important;
+        }
 
-.header div span{
-	color: #5379fa !important;
-}
+        .login {
+            position: absolute;
+            top: calc(50% - 75px);
+            left: calc(50% - 50px);
+            height: 150px;
+            width: 350px;
+            padding: 10px;
+            z-index: 2;
+        }
 
-.login{
-	position: absolute;
-	top: calc(50% - 75px);
-	left: calc(50% - 50px);
-	height: 150px;
-	width: 350px;
-	padding: 10px;
-	z-index: 2;
-}
+        .login input[type=text],
+        .login input[type=password] {
+            width: 250px;
+            height: 30px;
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.6);
+            /* 修改邊框顏色 */
+            border-radius: 2px;
+            color: #000;
+            /* 變更文字顏色為黑色 */
+            font-family: 'Exo', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            padding: 4px;
+            margin-bottom: 10px;
+        }
 
-.login input[type=text]{
-	width: 250px;
-	height: 30px;
-	background: transparent;
-	border: 1px solid rgba(255,255,255,0.6);
-	border-radius: 2px;
-	color: #fff;
-	font-family: 'Exo', sans-serif;
-	font-size: 16px;
-	font-weight: 400;
-	padding: 4px;
-}
+        .login button {
+            width: 260px;
+            height: 35px;
+            background: #000;
+            /* 修改按鈕背景色 */
+            border: 1px solid #000;
+            /* 修改邊框顏色 */
+            cursor: pointer;
+            border-radius: 2px;
+            color: #fff;
+            /* 修改按鈕文字顏色為白色 */
+            font-family: 'Exo', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            padding: 6px;
+            margin-top: -1px;
+        }
 
-.login input[type=password]{
-	width: 250px;
-	height: 30px;
-	background: transparent;
-	border: 1px solid rgba(255,255,255,0.6);
-	border-radius: 2px;
-	color: #fff;
-	font-family: 'Exo', sans-serif;
-	font-size: 16px;
-	font-weight: 400;
-	padding: 4px;
-	margin-top: 10px;
-}
+        .login button:hover {
+            opacity: 0.8;
+        }
 
-.login input[type=button]{
-	width: 260px;
-	height: 35px;
-	background: #fff;
-	border: 1px solid #fff;
-	cursor: pointer;
-	border-radius: 2px;
-	color: #a18d6c;
-	font-family: 'Exo', sans-serif;
-	font-size: 16px;
-	font-weight: 400;
-	padding: 6px;
-	margin-top: 10px;
-}
+        .login button:active {
+            opacity: 0.6;
+        }
 
-.login input[type=button]:hover{
-	opacity: 0.8;
-}
+        .login input[type=text]:focus,
+        .login input[type=password]:focus,
+        .login button:focus {
+            outline: none;
+            border: 1px solid rgba(0, 0, 0, 0.9);
+            /* 修改焦點時的邊框顏色 */
+        }
 
-.login input[type=button]:active{
-	opacity: 0.6;
-}
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
 
-.login input[type=text]:focus{
-	outline: none;
-	border: 1px solid rgba(255,255,255,0.9);
-}
+        .register-link {
+            color: #fff;
+            background-color: #5379fa;
+            /* 藍色背景 */
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 10px;
+            display: inline-block;
+            border: none;
+            border-radius: 2px;
+            padding: 8px 16px;
+            /* 調整按鈕的內邊距 */
+        }
 
-.login input[type=password]:focus{
-	outline: none;
-	border: 1px solid rgba(255,255,255,0.9);
-}
+        .register-link:hover {
+            background-color: #2e488f;
+            /* 滑鼠懸停時的背景顏色 */
+        }
 
-.login input[type=button]:focus{
-	outline: none;
-}
+        ::-webkit-input-placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
 
-::-webkit-input-placeholder{
-   color: rgba(255,255,255,0.6);
-}
-
-::-moz-input-placeholder{
-   color: rgba(255,255,255,0.6);
-}
-</style>
-
-    <script src="js/prefixfree.min.js"></script>
+        ::-moz-input-placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
 
 </head>
 
 <body>
 
-  <div class="body"></div>
-		<div class="grad"></div>
-		<div class="header">
-			<div>Site<span>Random</span></div>
-		</div>
-		<br>
-		<div class="login">
-			<form action="{% url 'signin' %}" method="post">
-				{% csrf_token %}
-				<input type="text" placeholder="username" name="username"><br>
-				<input type="password" placeholder="password" name="password"><br>
-				<input type="submit" value="Login">
-			</form>
-			<a href="/explorer/signup/">Sign Up</a>
-			{% if error %}
-				<p style="color:red;">{{ error }}</p>
-			{% endif %}
-		</div>
+    <div class="body"></div>
+    <div class="grad"></div>
+    <div class="header">
+        <div>Safe<span>Path</span></div>
+    </div>
+    <br>
+    <div class="login">
+        <form action="{% url 'signin' %}" method="post">
+            {% csrf_token %}
+            <input type="text" placeholder="username" name="username"><br>
+            <input type="password" placeholder="password" name="password"><br>
+            <button type="submit">Login</button>
+        </form>
+        <a class="register-link" href="/explorer/signup/">Sign Up</a>
+		<a class="register-link" href="/explorer/index/">Home</a>
+        {% if error %}
+        <p class="error-message">{{ error }}</p>
+        {% endif %}
+    </div>
 
-  <script src='http://codepen.io/assets/libs/fullpage/jquery.js'></script>
+    <script src='http://codepen.io/assets/libs/fullpage/jquery.js'></script>
 
 </body>
 

@@ -67,18 +67,26 @@ function calculateAndDisplayRoute(start, destination) {
                     $('#display-info-earthquake').html('');
 
                     if (response.traffic_accident_number) {
-                        $('#display-info-traffic-accident').append('<p>事故次數: ' + response.traffic_accident_number + '</p>');
+                        $('#display-info-traffic-accident').append('<p>事故次數: ' + response.traffic_accident_number + ' (次/年)</p>');
                     }
                     if (response.traffic_accident_fatality) {
-                        $('#display-info-traffic-accident').append('<p>死亡人數: ' + response.traffic_accident_fatality + '</p>');
+                        $('#display-info-traffic-accident').append('<p>死亡人數: ' + response.traffic_accident_fatality + ' (人/年)</p>');
                     }
                     if (response.traffic_accident_injury) {
-                        $('#display-info-traffic-accident').append('<p>受傷人數: ' + response.traffic_accident_injury + '</p>');
+                        $('#display-info-traffic-accident').append('<p>受傷人數: ' + response.traffic_accident_injury + ' (人/年)</p>');
                     }
                     if (response.earthquake_number) {
-                        $('#display-info-earthquake-number').append('<p>地震次數: ' + response.earthquake_number + '</p>');
+                        $('#display-info-earthquake').append('<p>地震次數: ' + response.earthquake_number + ' (次)</p>');
+                    }
+                    if (response.earthquake_average_magnitude) {
+                        $('#display-info-earthquake').append('<p>平均規模: ' + response.earthquake_average_magnitude + '</p>');
+                    }
+                    if (response.earthquake_average_depth) {
+                        $('#display-info-earthquake').append('<p>平均深度: ' + response.earthquake_average_depth + ' (公里)</p>');
+                    }
+                    if (response.earthquake_data) {
                         response.earthquake_data.forEach(data => {
-                            $('#display-info-earthquake').append(
+                            $('#display-info-earthquake-list').append(
                                 '<div class="earthquake-item">' +
                                 '<p>Date: ' + data.date + '</p>' +
                                 '<p>Coordinate: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
