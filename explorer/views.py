@@ -172,7 +172,7 @@ def travel_map(request):
 
 import json
 
-def home(request):
+def map(request):
     if request.method == 'POST':
         start = request.POST.get('start', '')
         destination = request.POST.get('destination', '')
@@ -219,60 +219,8 @@ def home(request):
         'magnitude': magnitude
     })
     else:
-        return render(request, 'home.html', {})
+        return render(request, 'map.html', {})
 
-
-# def home(request):
-#     if request.method == 'POST':
-#         start = request.POST.get('start', '')
-#         destination = request.POST.get('destination', '')
-#         coordinates = request.POST.get('coordinates', '')
-
-#         print('Received start:', start)
-#         print('Received destination:', destination)
-#         print('Received coordinates:', coordinates)
-
-#         try:
-#             coordinates = json.loads(coordinates)
-#             print('Parsed coordinates:', coordinates)
-#         except json.JSONDecodeError:
-#             return JsonResponse({'error': 'Invalid coordinates format'}, status=400)
-
-#         # direction = DirectionAPI()
-#         # direction = DirectionAPI(origin=start, destination=destination) # This will spend googlemaps api quotas
-#         direction = Direction(coordinates)
-
-#         # coordinates = direction.coordinates
-#         # fatality = await direction.traffic_accident.total_fatality
-#         # injury = await direction.traffic_accident.total_injury
-#         fatality = direction.traffic_accident.total_fatality
-#         if fatality == 0:
-#             fatality = "無死亡"
-#         injury = direction.traffic_accident.total_injury
-#         if injury == 0:
-#             injury = "無受傷"
-
-#         magnitude = direction.earthquake.magnitude
-#         if magnitude is None:
-#             magnitude = "無地震"
-#         else:
-#             magnitude = direction.earthquake.magnitude[0]
-
-#         # return render(request, 'home.html', {
-#         #     'start': start,
-#         #     'destination': destination,
-#         #     'coordinates': coordinates,
-#         #     'fatality': fatality,
-#         #     'injury': injury
-#         # })
-#         return JsonResponse({
-#         'fatality': fatality,
-#         'injury': injury,
-#         'magnitude': magnitude
-#         # 'magnitude': coordinates
-#     })
-#     else:
-#         return render(request, 'home.html', {})
 
 # from django.http import JsonResponse
 # import json

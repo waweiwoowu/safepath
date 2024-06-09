@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^logout/', views.logout, name="logout"),
     url(r'^signup/', views.signup, name="signup"),
     url(r'^verify/', views.verify, name="verify"),
-    url(r'^home/', views.home, name='home'),
+    url(r'^map/', views.map, name='map'),
     url(r'^travel/', views.travel, name='travel'),
     url(r'^travel_map/', views.travel_map, name='travel_map'),
 ]

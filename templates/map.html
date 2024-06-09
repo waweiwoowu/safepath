@@ -5,24 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map Project</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% ./.. 'static/css/map.css' %}">
-
+    <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}">
+    <script src="{% static 'js/map.js' %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFzApqD1tGY615APaue-nIwjC6Lx5pOp0&callback=initMap" async defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="top-bar">
-        <label for="start">Start:</label>
-        <input type="text" id="start" name="start">
-        <label for="destination">Destination:</label>
-        <input type="text" id="destination" name="destination">
-        <button type="button">OK</button>
+        <form id="route-form" action="" method="post">
+            {% csrf_token %}
+            <label for="start">Start:</label>
+            <input type="text" id="start" name="start" value="{{ start }}" required>
+            <label for="destination">Destination:</label>
+            <input type="text" id="destination" name="destination" value="{{ destination }}" required>
+            <button type="submit">OK</button>
+        </form>
     </div>
+    <br>
     <div class="container">
         <div class="left">
-            <iframe src="https://www.google.com/maps" id="map_iframe"></iframe>
+            <div id="map" style="height: 100%; width: 100%;"></div>
         </div>
         <div class="right">
-            <input type="text" id="risk_t" name="risk_t" placeholder="Risk_T">
-            <input type="text" id="risk_e" name="risk_e" placeholder="Risk_E">
+            <div id="loading-message" style="display: none;">Calculating risks, please wait...\nDon\'t refresh the screen!!!!!!!!!!!!</div>
+            <div id="display-info"></div>
         </div>
     </div>
 </body>
