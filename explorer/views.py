@@ -50,9 +50,9 @@ def map(request):
         } for i in range(earthquake_number)]
 
         return JsonResponse({
-            'traffic_accident_number': str(traffic_accident_number) + "次",
-            'traffic_accident_fatality': str(traffic_accident_fatality) + "人",
-            'traffic_accident_injury': str(traffic_accident_injury) + "人",
+            'traffic_accident_number': str(traffic_accident_number) + "次/年",
+            'traffic_accident_fatality': str(traffic_accident_fatality) + "人/年",
+            'traffic_accident_injury': str(traffic_accident_injury) + "人/年",
             'earthquake_number': str(earthquake_number) + "次",
             'earthquake_data': earthquake_data
     })

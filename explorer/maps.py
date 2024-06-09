@@ -90,15 +90,15 @@ class DirectionAPI():
     def __init__(self, origin=None, destination=None, waypoints=None, optimize_waypoints=True):
         if origin and destination and GOOGLE_MAPS_API_KEY:
             gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
-            self.data = gmaps.directions(origin=origin, 
-                                         destination=destination, 
-                                         waypoints=waypoints, 
+            self.data = gmaps.directions(origin=origin,
+                                         destination=destination,
+                                         waypoints=waypoints,
                                          optimize_waypoints=optimize_waypoints)
         if origin and destination and GOOGLE_MAPS_API_KEY:
             gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
-            self.data = gmaps.directions(origin=origin, 
-                                         destination=destination, 
-                                         waypoints=waypoints, 
+            self.data = gmaps.directions(origin=origin,
+                                         destination=destination,
+                                         waypoints=waypoints,
                                          optimize_waypoints=optimize_waypoints, )[0]
         else:
             self.data = DIRECTIONS[0]
