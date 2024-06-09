@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^/', views.index, name="index"),
     url(r'^home/', views.home, name="home"),
     url(r'^signin/', views.signin, name="signin"),
+    url(r'^index/', views.index, name="index"),
     url(r'^logout/', views.logout, name="logout"),
     url(r'^signup/', views.signup, name="signup"),
     url(r'^verify/', views.verify, name="verify"),
