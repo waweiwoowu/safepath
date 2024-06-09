@@ -1,13 +1,11 @@
+import os
+import sys
 import json
 import math
 import sqlite3
 import pandas as pd
 from datetime import datetime
 
-# import risk
-
-import os
-import sys
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -16,7 +14,6 @@ import explorer.risk as risk
 
 DEGREE_DIFFERENCE = 0.0001
 TRACKING_JSON_PATH = r".\data\tracking.json"
-# TRACKING_JSON_PATH = r"C:\Users\user\Documents\GitHub\safepath\explorer\data\tracking.json"
 
 def rounding(degree, difference=DEGREE_DIFFERENCE):
     """This method is used to determine rounded values of degrees of latitudes
@@ -80,32 +77,6 @@ class Coordinate:
         if self._earthquake is None:
             self._earthquake = EarthquakeData(self.latitude_grid, self.longitude_grid)
         return self._earthquake
-
-class Hotspot():
-    def __init__(self, area_1, area_2=None):
-        self._area_1 = area_1
-        self._area_2 = area_2
-        self.controller = AttractionSQLController()
-        self.id = []
-        self.latitude = []
-        self.longitude = []
-        self.coordinate = []
-        self.name = []
-
-
-        self._get_data_from_area()
-
-
-    def _get_data_from_area(self):
-        self.data = self.controller.get_data_from_area(self._area_1, self._area_2)
-
-
-        for data in self.data:
-            self.id.append(data[0])
-            self.name.append(data[1])
-            self.latitude.append(data[2])
-            self.longitude.append(data[3])
-            self.coordinate.append((data[2], data[3]))
 
 class TrafficAccidentData():
     def __init__(self, latitude, longitude):
@@ -649,27 +620,6 @@ class Attraction:
         else:
             return self._images
 
-class OpeningHours:
-    def __init__(self, opening_hours):
-        opening_hours = opening_hours.replace("'", '"')
-        self.all = json.loads(opening_hours)
-        try:
-            self.mon = self.all[0]
-            self.tue = self.all[1]
-            self.wed = self.all[2]
-            self.thu = self.all[3]
-            self.fri = self.all[4]
-            self.sat = self.all[5]
-            self.sun = self.all[6]
-        except:
-            self.mon = None
-            self.tue = None
-            self.wed = None
-            self.thu = None
-            self.fri = None
-            self.sat = None
-            self.sun = None
-
 class Restaurant:
     def __init__(self):
         self._df = pd.DataFrame()
@@ -722,7 +672,6 @@ class Restaurant:
             area_2 = self._area_2[i]
             address = self._address[i]
             phone = self._phone[i]
-            # opening_hours = OpeningHours(self._opening_hours_all[i])
             opening_hours = self._opening_hours_all[i]
             rating = self._rating[i]
             avg_price = self._avg_price[i].astype(int)
@@ -881,6 +830,33 @@ class SQLController:
         sql = f"SELECT * FROM {self.table_name} ORDER BY {ordered_column}"
         if not is_ascending:
             sql += " DESC"
+        self.cursor.execute(sql)
+        data = self.cursor.fetchall()
+        if data:
+            return data
+        else:
+            return None
+        
+    def get_data_from_columns(self, *columns):
+        """This method is used to get data from database with specific columns
+        
+        :param *columns: a set of column name and column value
+        :type *columns: tuple
+        
+        e.g. *columns = ("area_1", "new taipei city"), ("area_2", "yonghe")
+        """
+        
+        sqls = []
+        if type(columns[0]) == list:
+            columns = columns[0]
+        for column in columns:
+            if type(column[1]) == str:
+                sqls.append(f"{column[0]} = '{column[1]}'")
+            else:
+                sqls.append(f"{column[0]} = {column[1]}")
+        sql = " AND ".join(sqls)
+        sql = f"SELECT * FROM {self.table_name} WHERE " + sql
+        print(sql)
         self.cursor.execute(sql)
         data = self.cursor.fetchall()
         if data:
@@ -1054,16 +1030,6 @@ class AttractionSQLController(SQLController):
             self.cursor.execute(sql, (name, latitude, longitude, area_1, area_2,
                                       address, image))
             self.conn.commit()
-    def get_data_from_area(self, area_1, area_2=None):
-        sql = f"SELECT * FROM {self.table_name} WHERE area_1 = '{area_1}'"
-        # sql = f"SELECT * FROM {self.table_name}"
-        if area_2:
-            sql += f" AND area_2 = '{area_2}'"
-
-        print("CC --> " + sql + " <-- DD")
-        self.cursor.execute(sql)
-        self.conn.commit()
-        return self.cursor.fetchall()
 
 class RestaurantSQLController(SQLController):
     def __init__(self):
@@ -1080,17 +1046,6 @@ class RestaurantSQLController(SQLController):
                                       address, phone, opening_hours, rating,
                                       avg_price, image))
             self.conn.commit()
-
-    def get_data_from_area(self, area_1, area_2=None):
-        sql = f"SELECT * FROM {self.table_name} WHERE area_1 = '{area_1}'"
-        # sql = f"SELECT * FROM {self.table_name}"
-        if area_2:
-            sql += f" AND area_2 = '{area_2}'"
-
-        print("EE --> " + sql + " <-- FF")
-        self.cursor.execute(sql)
-        self.conn.commit()
-        return self.cursor.fetchall()
 
 
 class UpdateTrafficAccidentData:
@@ -1342,14 +1297,6 @@ def test_Restaurant():
     print(restaurant.address())
     pass
 
-def test_hotspot():
-    area_1 = "臺北市"
-    area_2 = "信義區"
-    hotspot=Hotspot(area_1, area_2)
-    print(hotspot.id)
-    print(hotspot.name)
-    print(hotspot.latitude)
-    print(hotspot.longitude)
 
 if __name__ == "__main__":
     # test_Coordinate()
@@ -1358,7 +1305,6 @@ if __name__ == "__main__":
     # test_TrafficAccident()
     # test_Earthquake()
     # test_Restaurant()
-    test_hotspot()
     pass
 
 

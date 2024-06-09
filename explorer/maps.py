@@ -420,10 +420,6 @@ class Geocode():
         return (self.latitude, self.longitude)
 
 
-class Taiwan():
-    def __init__(self):
-        self.traffic_accident = _TrafficAccidentData()
-
 class Hotspot():
     def __init__(self, area_1, area_2=None):
         self._area_1 = area_1
@@ -435,13 +431,10 @@ class Hotspot():
         self.coordinate = []
         self.name = []
 
-
         self._get_data_from_area()
-
 
     def _get_data_from_area(self):
         self.data = self.controller.get_data_from_area(self._area_1, self._area_2)
-
 
         for data in self.data:
             self.id.append(data[0])
@@ -451,23 +444,53 @@ class Hotspot():
             self.coordinate.append((data[2], data[3]))
 
 class Foodspot():
-    def __init__(self, area_1, area_2=None):
-        self._area_1 = area_1
-        self._area_2 = area_2
+    def __init__(self, name=None, area_1=None, area_2=None, coordinate=None, 
+                 rating=None, avg_price=None):
+        self._columns = []
+        if name:
+            self._name = name
+            self._columns.append(("name", self._name))
+        if area_1:
+            if area_1[0] == "臺":
+                area_1 = area_1.replace("臺", "台")
+            self._area_1 = area_1
+            self._columns.append(("area_1", self._area_1))
+        if area_2:
+            self._area_2 = area_2
+            self._columns.append(("area_2", self._area_2))
+        if coordinate:
+            self._coordinate = coordinate
+            self._latitude = self._coordinate[0]
+            self._longitude = self._coordinate[0]
+            self._columns.append(("latitude", self._latitude))
+            self._columns.append(("longitude", self._longitude))
+        if rating:
+            self._rating = rating
+            self._columns.append(("rating", self._rating))
+        if avg_price:
+            self._avg_price = avg_price
+            self._columns.append(("avg_price", self._avg_price))
+            
         self.controller = RestaurantSQLController()
+        self.data = []
         self.id = []
+        self.name = []
         self.latitude = []
         self.longitude = []
+        self.area_1 = []
+        self.area_2 = []
         self.coordinate = []
-        self.name = []
+        self.address = []
+        self.phone = []
+        self._opening_hours = []
+        self.rating = []
+        self.avg_price = []
+        self.image = []
 
+        self._get_data()
 
-        self._get_data_from_area()
-
-
-    def _get_data_from_area(self):
-        self.data = self.controller.get_data_from_area(self._area_1, self._area_2)
-
+    def _get_data(self):
+        self.data = self.controller.get_data_from_columns(self._columns)
 
         for data in self.data:
             self.id.append(data[0])
@@ -475,8 +498,44 @@ class Foodspot():
             self.latitude.append(data[2])
             self.longitude.append(data[3])
             self.coordinate.append((data[2], data[3]))
+            self.area_1.append(data[4])
+            self.area_2.append(data[5])
+            self.address.append(data[6])
+            self.phone.append(data[7])
+            self._opening_hours.append(data[8])
+            self.rating.append(data[9])
+            self.avg_price.append(data[10])
+            self.image.append(data[11])
+        
+    #     self._get_opening_hours()
+        
+    # def _get_opening_hours(self):
+    #     for opening_hours in self._opening_hours:
+    #         opening_hours = 
+    #         self.opening_hours.mon
 
-class _TrafficAccidentData():
+class OpeningHours:
+    def __init__(self, opening_hours):
+        opening_hours = opening_hours.replace("'", '"')
+        self.all = json.loads(opening_hours)
+        try:
+            self.mon = self.all[0]
+            self.tue = self.all[1]
+            self.wed = self.all[2]
+            self.thu = self.all[3]
+            self.fri = self.all[4]
+            self.sat = self.all[5]
+            self.sun = self.all[6]
+        except:
+            self.mon = None
+            self.tue = None
+            self.wed = None
+            self.thu = None
+            self.fri = None
+            self.sat = None
+            self.sun = None
+
+class TrafficAccidentData():
     def __init__(self):
         self._controller = PedestrianHellSQLController()
         self.number = GetSQLData(self._controller, "number", 3)
@@ -598,16 +657,17 @@ def test_Taiwan():
 def test_hotspot():
     area_1 = "臺北市"
     area_2 = "信義區"
-    hotspot=Hotspot(area_1, area_2)
+    hotspot = Hotspot(area_1=area_1, area_2=area_2)
     print(hotspot.id)
     print(hotspot.name)
     print(hotspot.latitude)
     print(hotspot.longitude)
 
 def test_foodspot():
-    area_1 = "台北市"
+    area_1 = "臺北市"
     area_2 = "信義區"
-    foodspot=Foodspot(area_1, area_2)
+    foodspot = Foodspot(area_1=area_1, area_2=area_2)
+    # print(foodspot.data)
     print(foodspot.id)
     print(foodspot.name)
     print(foodspot.latitude)
@@ -617,7 +677,6 @@ if __name__ == "__main__":
     # test_Direction()
     # test_Geocode()
     # test_Taiwan()
-
     # test_hotspot()
     test_foodspot()
     pass

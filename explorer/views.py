@@ -1,14 +1,14 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from .models import UserInfo
-from django.core.mail import send_mail
-from asgiref.sync import sync_to_async
-import random
-from .maps import Direction, DirectionAPI, Hotspot, Foodspot
-from explorer.database import AttractionSQLController, RestaurantSQLController
-
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib import auth
+from django.core.mail import send_mail
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
+from explorer.database import AttractionSQLController, RestaurantSQLController
+from explorer.maps import Direction, DirectionAPI, Hotspot, Foodspot
+from explorer.models import UserInfo
+import json
+import random
+
 
 def index(request):
     if 'username' in request.session:
@@ -19,6 +19,138 @@ def index(request):
 
 def home(request):
     return redirect('/explorer/map')
+
+def map(request):
+    if request.method == 'POST':
+        start = request.POST.get('start', '')
+        destination = request.POST.get('destination', '')
+        coordinates = request.POST.get('coordinates', '')
+
+        try:
+            if not coordinates:
+                raise ValueError('No coordinates provided')
+            coordinates = json.loads(coordinates)
+            print('Parsed coordinates:', coordinates)
+        except (json.JSONDecodeError, ValueError) as e:
+            print('Error:', str(e))
+            return JsonResponse({'error': 'Invalid coordinates format or no coordinates provided'}, status=400)
+
+        direction = Direction(coordinates)
+        # direction = DirectionAPI()
+        # direction = DirectionAPI(origin=start, destination=destination) # This will spend googlemaps api quotas
+
+        fatality = direction.traffic_accident.total_fatality
+        if fatality == 0:
+            fatality = "無死亡"
+        injury = direction.traffic_accident.total_injury
+        if injury == 0:
+            injury = "無受傷"
+
+        magnitude = direction.earthquake.magnitude
+        if magnitude is None:
+            magnitude = "無地震"
+        else:
+            magnitude = direction.earthquake.magnitude[0]
+
+        # return render(request, 'home.html', {
+        #     'start': start,
+        #     'destination': destination,
+        #     'coordinates': coordinates,
+        #     'fatality': fatality,
+        #     'injury': injury
+        # })
+        return JsonResponse({
+        'fatality': fatality,
+        'injury': injury,
+        'magnitude': magnitude
+    })
+    else:
+        return render(request, 'map.html', {})
+
+@csrf_exempt
+def travel(request):
+    attractions = []
+    food_places = []
+    if request.method == 'POST':
+        area_1 = request.POST.get('city')  # 選擇的縣市
+        area_2 = request.POST.get('area')  # 選擇的縣市行政區內鄉鎮
+        # hotspot = Hotspot(area_1, area_2)
+        foodspots = Foodspot(area_1=area_1, area_2=area_2)
+
+        # name_list = hotspot.name
+        # # 所有的景點
+        # for name in name_list:
+        #     print(name)
+        #     pass
+
+        # return HttpResponse(str(city))
+        # if city == "臺北市" and area == "文山區":
+
+        # 網推薦景點填入
+        attractions = [
+            {
+                'title': '台北小巨蛋',
+                'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
+                'address': '地址A',
+                'phone': '電話A',
+            },
+            {
+                'title': '木柵動物園',
+                'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
+                'address': '地址B',
+                'phone': '電話B',
+            }
+        ]
+        restaurants = []
+        for i in range(len(foodspots.data)):
+            data = {}
+            data["title"] = foodspots.name[i]
+            data["image"] = foodspots.image[i]
+            data["rating"] = foodspots.rating[i]
+            data["address"] = foodspots.address[i]
+            data["phone"] = foodspots.phone[i]
+            data["openhour"] = foodspots._opening_hours[i]
+            data["price"] = foodspots.avg_price[i]
+            restaurants.append(data)
+
+        food_places = [
+            {
+                'title': '梅子鰻蒲燒屋日本料理',
+                'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
+                'rating': '5星',
+                'address': '地址B',
+                'phone': '電話B',
+                'openhour': '星期一 11:30-23:00',
+                'price':'800-1000'
+            },
+            {
+                'title': '紫艷中餐廳',
+                'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
+                'rating': '4星',
+                'address': '地址B',
+                'phone': '電話B',
+                'openhour': '星期一 11:30-23:00',
+                'price':'400-500'
+            }
+        ]
+
+        return JsonResponse({"attractions": attractions, "food_places": restaurants}, safe=False)
+    else:
+
+        return render(request, 'travel.html')
+
+def travel_map(request):
+    start = request.GET.get('start', '')
+    end = request.GET.get('end', '')
+    waypoints = request.GET.get('waypoints', '')
+
+    context = {
+        'start': start,
+        'end': end,
+        'waypoints': waypoints.split('|') if waypoints else []
+    }
+
+    return render(request, 'travel_map.html', context)
 
 def signin(request):
     if request.method == "GET":
@@ -92,158 +224,3 @@ def verify(request):
             return redirect('signin')
         except:
             return HttpResponse("Failed")
-
-@csrf_exempt
-def travel(request):
-    attractions = []
-    food_places = []
-    if request.method == 'POST':
-        city = request.POST.get('city')  # 選擇的縣市
-        area = request.POST.get('area')  # 選擇的縣市行政區內鄉鎮
-        # print("--> " + city + " <--")
-        # print("--> " + area + " <--")
-        hotspot = Hotspot(city, area)
-        foodspot = Foodspot(city, area)
-
-        AA = foodspot.name
-        for A in AA:
-            print(A)
-
-        name_list = hotspot.name
-        # 所有的景點
-        for name in name_list:
-            print(name)
-            pass
-
-        # return HttpResponse(str(city))
-        # if city == "臺北市" and area == "文山區":
-
-        # 網推薦景點填入
-        attractions = [
-            {
-                'title': '台北小巨蛋',
-                'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
-                'address': '地址A',
-                'phone': '電話A',
-            },
-            {
-                'title': '木柵動物園',
-                'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
-                'address': '地址B',
-                'phone': '電話B',
-            }
-        ]
-        food_places = [
-            {
-                'title': '梅子鰻蒲燒屋日本料理',
-                'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
-                'rating': '5星',
-                'address': '地址B',
-                'phone': '電話B',
-                'openhour': '星期一 11:30-23:00',
-                'price':'800-1000'
-            },
-            {
-                'title': '紫艷中餐廳',
-                'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
-                'rating': '4星',
-                'address': '地址B',
-                'phone': '電話B',
-                'openhour': '星期一 11:30-23:00',
-                'price':'400-500'
-            }
-        ]
-
-        return JsonResponse({"attractions": attractions, "food_places": food_places}, safe=False)
-    else:
-
-        return render(request, 'travel.html')
-
-def travel_map(request):
-    start = request.GET.get('start', '')
-    end = request.GET.get('end', '')
-    waypoints = request.GET.get('waypoints', '')
-
-    context = {
-        'start': start,
-        'end': end,
-        'waypoints': waypoints.split('|') if waypoints else []
-    }
-
-    return render(request, 'travel_map.html', context)
-
-import json
-
-def map(request):
-    if request.method == 'POST':
-        start = request.POST.get('start', '')
-        destination = request.POST.get('destination', '')
-        coordinates = request.POST.get('coordinates', '')
-
-        try:
-            if not coordinates:
-                raise ValueError('No coordinates provided')
-            coordinates = json.loads(coordinates)
-            print('Parsed coordinates:', coordinates)
-        except (json.JSONDecodeError, ValueError) as e:
-            print('Error:', str(e))
-            return JsonResponse({'error': 'Invalid coordinates format or no coordinates provided'}, status=400)
-
-        direction = Direction(coordinates)
-        # direction = DirectionAPI()
-        # direction = DirectionAPI(origin=start, destination=destination) # This will spend googlemaps api quotas
-
-        # coordinates = direction.coordinates
-
-        fatality = direction.traffic_accident.total_fatality
-        if fatality == 0:
-            fatality = "無死亡"
-        injury = direction.traffic_accident.total_injury
-        if injury == 0:
-            injury = "無受傷"
-
-        magnitude = direction.earthquake.magnitude
-        if magnitude is None:
-            magnitude = "無地震"
-        else:
-            magnitude = direction.earthquake.magnitude[0]
-
-        # return render(request, 'home.html', {
-        #     'start': start,
-        #     'destination': destination,
-        #     'coordinates': coordinates,
-        #     'fatality': fatality,
-        #     'injury': injury
-        # })
-        return JsonResponse({
-        'fatality': fatality,
-        'injury': injury,
-        'magnitude': magnitude
-    })
-    else:
-        return render(request, 'map.html', {})
-
-
-# from django.http import JsonResponse
-# import json
-
-# def home(request):
-#     if request.method == 'POST' and request.is_ajax():
-#         data = json.loads(request.body)
-#         start = data.get('start')
-#         destination = data.get('destination')
-
-#         # Do whatever processing you need with start and destination here
-#         # For example, you can pass them to Direction class and get coordinates
-
-#         coordinates = []  # Assuming you get coordinates somehow
-#         return JsonResponse({
-#             'start': start,
-#             'destination': destination,
-#             'coordinates': coordinates
-#         })
-#     else:
-#         return render(request, 'home.html', {})
-
-
-
