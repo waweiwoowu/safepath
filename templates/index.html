@@ -4,19 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>測試頁面</title>
-    </head>
+    <title>旅遊規劃網站</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('/static/images/travel-abroad.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            background-attachment: fixed;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .nav a {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: black;
+            padding: 20px 40px;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            display: block;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        .nav a:hover {
+            background-color: rgba(255, 255, 255, 1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+        }
+        .nav a:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
 <body>
-    <h1>Hi, {{user}}</h1>
-
-    <a href = "/explorer/signin/">登入</a>
-    <br>
-    <a href = "/explorer/signup/">註冊</a>
-    <br>
-    <a href = "/explorer/hell/">地獄路線圖</a>
-    <br>
-    <a href = "/explorer/travel/">推薦行程</a>
-    <br>
-    <a href = "/explorer/logout/">登出</a>
+    <div class="overlay">
+        <h1>歡迎來到旅遊規劃網站, {{user}}</h1>
+        <div class="nav">
+            <a href="/explorer/signin/">登入</a>
+            <a href="/explorer/signup/">註冊</a>
+            <a href="/explorer/hell/">地獄路線圖</a>
+            <a href="/explorer/travel/">推薦行程</a>
+            <a href="/explorer/logout/">登出</a>
+        </div>
+    </div>
 </body>
 </html>
