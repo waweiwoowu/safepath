@@ -856,7 +856,7 @@ class SQLController:
                 sqls.append(f"{column[0]} = {column[1]}")
         sql = " AND ".join(sqls)
         sql = f"SELECT * FROM {self.table_name} WHERE " + sql
-        print(sql)
+
         self.cursor.execute(sql)
         data = self.cursor.fetchall()
         if data:

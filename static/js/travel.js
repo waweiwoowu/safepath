@@ -244,7 +244,6 @@ $(document).ready(function(){
                     attractionsHtml += '<h3>'+ attraction.title + '</h3>';
                     attractionsHtml += '<img src="' + attraction.image +'" alt="' + attraction.title + '">';
                     attractionsHtml += '<p>地址:' + attraction.address + '</p>';
-                    attractionsHtml += '<p>電話:'+ attraction.phone + '</p>';
                     attractionsHtml += '</div>';
                 });
 

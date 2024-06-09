@@ -74,33 +74,17 @@ def travel(request):
     if request.method == 'POST':
         area_1 = request.POST.get('city')  # 選擇的縣市
         area_2 = request.POST.get('area')  # 選擇的縣市行政區內鄉鎮
-        # hotspot = Hotspot(area_1, area_2)
+        hotspots = Hotspot(area_1=area_1, area_2=area_2)
         foodspots = Foodspot(area_1=area_1, area_2=area_2)
 
-        # name_list = hotspot.name
-        # # 所有的景點
-        # for name in name_list:
-        #     print(name)
-        #     pass
+        attractions = []
+        for i in range(len(hotspots.data)):
+            data = {}
+            data["title"] = hotspots.name[i]
+            data["image"] = hotspots.image[i]
+            data["address"] = hotspots.address[i]
+            attractions.append(data)
 
-        # return HttpResponse(str(city))
-        # if city == "臺北市" and area == "文山區":
-
-        # 網推薦景點填入
-        attractions = [
-            {
-                'title': '台北小巨蛋',
-                'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
-                'address': '地址A',
-                'phone': '電話A',
-            },
-            {
-                'title': '木柵動物園',
-                'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WoAAe2RE9lmNkIsPButFnegYyjwmTWZFbw&s',
-                'address': '地址B',
-                'phone': '電話B',
-            }
-        ]
         restaurants = []
         for i in range(len(foodspots.data)):
             data = {}
@@ -112,27 +96,6 @@ def travel(request):
             data["openhour"] = foodspots._opening_hours[i]
             data["price"] = foodspots.avg_price[i]
             restaurants.append(data)
-
-        food_places = [
-            {
-                'title': '梅子鰻蒲燒屋日本料理',
-                'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
-                'rating': '5星',
-                'address': '地址B',
-                'phone': '電話B',
-                'openhour': '星期一 11:30-23:00',
-                'price':'800-1000'
-            },
-            {
-                'title': '紫艷中餐廳',
-                'image': 'https://media.istockphoto.com/id/483120255/zh/照片/asian-oranage-chicken-with-green-onions.jpg?s=612x612&w=0&k=20&c=MujdLI69HjK4hSVFmpfQXHynGDHT2XOBOPSigQKcnyo=',
-                'rating': '4星',
-                'address': '地址B',
-                'phone': '電話B',
-                'openhour': '星期一 11:30-23:00',
-                'price':'400-500'
-            }
-        ]
 
         return JsonResponse({"attractions": attractions, "food_places": restaurants}, safe=False)
     else:

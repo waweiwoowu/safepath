@@ -421,20 +421,40 @@ class Geocode():
 
 
 class Hotspot():
-    def __init__(self, area_1, area_2=None):
-        self._area_1 = area_1
-        self._area_2 = area_2
+    def __init__(self, name=None, area_1=None, area_2=None, coordinate=None):
+        self._columns = []
+        if name:
+            self._name = name
+            self._columns.append(("name", self._name))
+        if area_1:
+            self._area_1 = area_1
+            self._columns.append(("area_1", self._area_1))
+        if area_2:
+            self._area_2 = area_2
+            self._columns.append(("area_2", self._area_2))
+        if coordinate:
+            self._coordinate = coordinate
+            self._latitude = self._coordinate[0]
+            self._longitude = self._coordinate[0]
+            self._columns.append(("latitude", self._latitude))
+            self._columns.append(("longitude", self._longitude))
+
         self.controller = AttractionSQLController()
+        self.data = []
         self.id = []
+        self.name = []
         self.latitude = []
         self.longitude = []
+        self.area_1 = []
+        self.area_2 = []
         self.coordinate = []
-        self.name = []
+        self.address = []
+        self.image = []
 
-        self._get_data_from_area()
+        self._get_data()
 
-    def _get_data_from_area(self):
-        self.data = self.controller.get_data_from_area(self._area_1, self._area_2)
+    def _get_data(self):
+        self.data = self.controller.get_data_from_columns(self._columns)
 
         for data in self.data:
             self.id.append(data[0])
@@ -442,6 +462,10 @@ class Hotspot():
             self.latitude.append(data[2])
             self.longitude.append(data[3])
             self.coordinate.append((data[2], data[3]))
+            self.area_1.append(data[4])
+            self.area_2.append(data[5])
+            self.address.append(data[6])
+            self.image.append(data[7])
 
 class Foodspot():
     def __init__(self, name=None, area_1=None, area_2=None, coordinate=None, 
@@ -677,6 +701,6 @@ if __name__ == "__main__":
     # test_Direction()
     # test_Geocode()
     # test_Taiwan()
-    # test_hotspot()
-    test_foodspot()
+    test_hotspot()
+    # test_foodspot()
     pass
