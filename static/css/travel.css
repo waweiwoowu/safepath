@@ -1,45 +1,4 @@
-/* body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f0f0;
-}
 
-.Area, .Optimal_route, .Recommend_spot, .Recommend_food {
-    border: 1px solid #000;
-    padding: 10px;
-    margin: 10px;
-    background-color: #fff;
-}
-
-.Area {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.Optimal_route, .Recommend_spot, .Recommend_food {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.Recommend_spot .left, .Recommend_food .left {
-    width: 20%;
-}
-
-.Recommend_spot .middle, .Recommend_food .middle {
-    width: 30%;
-}
-
-.Recommend_spot .right, .Recommend_food .right {
-    width: 50%;
-}
-
-.Recommend_spot .left, .Recommend_spot .middle, .Recommend_spot .right,
-.Recommend_food .left, .Recommend_food .middle, .Recommend_food .right {
-    padding: 10px;
-} */
 
 body {
     font-family: Arial, sans-serif;
@@ -91,41 +50,3 @@ body {
     display: block;
 }
 
-
-
-
-/* body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f0f0;
-}
-.Area, .Optimal_route, .Recommend_spot, .Recommend_food {
-    border: 1px solid #000;
-    padding: 10px;
-    margin: 10px;
-    background-color: #fff;
-}
-.Area {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-.Optimal_route, .Recommend_spot, .Recommend_food {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-.Recommend_spot .left, .Recommend_food .left {
-    width: 20%;
-}
-.Recommend_spot .middle, .Recommend_food .middle {
-    width: 30%;
-}
-.Recommend_spot .right, .Recommend_food .right {
-    width: 50%;
-}
-.Recommend_spot .left, .Recommend_spot .middle, .Recommend_spot .right,
-.Recommend_food .left, .Recommend_food .middle, .Recommend_food .right {
-    padding: 10px;
-} */

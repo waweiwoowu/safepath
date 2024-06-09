@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    var selectedLocations = [];
+
+    // Fetch and populate the city dropdown
     $.ajax({
         url: '/static/json/travel.json',
         type: "get",
@@ -11,10 +14,11 @@ $(document).ready(function() {
             window.cityData = data;
         },
         error: function (data) {
-            alert("fail");
+            alert("Failed to load city data.");
         }
     });
 
+    // Populate the area dropdown based on the selected city
     $("#city").change(function() {
         var cityValue = $("#city").val();
         $("#area").empty().css("display", "inline").append('<option value="">選擇鄉鎮</option>');
@@ -27,6 +31,7 @@ $(document).ready(function() {
         });
     });
 
+    // Form submission to get recommended locations
     $("#recommendform").submit(function(event) {
         event.preventDefault();
         var cityValue = $("#city").val();
@@ -47,15 +52,17 @@ $(document).ready(function() {
                 var foodPlacesHtml = '';
 
                 $.each(response.attractions, function(index, attraction) {
+                    var disabled = isLocationSelected(attraction.title) ? 'disabled' : '';
                     attractionsHtml += '<div class="grid-item">';
                     attractionsHtml += '<img src="' + attraction.image + '" alt="' + attraction.title + '" style="width:100%">';
                     attractionsHtml += '<div class="data"><h3>' + attraction.title + '</h3>';
                     attractionsHtml += '<p>' + attraction.address + '</p></div>';
-                    attractionsHtml += '<button class="select" onclick="addToRoute(\'hotspot\', \'' + attraction.title + '\')">select</button>';
+                    attractionsHtml += '<button class="select" onclick="addToRoute(\'hotspot\', \'' + attraction.title + '\')" ' + disabled + '>select</button>';
                     attractionsHtml += '</div>';
                 });
 
                 $.each(response.food_places, function(index, food_place) {
+                    var disabled = isLocationSelected(food_place.title) ? 'disabled' : '';
                     foodPlacesHtml += '<div class="grid-item">';
                     foodPlacesHtml += '<img src="' + food_place.image + '" alt="' + food_place.title + '" style="width:100%">';
                     foodPlacesHtml += '<div class="data"><h3>' + food_place.title + '</h3>';
@@ -64,7 +71,7 @@ $(document).ready(function() {
                     foodPlacesHtml += '<p>Phone: ' + food_place.phone + '</p>';
                     foodPlacesHtml += '<p>Open Hours: ' + food_place.openhour + '</p>';
                     foodPlacesHtml += '<p>Average Price: ' + food_place.price + '</p></div>';
-                    foodPlacesHtml += '<button class="select" onclick="addToRoute(\'foodspot\', \'' + food_place.title + '\')">select</button>';
+                    foodPlacesHtml += '<button class="select" onclick="addToRoute(\'foodspot\', \'' + food_place.title + '\')" ' + disabled + '>select</button>';
                     foodPlacesHtml += '</div>';
                 });
 
@@ -72,50 +79,61 @@ $(document).ready(function() {
                 $('#foodspotContainer').html(foodPlacesHtml);
             },
             error: function() {
-                alert("fail");
+                alert("Failed to get recommendations.");
             }
         });
     });
 
     window.addToRoute = function(type, title) {
-        var selectedItems = [];
-        var startPoint = $('#Start_Point').val();
-        var destination = $('#Destination').val();
-
-        if (type === 'hotspot') {
-            $('.hotSpot:checked').each(function() {
-                selectedItems.push($(this).data('title'));
-            });
-        } else if (type === 'foodspot') {
-            $('.foodPlace:checked').each(function() {
-                selectedItems.push($(this).data('title'));
-            });
+        if (selectedLocations.length >= 5) {
+            alert("You can only select up to 5 locations.");
+            return;
         }
 
-        selectedItems.push(title);
-
-        var routeHtml = '<p>' + startPoint + ' --- ';
-        $.each(selectedItems, function(index, item) {
-            routeHtml += item + ' --- ';
-        });
-
-        $('#routeContainer').html(routeHtml + destination + '</p>');
+        selectedLocations.push({ type: type, title: title });
+        updateSelectedLocations();
+        updateDisabledButtons();
     };
 
+    window.removeFromRoute = function(index) {
+        selectedLocations.splice(index, 1);
+        updateSelectedLocations();
+        updateDisabledButtons();
+    };
+
+    function updateSelectedLocations() {
+        var selectedHtml = '';
+        $.each(selectedLocations, function(index, item) {
+            selectedHtml += '<div class="grid-item selected-item">';
+            selectedHtml += '<span>' + item.title + '</span>';
+            selectedHtml += '<button class="cancel" onclick="removeFromRoute(' + index + ')">cancel</button>';
+            selectedHtml += '</div>';
+        });
+        $('#selectedContainer').html(selectedHtml);
+    }
+
+    function updateDisabledButtons() {
+        $('.select').each(function() {
+            var title = $(this).siblings('.data').find('h3').text();
+            if (isLocationSelected(title)) {
+                $(this).attr('disabled', 'disabled');
+            } else {
+                $(this).removeAttr('disabled');
+            }
+        });
+    }
+
+    function isLocationSelected(title) {
+        return selectedLocations.some(function(location) {
+            return location.title === title;
+        });
+    }
+
     $('#planRouteButton').click(function() {
-        var selectedItems = [];
         var startPoint = $('#Start_Point').val();
         var destination = $('#Destination').val();
-
-        $('.hotSpot:checked').each(function() {
-            selectedItems.push($(this).data('title'));
-        });
-
-        $('.foodPlace:checked').each(function() {
-            selectedItems.push($(this).data('title'));
-        });
-
-        var waypoints = selectedItems.join('|');
+        var selectedTitles = selectedLocations.map(function(item) { return item.title; });
+        var waypoints = selectedTitles.join('|');
         var url = '/explorer/travel_map/?start=' + encodeURIComponent(startPoint) + '&end=' + encodeURIComponent(destination) + '&waypoints=' + encodeURIComponent(waypoints);
         window.location.href = url;
     });
