@@ -39,11 +39,32 @@ body {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 }
 .right input {
     margin-bottom: 20px;
     padding: 10px;
     width: 80%;
+}
+.section-title {
+    width: 100%;
+    background-color: #00f;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    margin-top: 10px;
+}
+.earthquake-container {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+}
+.earthquake-item {
+    border: 1px solid red;
+    padding: 10px;
+    margin-bottom: 10px;
 }

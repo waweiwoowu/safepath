@@ -69,7 +69,7 @@ $(document).ready(function() {
                     foodPlacesHtml += '<p>Rating: ' + food_place.rating + '</p>';
                     foodPlacesHtml += '<p>Address: ' + food_place.address + '</p>';
                     foodPlacesHtml += '<p>Phone: ' + food_place.phone + '</p>';
-                    foodPlacesHtml += '<p>Open Hours: ' + food_place.openhour + '</p>';
+                    // foodPlacesHtml += '<p>Open Hours: ' + food_place.openhour + '</p>';
                     foodPlacesHtml += '<p>Average Price: ' + food_place.price + '</p></div>';
                     foodPlacesHtml += '<button class="select" onclick="addToRoute(\'foodspot\', \'' + food_place.title + '\')" ' + disabled + '>select</button>';
                     foodPlacesHtml += '</div>';

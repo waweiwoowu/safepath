@@ -63,21 +63,30 @@ function calculateAndDisplayRoute(start, destination) {
                 success: function(response) {
                     console.log('Server response:', response);  // Log server response
                     $('#display-info').html('');
+                    $('#display-info-traffic-accident').html('');
+                    $('#display-info-earthquake').html('');
 
-                    if (start) {
-                        $('#display-info').append('<p>Start: ' + start + '</p>');
+                    if (response.traffic_accident_number) {
+                        $('#display-info-traffic-accident').append('<p>事故次數: ' + response.traffic_accident_number + '</p>');
                     }
-                    if (destination) {
-                        $('#display-info').append('<p>Destination: ' + destination + '</p>');
+                    if (response.traffic_accident_fatality) {
+                        $('#display-info-traffic-accident').append('<p>死亡人數: ' + response.traffic_accident_fatality + '</p>');
                     }
-                    if (response.fatality) {
-                        $('#display-info').append('<p>Fatality: ' + response.fatality + '</p>');
+                    if (response.traffic_accident_injury) {
+                        $('#display-info-traffic-accident').append('<p>受傷人數: ' + response.traffic_accident_injury + '</p>');
                     }
-                    if (response.injury) {
-                        $('#display-info').append('<p>Injury: ' + response.injury + '</p>');
-                    }
-                    if (response.magnitude) {
-                        $('#display-info').append('<p>Magnitude: ' + response.magnitude + '</p>');
+                    if (response.earthquake_number) {
+                        $('#display-info-earthquake-number').append('<p>地震次數: ' + response.earthquake_number + '</p>');
+                        response.earthquake_data.forEach(data => {
+                            $('#display-info-earthquake').append(
+                                '<div class="earthquake-item">' +
+                                '<p>Date: ' + data.date + '</p>' +
+                                '<p>Coordinate: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
+                                '<p>Magnitude: ' + data.magnitude + '</p>' +
+                                '<p>Depth: ' + data.depth + '</p>' +
+                                '</div>'
+                            );
+                        });
                     }
 
                     $('#loading-message').hide();

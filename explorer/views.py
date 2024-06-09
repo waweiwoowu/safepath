@@ -30,39 +30,31 @@ def map(request):
             if not coordinates:
                 raise ValueError('No coordinates provided')
             coordinates = json.loads(coordinates)
-            print('Parsed coordinates:', coordinates)
+            # print('Parsed coordinates:', coordinates)
         except (json.JSONDecodeError, ValueError) as e:
             print('Error:', str(e))
             return JsonResponse({'error': 'Invalid coordinates format or no coordinates provided'}, status=400)
 
         direction = Direction(coordinates)
-        # direction = DirectionAPI()
-        # direction = DirectionAPI(origin=start, destination=destination) # This will spend googlemaps api quotas
+        traffic_accident_number = direction.traffic_accident.number
+        traffic_accident_fatality = direction.traffic_accident.total_fatality
+        traffic_accident_injury = direction.traffic_accident.total_injury
+        earthquake_number = len(direction.earthquake.data)
+        earthquake_data = [{
+            "date": direction.earthquake.date[i],
+            "coordinate": direction.earthquake.coordinate[i],
+            "magnitude": direction.earthquake.magnitude[i],
+            "depth": direction.earthquake.depth[i],
+            "date": direction.earthquake.date[i],
+            "date": direction.earthquake.date[i],
+        } for i in range(earthquake_number)]
 
-        fatality = direction.traffic_accident.total_fatality
-        if fatality == 0:
-            fatality = "無死亡"
-        injury = direction.traffic_accident.total_injury
-        if injury == 0:
-            injury = "無受傷"
-
-        magnitude = direction.earthquake.magnitude
-        if magnitude is None:
-            magnitude = "無地震"
-        else:
-            magnitude = direction.earthquake.magnitude[0]
-
-        # return render(request, 'home.html', {
-        #     'start': start,
-        #     'destination': destination,
-        #     'coordinates': coordinates,
-        #     'fatality': fatality,
-        #     'injury': injury
-        # })
         return JsonResponse({
-        'fatality': fatality,
-        'injury': injury,
-        'magnitude': magnitude
+            'traffic_accident_number': str(traffic_accident_number) + "次",
+            'traffic_accident_fatality': str(traffic_accident_fatality) + "人",
+            'traffic_accident_injury': str(traffic_accident_injury) + "人",
+            'earthquake_number': str(earthquake_number) + "次",
+            'earthquake_data': earthquake_data
     })
     else:
         return render(request, 'map.html', {})

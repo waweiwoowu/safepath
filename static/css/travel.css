@@ -50,3 +50,52 @@ body {
     display: block;
 }
 
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-height: 800px;
+    overflow-y: scroll;
+}
+.grid-item {
+    border: 2px solid red;
+    padding: 10px;
+    text-align: center;
+}
+.select {
+    background-color: orange;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.MainPanel {
+    margin-bottom: 20px;
+}
+.containers {
+    display: flex;
+    justify-content: space-between;
+}
+.Recommend_spot, .Recommend_food {
+    width: 48%;
+}
+.data {
+    text-align: left;
+}
+#selectedContainer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+.selected-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.cancel {
+    background-color: blue;
+    border: none;
+    padding: 5px 10px;
+    color: white;
+    cursor: pointer;
+    margin-top: 5px;
+}

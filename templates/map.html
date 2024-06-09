@@ -27,8 +27,13 @@
             <div id="map" style="height: 100%; width: 100%;"></div>
         </div>
         <div class="right">
-            <div id="loading-message" style="display: none;">Calculating risks, please wait...\nDon\'t refresh the screen!!!!!!!!!!!!</div>
-            <div id="display-info"></div>
+            <div id="loading-message" style="display: none;">Calculating risks, please wait...\nDon't refresh the screen!!!!!!!!!!!!</div>
+            {% comment %} <div id="display-info"></div> {% endcomment %}
+            <div class="section-title">交通事故</div>
+            <div id="display-info-traffic-accident"></div>
+            <div class="section-title">地震紀錄</div>
+            <div id="display-info-earthquake-number"></div>
+            <div id="display-info-earthquake" class="earthquake-container"></div>
         </div>
     </div>
 </body>
