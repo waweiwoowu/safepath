@@ -353,6 +353,7 @@ class _DirectionEarthquakeData():
                 self._avg_depth = 0
                 for depth in self.depth:
                     self._avg_depth += depth
+                self._avg_depth /= len(self.depth)
             except:
                 return None
         return self._avg_depth
