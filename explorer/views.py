@@ -77,13 +77,13 @@ def travel(request):
 
         attractions = [{
             "title": hotspots.name[i],
-            "image": hotspots.image[i],
+            "image": f"/static/images/hotspots/{hotspots.image[i]}",
             "address": hotspots.address[i]
         } for i in range(len(hotspots.data))]
 
         food_places = [{
             "title": foodspots.name[i],
-            "image": foodspots.image[i],
+            "image": f"/static/images/hotspots/{foodspots.image[i]}",
             "rating": foodspots.rating[i],
             "address": foodspots.address[i],
             "phone": foodspots.phone[i],
