@@ -20,19 +20,18 @@
             font-size: 12px;
         }
 
-        .body {
-            position: absolute;
-            top: -20px;
-            left: -20px;
-            right: -40px;
-            bottom: -40px;
-            width: auto;
-            height: auto;
-            background-image: url(https://t3.ftcdn.net/jpg/06/17/08/62/360_F_617086272_rDe3izCcKb9wZlvm462Myd17uwLdqUNU.jpg);
-            background-size: cover;
-            -webkit-filter: blur(5px);
-            z-index: 0;
-        }
+		.body {
+			position: absolute;
+			top: -20px;
+			left: -20px;
+			right: -40px;
+			bottom: -40px;
+			width: auto;
+			height: auto;
+			background-image: url('/static/images/index/simple-color-sign-in-the-wall-background-material.jpg');
+			background-size: cover;
+			z-index: 0;
+		}
 
         .grad {
             position: absolute;
@@ -82,9 +81,9 @@
             width: 250px;
             height: 30px;
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.6); /* 將邊框顏色改為黑色 */
             border-radius: 2px;
-            color: #fff;
+            color: #000; /* 文字顏色改為黑色 */
             font-family: 'Exo', sans-serif;
             font-size: 16px;
             font-weight: 400;
@@ -95,15 +94,16 @@
         .login input[type=submit] {
             width: 260px;
             height: 35px;
-            background: #fff;
-            border: 1px solid #fff;
+            background: #000; /* 背景顏色改為黑色 */
+            border: 1px solid #000; /* 邊框顏色改為黑色 */
             cursor: pointer;
             border-radius: 2px;
-            color: #a18d6c;
+            color: #fff; /* 文字顏色改為白色 */
             font-family: 'Exo', sans-serif;
             font-size: 16px;
             font-weight: 400;
             padding: 6px;
+            margin-bottom: 1px; /* 調整下方間距 */
         }
 
         .login input[type=submit]:hover {
@@ -120,20 +120,49 @@
             outline: none;
         }
 
+        .register-button {
+            width: 260px;
+            height: 35px;
+            background: #5379fa; /* 按鈕背景顏色 */
+            border: 1px solid #5379fa; /* 按鈕邊框顏色 */
+            cursor: pointer;
+            border-radius: 2px;
+            color: #fff; /* 文字顏色改為白色 */
+            font-family: 'Exo', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            padding: 6px;
+            margin-bottom: 10px; /* 調整下方間距 */
+            text-decoration: none; /* 移除連結的底線 */
+            display: inline-block; /* 讓按鈕顯示為行內元素，以使其與其他元素並排 */
+            text-align: center; /* 文字置中 */
+        }
+
         .register-link {
-            color: #5379fa;
+            color: #fff;
+            background-color: #5379fa;
+            /* 藍色背景 */
             text-decoration: none;
             font-size: 14px;
             margin-top: 10px;
             display: inline-block;
+            border: none;
+            border-radius: 2px;
+            padding: 8px 16px;
+            /* 調整按鈕的內邊距 */
+        }
+
+        .register-link:hover {
+            background-color: #2e488f;
+            /* 滑鼠懸停時的背景顏色 */
         }
 
         ::-webkit-input-placeholder {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(0, 0, 0, 0.6); /* 提示文字顏色改為黑色 */
         }
 
         ::-moz-input-placeholder {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(0, 0, 0, 0.6); /* 提示文字顏色改為黑色 */
         }
     </style>
 
@@ -144,7 +173,7 @@
     <div class="body"></div>
     <div class="grad"></div>
     <div class="header">
-        <div>Site<span>Random</span></div>
+        <div>Safe<span>Path</span></div>
     </div>
     <br>
     <div class="login">
@@ -157,10 +186,7 @@
             <input type="submit" value="Sign Up">
         </form>
         <a class="register-link" href="/explorer/signin">Sign In</a>
+        <a class="register-link" href="/explorer/index/">Home</a>
     </div>
 
-    <script src='http://codepen.io/assets/libs/fullpage/jquery.js'></script>
-
-</body>
-
-</html>
+   

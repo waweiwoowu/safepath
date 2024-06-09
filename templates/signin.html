@@ -28,9 +28,8 @@
             bottom: -40px;
             width: auto;
             height: auto;
-            background-image: url(https://t3.ftcdn.net/jpg/06/17/08/62/360_F_617086272_rDe3izCcKb9wZlvm462Myd17uwLdqUNU.jpg);
+            background-image: url('/static/images/index/simple-color-sign-in-the-wall-background-material.jpg');
             background-size: cover;
-            -webkit-filter: blur(5px);
             z-index: 0;
         }
 
@@ -77,46 +76,39 @@
             z-index: 2;
         }
 
-        .login input[type=text] {
-            width: 250px;
-            height: 30px;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 2px;
-            color: #fff;
-            font-family: 'Exo', sans-serif;
-            font-size: 16px;
-            font-weight: 400;
-            padding: 4px;
-        }
-
+        .login input[type=text],
         .login input[type=password] {
             width: 250px;
             height: 30px;
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.6);
+            /* 修改邊框顏色 */
             border-radius: 2px;
-            color: #fff;
+            color: #000;
+            /* 變更文字顏色為黑色 */
             font-family: 'Exo', sans-serif;
             font-size: 16px;
             font-weight: 400;
             padding: 4px;
-            margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .login button {
             width: 260px;
             height: 35px;
-            background: #fff;
-            border: 1px solid #fff;
+            background: #000;
+            /* 修改按鈕背景色 */
+            border: 1px solid #000;
+            /* 修改邊框顏色 */
             cursor: pointer;
             border-radius: 2px;
-            color: #a18d6c;
+            color: #fff;
+            /* 修改按鈕文字顏色為白色 */
             font-family: 'Exo', sans-serif;
             font-size: 16px;
             font-weight: 400;
             padding: 6px;
-            margin-top: 20px; /* 調整此處的 margin-top */
+            margin-top: -1px;
         }
 
         .login button:hover {
@@ -127,18 +119,12 @@
             opacity: 0.6;
         }
 
-        .login input[type=text]:focus {
-            outline: none;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-        }
-
-        .login input[type=password]:focus {
-            outline: none;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-        }
-
+        .login input[type=text]:focus,
+        .login input[type=password]:focus,
         .login button:focus {
             outline: none;
+            border: 1px solid rgba(0, 0, 0, 0.9);
+            /* 修改焦點時的邊框顏色 */
         }
 
         .error-message {
@@ -148,18 +134,22 @@
         }
 
         .register-link {
-            color: #5379fa;
+            color: #fff;
+            background-color: #5379fa;
+            /* 藍色背景 */
             text-decoration: none;
             font-size: 14px;
             margin-top: 10px;
             display: inline-block;
-            border-bottom: 1px solid #5379fa;
-            padding-bottom: 2px;
+            border: none;
+            border-radius: 2px;
+            padding: 8px 16px;
+            /* 調整按鈕的內邊距 */
         }
 
         .register-link:hover {
-            color: #2e488f;
-            border-bottom: 1px solid #2e488f;
+            background-color: #2e488f;
+            /* 滑鼠懸停時的背景顏色 */
         }
 
         ::-webkit-input-placeholder {
@@ -178,7 +168,7 @@
     <div class="body"></div>
     <div class="grad"></div>
     <div class="header">
-        <div>Site<span>Random</span></div>
+        <div>Safe<span>Path</span></div>
     </div>
     <br>
     <div class="login">
@@ -189,6 +179,7 @@
             <button type="submit">Login</button>
         </form>
         <a class="register-link" href="/explorer/signup/">Sign Up</a>
+		<a class="register-link" href="/explorer/index/">Home</a>
         {% if error %}
         <p class="error-message">{{ error }}</p>
         {% endif %}
