@@ -106,15 +106,19 @@ $(document).ready(function() {
         var selectedItems = [];
         var startPoint = $('#Start_Point').val();
         var destination = $('#Destination').val();
-
+        // var startPoint = "台北車站"
+        // var destination = "中正紀念堂"
+        alert(" =========== aaa =========== ")
         $('.hotSpot:checked').each(function() {
+            alert("bbb")
             selectedItems.push($(this).data('title'));
         });
 
         $('.foodPlace:checked').each(function() {
+            alert(" =========== ccc =========== ")
             selectedItems.push($(this).data('title'));
         });
-
+        alert(" =========== ddd =========== ")
         var waypoints = selectedItems.join('|');
         var url = '/explorer/travel_map/?start=' + encodeURIComponent(startPoint) + '&end=' + encodeURIComponent(destination) + '&waypoints=' + encodeURIComponent(waypoints);
         window.location.href = url;
