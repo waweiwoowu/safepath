@@ -8,12 +8,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ### runserver
 from explorer.test_data import *
 from explorer.database import Coordinate, PedestrianHellSQLController, AttractionSQLController, RestaurantSQLController
-# KEY_PATH = r"C:\Users\user\Documents\GitHub\safepath1\explorer\data\keys\paths.json"
+import explorer.risk as risk
 
 ### run python file
 # from test_data import *
 # from database import Coordinate, PedestrianHellSQLController
-KEY_PATH = r".\data\keys\paths.json"
 
 __all__ = ["GOOGLE_MAPS_API_KEY", "Coordinates", "Direction", "Geocode"]
 
@@ -26,6 +25,7 @@ And then add the file location to the list of the json file in '.\data\keys\path
 """
 
 def _get_google_maps_api_paths():
+    KEY_PATH = r".\data\keys\paths.json"
     try:
         with open(KEY_PATH) as file:
             data = json.load(file)
@@ -244,6 +244,8 @@ class _DirectionEarthquakeData():
         self._coordinate = None
         self._magnitude = None
         self._depth = None
+        self._avg_magnitude = None
+        self._avg_depth = None
 
     @property
     def data(self):
@@ -337,6 +339,23 @@ class _DirectionEarthquakeData():
                 for data in self.data:
                     self._depth.append(data[6])
         return self._depth
+
+    @property
+    def average_magnitude(self):
+        if self._avg_magnitude is None:
+            self._avg_magnitude = risk.average_magnitude(self.magnitude)
+        return self._avg_magnitude
+
+    @property
+    def average_depth(self):
+        if self._avg_depth is None:
+            try:
+                self._avg_depth = 0
+                for depth in self.depth:
+                    self._avg_depth += depth
+            except:
+                return None
+        return self._avg_depth
 
 
 class Geocode():
@@ -676,7 +695,6 @@ def test_Taiwan():
         print(f"第{i+1}名:", end=" ")
         print(f"{total_injury[i][1]} {total_injury[i][2]} {total_injury[i][5]}")
     pass
-
 
 def test_hotspot():
     area_1 = "臺北市"
