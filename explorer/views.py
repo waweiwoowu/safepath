@@ -69,38 +69,32 @@ def map(request):
 
 @csrf_exempt
 def travel(request):
-    attractions = []
-    food_places = []
     if request.method == 'POST':
-        area_1 = request.POST.get('city')  # 選擇的縣市
-        area_2 = request.POST.get('area')  # 選擇的縣市行政區內鄉鎮
+        area_1 = request.POST.get('city')
+        area_2 = request.POST.get('area')
         hotspots = Hotspot(area_1=area_1, area_2=area_2)
         foodspots = Foodspot(area_1=area_1, area_2=area_2)
 
-        attractions = []
-        for i in range(len(hotspots.data)):
-            data = {}
-            data["title"] = hotspots.name[i]
-            data["image"] = hotspots.image[i]
-            data["address"] = hotspots.address[i]
-            attractions.append(data)
+        attractions = [{
+            "title": hotspots.name[i],
+            "image": hotspots.image[i],
+            "address": hotspots.address[i]
+        } for i in range(len(hotspots.data))]
 
-        restaurants = []
-        for i in range(len(foodspots.data)):
-            data = {}
-            data["title"] = foodspots.name[i]
-            data["image"] = foodspots.image[i]
-            data["rating"] = foodspots.rating[i]
-            data["address"] = foodspots.address[i]
-            data["phone"] = foodspots.phone[i]
-            data["openhour"] = foodspots._opening_hours[i]
-            data["price"] = foodspots.avg_price[i]
-            restaurants.append(data)
+        food_places = [{
+            "title": foodspots.name[i],
+            "image": foodspots.image[i],
+            "rating": foodspots.rating[i],
+            "address": foodspots.address[i],
+            "phone": foodspots.phone[i],
+            "openhour": foodspots._opening_hours[i],
+            "price": foodspots.avg_price[i]
+        } for i in range(len(foodspots.data))]
 
-        return JsonResponse({"attractions": attractions, "food_places": restaurants}, safe=False)
+        return JsonResponse({"attractions": attractions, "food_places": food_places}, safe=False)
     else:
-
-        return render(request, 'travel.html')
+        cities = []  # Assuming you have a list of cities to pass to the template
+        return render(request, 'travel.html', {'cities': cities})
 
 def travel_map(request):
     start = request.GET.get('start', '')
