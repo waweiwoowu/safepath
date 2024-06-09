@@ -106,6 +106,7 @@ $(document).ready(function() {
         $.each(selectedLocations, function(index, item) {
             selectedHtml += '<div class="grid-item selected-item">';
             selectedHtml += '<span>' + item.title + '</span>';
+            selectedHtml += '<span style="display: none">' + item.address + '</span>';
             selectedHtml += '<button class="cancel" onclick="removeFromRoute(' + index + ')">cancel</button>';
             selectedHtml += '</div>';
         });

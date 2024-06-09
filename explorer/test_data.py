@@ -251,3 +251,5 @@ GEOCODE_ZH_3 = [{
                               'southwest': {'lat': 24.4313858697085, 'lng': 118.3164940697085}}}, 
     'place_id': 'ChIJjYeq42uiFDQREdi7jUBZgRQ', 
     'types': ['premise']}]
+
+DIRECTION_WAYPOINTS = None

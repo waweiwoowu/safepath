@@ -87,10 +87,19 @@ class DirectionAPI():
         returns the direction from '台北101' to '台北市立動物園'. Please
         check 'constants.py' for more information.
     """
-    def __init__(self, origin=None, destination=None):
+    def __init__(self, origin=None, destination=None, waypoints=None, optimize_waypoints=True):
         if origin and destination and GOOGLE_MAPS_API_KEY:
             gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
-            self.data = gmaps.directions(origin, destination, )[0]
+            self.data = gmaps.directions(origin=origin, 
+                                         destination=destination, 
+                                         waypoints=waypoints, 
+                                         optimize_waypoints=optimize_waypoints)
+        if origin and destination and GOOGLE_MAPS_API_KEY:
+            gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
+            self.data = gmaps.directions(origin=origin, 
+                                         destination=destination, 
+                                         waypoints=waypoints, 
+                                         optimize_waypoints=optimize_waypoints, )[0]
         else:
             self.data = DIRECTIONS[0]
         self._traffic_accident = None
@@ -592,29 +601,20 @@ class GetSQLData:
         return sum_
 
 
+def test_DirectionAPI():
+    start = "台北車站"
+    destination = "台灣大學"
+    waypoints = ["桃園國際機場", "板橋捷運站"]
+    optimize_waypoints = True
+    direction = DirectionAPI(start, destination, waypoints, optimize_waypoints)
+    print(direction.data)
+
 def test_Direction():
     # direction = Direction()
     start = "台北車站"
     destination = "台灣大學"
     direction = Direction(start, destination)
     # print(direction.coordinates)
-    print("[Traffic Accident Data]")
-    print("data:", direction.traffic_accident.data)
-    print("number:", direction.traffic_accident.number)
-    print("total_fatality:", direction.traffic_accident.total_fatality)
-    print("total_injury:", direction.traffic_accident.total_injury)
-    print("pedestrian_fatality:", direction.traffic_accident.pedestrian_fatality)
-    print("pedestrian_injury:", direction.traffic_accident.pedestrian_injury)
-    print("[Earthquake Data]")
-    print("data:", direction.earthquake.data)
-    print("number:", direction.earthquake.number)
-    print("date:", direction.earthquake.date)
-    print("time:", direction.earthquake.time)
-    print("latitude:", direction.earthquake.latitude)
-    print("longitude:", direction.earthquake.longitude)
-    print("coordinate:", direction.earthquake.coordinate)
-    print("magnitude:", direction.earthquake.magnitude)
-    print("depth:", direction.earthquake.depth)
     pass
 
 def test_Geocode():
@@ -698,9 +698,10 @@ def test_foodspot():
     print(foodspot.longitude)
 
 if __name__ == "__main__":
+    test_DirectionAPI()
     # test_Direction()
     # test_Geocode()
     # test_Taiwan()
-    test_hotspot()
+    # test_hotspot()
     # test_foodspot()
     pass
