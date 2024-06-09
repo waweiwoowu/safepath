@@ -20,6 +20,7 @@ from explorer import views
 
 urlpatterns = [
     url(r'^/', views.index, name="index"),
+    url(r'^home/', views.home, name="home"),
     url(r'^signin/', views.signin, name="signin"),
     url(r'^logout/', views.logout, name="logout"),
     url(r'^signup/', views.signup, name="signup"),

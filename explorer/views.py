@@ -17,6 +17,8 @@ def index(request):
 
     return render(request, "index.html", {'user':"您尚未登入"})
 
+def home(request):
+    return redirect('/explorer/map')
 
 def signin(request):
     if request.method == "GET":
