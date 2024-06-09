@@ -139,7 +139,7 @@ $(document).ready(function() {
 
         // alert("startPoint: \n" + startPoint + "\n" + "destination: " + destination)
         // var selectedTitles = selectedLocations.map(function(item) { return item.title; });
-        var selectedAddress = selectedLocations.map(function(item) { return item.addr; });
+        var selectedAddress = selectedLocations.map(function(item) { return item.addr; }); // David Using Address instead of LocationName
         // alert("selectedTitles: \n" + selectedTitles)
         var waypoints = selectedAddress.join('|');
         // alert("waypoints: \n" + waypoints)
