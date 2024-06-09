@@ -76,7 +76,7 @@ def travel(request):
 
         food_places = [{
             "title": foodspots.name[i],
-            "image": f"/static/images/hotspots/{foodspots.image[i]}",
+            "image": f"/static/images/foodspots/{foodspots.image[i]}",
             "rating": foodspots.rating[i],
             "address": foodspots.address[i],
             "phone": foodspots.phone[i],
