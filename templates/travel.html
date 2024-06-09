@@ -38,6 +38,24 @@
         .data {
             text-align: left;
         }
+        #selectedContainer {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        .selected-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .cancel {
+            background-color: blue;
+            border: none;
+            padding: 5px 10px;
+            color: white;
+            cursor: pointer;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -70,7 +88,7 @@
         <div id="result" style="margin-top: 20px;"></div>
     </div>
     <div class="Optimal_route">
-        <button class="Insert_To_WayPoints">加入行程</button>
+        <div id="selectedContainer"></div>
         <div id="routeContainer"></div>
         <button id="planRouteButton">規劃路線</button>
     </div>

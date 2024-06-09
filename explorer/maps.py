@@ -468,7 +468,7 @@ class Hotspot():
             self.image.append(data[7])
 
 class Foodspot():
-    def __init__(self, name=None, area_1=None, area_2=None, coordinate=None, 
+    def __init__(self, name=None, area_1=None, area_2=None, coordinate=None,
                  rating=None, avg_price=None):
         self._columns = []
         if name:
@@ -494,7 +494,7 @@ class Foodspot():
         if avg_price:
             self._avg_price = avg_price
             self._columns.append(("avg_price", self._avg_price))
-            
+
         self.controller = RestaurantSQLController()
         self.data = []
         self.id = []
@@ -530,12 +530,12 @@ class Foodspot():
             self.rating.append(data[9])
             self.avg_price.append(data[10])
             self.image.append(data[11])
-        
+
     #     self._get_opening_hours()
-        
+
     # def _get_opening_hours(self):
     #     for opening_hours in self._opening_hours:
-    #         opening_hours = 
+    #         opening_hours =
     #         self.opening_hours.mon
 
 class OpeningHours:

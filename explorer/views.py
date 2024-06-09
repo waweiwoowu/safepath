@@ -72,6 +72,7 @@ def travel(request):
     if request.method == 'POST':
         area_1 = request.POST.get('city')
         area_2 = request.POST.get('area')
+
         hotspots = Hotspot(area_1=area_1, area_2=area_2)
         foodspots = Foodspot(area_1=area_1, area_2=area_2)
 
