@@ -17,6 +17,9 @@ function initMap() {
 
         // Clear previous results and show the loading message
         $('#display-info').html('');
+        $('#display-info-traffic-accident').hide();
+        $('#display-info-earthquake').hide();
+        $('#display-info-earthquake-list').hide();
         $('#loading-message').html('Calculating risks, please wait...\nDon\'t refresh the screen!!!!!!!!!!!!').show();
 
         // Calculate and display the route and then send the AJAX request
@@ -67,24 +70,21 @@ function calculateAndDisplayRoute(start, destination) {
                     $('#display-info-earthquake').html('');
 
                     if (response.traffic_accident_number) {
-                        $('#display-info-traffic-accident').append('<p>事故次數: ' + response.traffic_accident_number + ' (次/年)</p>');
+                        $('#display-info-traffic-accident').show();
+                        $('#display-info-traffic-accident').append('<p>事故次數: ' + response.traffic_accident_number + ' 次</p>');
                     }
                     if (response.traffic_accident_fatality) {
-                        $('#display-info-traffic-accident').append('<p>死亡人數: ' + response.traffic_accident_fatality + ' (人/年)</p>');
+                        $('#display-info-traffic-accident').append('<p>死亡人數: ' + response.traffic_accident_fatality + ' 人</p>');
                     }
                     if (response.traffic_accident_injury) {
-                        $('#display-info-traffic-accident').append('<p>受傷人數: ' + response.traffic_accident_injury + ' (人/年)</p>');
+                        $('#display-info-traffic-accident').append('<p>受傷人數: ' + response.traffic_accident_injury + ' 人</p>');
                     }
                     if (response.earthquake_number) {
-                        $('#display-info-earthquake').append('<p>地震次數: ' + response.earthquake_number + ' (次)</p>');
-                    }
-                    if (response.earthquake_average_magnitude) {
+                        $('#display-info-earthquake').show();
+                        $('#display-info-earthquake').append('<p>地震次數: ' + response.earthquake_number + ' 次</p>');
                         $('#display-info-earthquake').append('<p>平均規模: ' + response.earthquake_average_magnitude + '</p>');
-                    }
-                    if (response.earthquake_average_depth) {
-                        $('#display-info-earthquake').append('<p>平均深度: ' + response.earthquake_average_depth + ' (公里)</p>');
-                    }
-                    if (response.earthquake_data) {
+                        $('#display-info-earthquake').append('<p>平均深度: ' + response.earthquake_average_depth + ' 公里</p>');
+                        $('#display-info-earthquake-list').show();
                         response.earthquake_data.forEach(data => {
                             $('#display-info-earthquake-list').append(
                                 '<div class="earthquake-item">' +
@@ -95,6 +95,9 @@ function calculateAndDisplayRoute(start, destination) {
                                 '</div>'
                             );
                         });
+                    } else {
+                        $('#display-info-earthquake').show();
+                        $('#display-info-earthquake').append('<p>無地震紀錄</p>');
                     }
 
                     $('#loading-message').hide();

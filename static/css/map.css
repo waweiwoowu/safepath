@@ -47,9 +47,25 @@ body {
     padding: 10px;
     width: 80%;
 }
+.main-title {
+    width: 100%;
+    background-color: #365E32;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    margin-top: 10px;
+}
 .section-title {
     width: 100%;
-    background-color: #00f;
+    background-color: #81A263;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    margin-top: 10px;
+}
+.loading-message {
+    width: 100%;
+    background-color: #eb382f;
     color: #fff;
     text-align: center;
     padding: 10px;

@@ -27,13 +27,14 @@
             <div id="map" style="height: 100%; width: 100%;"></div>
         </div>
         <div class="right">
-            <div id="loading-message" style="display: none;">Calculating risks, please wait...\nDon't refresh the screen!!!!!!!!!!!!</div>
             {% comment %} <div id="display-info"></div> {% endcomment %}
-            <div class="section-title">交通事故 (平均一年紀錄)</div>
+            <div class="main-title">本此路線行經的風險</div>
+            <div class="section-title">交通事故紀錄 (平均一年發生次數)</div>
             <div id="display-info-traffic-accident"></div>
-            <div class="section-title">地震紀錄 (從1995年至今)</div>
+            <div class="section-title">地震紀錄 (1995年至今的震央位置)</div>
             <div id="display-info-earthquake"></div>
-            <div id="display-info-earthquake-list" class="earthquake-container"></div>
+            <div class="earthquake-container" id="display-info-earthquake-list" style="display: none;"></div>
+            <div class="loading-message" id="loading-message" style="display: none;">Calculating risks, please wait...\nDon't refresh the screen!!!!!!!!!!!!</div>
         </div>
     </div>
 </body>
