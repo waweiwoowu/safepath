@@ -98,7 +98,13 @@ def travel(request):
         return JsonResponse({"attractions": attractions, "food_places": food_places}, safe=False)
     else:
         cities = []  # Assuming you have a list of cities to pass to the template
-        return render(request, 'travel.html', {'cities': cities})
+        start = request.GET.get('start')
+        destination = request.GET.get('destination')
+        if start and destination:
+            return render(request, 'travel.html', {'cities': cities, 'start': start, 'destination': destination})
+        else:
+            return render(request, 'travel.html', {'cities': cities})
+
 
 def travel_map(request):
     start = request.GET.get('start', '')

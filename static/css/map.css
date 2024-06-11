@@ -83,3 +83,17 @@ body {
     padding: 10px;
     margin-bottom: 10px;
 }
+.home {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #365E32;
+    color: white;
+    padding: 14px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+.home {
+    background-color: #365E32;
+}

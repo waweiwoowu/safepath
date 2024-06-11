@@ -149,4 +149,6 @@ $(document).ready(function() {
         // window.location.href = url; // 直接跳轉
         window.open(url, '_blank'); // 在新分頁中打開 URL
     });
+
+
 });

@@ -6,16 +6,19 @@
     <title>Map Project</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/travel.css' %}">
-    <style>
-
-    </style>
 </head>
 <body>
     <div class="MainPanel">
         <form id="recommendform" method="POST" action="{% url 'travel' %}">
             <div class="Area">
+                <a href="/explorer//">首頁</a>
+                {% if start and destination%}
+                <label for="Start_Point">起點:<input id="Start_Point" name="Start_Point" value="{{start}}"></label>
+                <label for="Destination">終點:<input id="Destination" name="Destination" value="{{destination}}"></label>
+                {% else %}
                 <label for="Start_Point">起點:<input id="Start_Point" name="Start_Point"></label>
                 <label for="Destination">終點:<input id="Destination" name="Destination"></label>
+                {% endif %}
             </div>
             <div class="Area">
                 <div>

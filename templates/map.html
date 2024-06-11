@@ -14,11 +14,14 @@
     <div class="top-bar">
         <form id="route-form" action="" method="post">
             {% csrf_token %}
+            <a class="home" href="/explorer//">首頁</a>
             <label for="start">Start:</label>
             <input type="text" id="start" name="start" value="{{ start }}" required>
             <label for="destination">Destination:</label>
             <input type="text" id="destination" name="destination" value="{{ destination }}" required>
-            <button type="submit">OK</button>
+            <button type="submit">搜尋路線</button>
+            <button type="button" id="recommend">推薦行程</button>
+
         </form>
     </div>
     <br>
@@ -37,5 +40,17 @@
             <div class="loading-message" id="loading-message" style="display: none;">Calculating risks, please wait...\nDon't refresh the screen!!!!!!!!!!!!</div>
         </div>
     </div>
+    <script>
+        document.getElementById('recommend').addEventListener('click', function () {
+            const start = document.getElementById('start').value;
+            const destination = document.getElementById('destination').value;
+            if (start && destination) {
+                const url = `/explorer/travel?start=${encodeURIComponent(start)}&destination=${encodeURIComponent(destination)}`;
+                window.location.href = url;
+            } else {
+                alert('Please enter both start and destination.');
+            }
+        });
+    </script>
 </body>
 </html>
