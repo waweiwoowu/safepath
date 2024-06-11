@@ -8,6 +8,7 @@ from explorer.maps import Direction, DirectionAPI, Hotspot, Foodspot
 from explorer.models import UserInfo
 import json
 import random
+from django.db import IntegrityError
 
 
 def index(request):
@@ -156,21 +157,67 @@ def signup(request):
         fullname = request.POST.get("fullname")
         email = request.POST.get("email")
         password = request.POST.get("password")
+
+        if not username or not fullname or not email or not password:
+            return render(request, "signup.html", {"error": "All fields are required."})
+        
+        if UserInfo.objects.filter(username=username).exists():
+            return render(request, "signup.html", {"error": "Username already taken."})
+        if UserInfo.objects.filter(email=email).exists():
+            return render(request, "signup.html", {"error": "Email already registered."})
+
         verification_code = verification_code_generator()
 
-        user_info = UserInfo(
-            username = username,
-            fullname = fullname,
-            email = email,
-            password = password,
-            verification_code = verification_code
-        )
+        try:
+            # 創建新用戶
+            user_info = UserInfo(
+                username=username,
+                fullname=fullname,
+                email=email,
+                password=password,
+                verification_code=verification_code
+            )
+            user_info.save()
 
-        user_info.save()
+        except IntegrityError:
+            return render(request, "signup.html", {"error": "Error creating user. Please try again."})
 
-        send_mail(f"Verify", f"hello {username},\nYour verification code is {verification_code}", "f37854979@gmail.com", [email])
+        # 發送驗證電子郵件
+        try:
+            send_mail(
+                "Verify",
+                f"Hello {username},\nYour verification code is {verification_code}",
+                "f37854979@gmail.com",
+                [email]
+            )
+        except Exception as e:
+            user_info.delete()
+            return render(request, "signup.html", {"error": "Error sending verification email. Please try again."})
 
         return render(request, "verification_code.html", {"username": username})
+# def signup(request):
+#     if request.method == "GET":
+#         return render(request, "signup.html", {})
+#     else:
+#         username = request.POST.get("username")
+#         fullname = request.POST.get("fullname")
+#         email = request.POST.get("email")
+#         password = request.POST.get("password")
+#         verification_code = verification_code_generator()
+
+#         user_info = UserInfo(
+#             username = username,
+#             fullname = fullname,
+#             email = email,
+#             password = password,
+#             verification_code = verification_code
+#         )
+
+#         user_info.save()
+
+#         send_mail(f"Verify", f"hello {username},\nYour verification code is {verification_code}", "f37854979@gmail.com", [email])
+
+#         return render(request, "verification_code.html", {"username": username})
 
 def verification_code_generator():
     code = ""
