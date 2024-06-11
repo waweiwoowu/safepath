@@ -57,7 +57,8 @@ $(document).ready(function() {
                     attractionsHtml += '<img src="' + attraction.image + '" alt="' + attraction.title + '" style="width:100%">';
                     attractionsHtml += '<div class="data"><h3>' + attraction.title + '</h3>';
                     attractionsHtml += '<p>' + attraction.address + '</p></div>';
-                    attractionsHtml += '<button class="select" onclick="addToRoute(\'hotspot\', \'' + attraction.title + '\')" ' + disabled + '>select</button>';
+                    // David add address parameter
+                    attractionsHtml += '<button class="select" onclick="addToRoute(\'hotspot\', \'' + attraction.title + '\', \'' + attraction.address + '\')" ' + disabled + '>select</button>';
                     attractionsHtml += '</div>';
                 });
 
@@ -71,7 +72,8 @@ $(document).ready(function() {
                     foodPlacesHtml += '<p>Phone: ' + food_place.phone + '</p>';
                     // foodPlacesHtml += '<p>Open Hours: ' + food_place.openhour + '</p>';
                     foodPlacesHtml += '<p>Average Price: ' + food_place.price + '</p></div>';
-                    foodPlacesHtml += '<button class="select" onclick="addToRoute(\'foodspot\', \'' + food_place.title + '\')" ' + disabled + '>select</button>';
+                    // David add address parameter
+                    foodPlacesHtml += '<button class="select" onclick="addToRoute(\'foodspot\', \'' + food_place.title + '\', \'' + food_place.address + '\')" ' + disabled + '>select</button>';
                     foodPlacesHtml += '</div>';
                 });
 
@@ -84,13 +86,13 @@ $(document).ready(function() {
         });
     });
 
-    window.addToRoute = function(type, title) {
+    window.addToRoute = function(type, title, addr) { // David add attr attribute
         if (selectedLocations.length >= 5) {
             alert("You can only select up to 5 locations.");
             return;
         }
 
-        selectedLocations.push({ type: type, title: title });
+        selectedLocations.push({ type: type, title: title, addr: addr }); // David add attr attribute
         updateSelectedLocations();
         updateDisabledButtons();
     };
@@ -106,7 +108,7 @@ $(document).ready(function() {
         $.each(selectedLocations, function(index, item) {
             selectedHtml += '<div class="grid-item selected-item">';
             selectedHtml += '<span>' + item.title + '</span>';
-            selectedHtml += '<span style="display: none">' + item.address + '</span>';
+            selectedHtml += '<span style="display: nonex">' + item.addr + '</span>'; // David add attr attribute
             selectedHtml += '<button class="cancel" onclick="removeFromRoute(' + index + ')">cancel</button>';
             selectedHtml += '</div>';
         });
@@ -130,18 +132,21 @@ $(document).ready(function() {
         });
     }
 
+    // 規劃路線按鈕
     $('#planRouteButton').click(function() {
         var startPoint = $('#Start_Point').val();
         var destination = $('#Destination').val();
 
         // alert("startPoint: \n" + startPoint + "\n" + "destination: " + destination)
-        var selectedTitles = selectedLocations.map(function(item) { return item.title; });
+        // var selectedTitles = selectedLocations.map(function(item) { return item.title; });
+        var selectedAddress = selectedLocations.map(function(item) { return item.addr; }); // David Using Address instead of LocationName
         // alert("selectedTitles: \n" + selectedTitles)
-        var waypoints = selectedTitles.join('|');
+        var waypoints = selectedAddress.join('|');
         // alert("waypoints: \n" + waypoints)
         // alert("start: " + encodeURIComponent(startPoint))
-        var url = '/explorer/travel_map/?start=' + encodeURIComponent(startPoint) + '&end=' + encodeURIComponent(destination) + '&waypoints=' + encodeURIComponent(waypoints) + '&optimize_waypoints=False';
+        var url = '/explorer/travel_map/?start=' + encodeURIComponent(startPoint) + '&end=' + encodeURIComponent(destination) + '&waypoints=' + encodeURIComponent(waypoints) + '&optimize_waypoints=True';
         // alert("url: \n" + url)
-        window.location.href = url;
+        // window.location.href = url; // 直接跳轉
+        window.open(url, '_blank'); // 在新分頁中打開 URL
     });
 });

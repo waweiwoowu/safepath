@@ -19,7 +19,7 @@ def index(request):
     return render(request, "index.html", {'user':"您尚未登入"})
 
 def home(request):
-    return redirect('/explorer/map')
+    return redirect('/explorer/index')
 
 def map(request):
     if request.method == 'POST':

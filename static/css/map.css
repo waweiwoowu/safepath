@@ -47,9 +47,24 @@ body {
     padding: 10px;
     width: 80%;
 }
+.main-title {
+    width: 100%;
+    background-color: #365E32;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
 .section-title {
     width: 100%;
-    background-color: #00f;
+    background-color: #81A263;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    margin-top: 10px;
+}
+.loading-message {
+    width: 100%;
+    background-color: #eb382f;
     color: #fff;
     text-align: center;
     padding: 10px;
@@ -64,7 +79,7 @@ body {
     margin-top: 10px;
 }
 .earthquake-item {
-    border: 1px solid red;
+    border: 4px solid #FD9B63;
     padding: 10px;
     margin-bottom: 10px;
 }
