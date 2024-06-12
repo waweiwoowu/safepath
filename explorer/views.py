@@ -146,7 +146,7 @@ def signin(request):
 def logout(request):
     if 'username' in request.session:
         del request.session['username']
-        return render(request, "index.html", {"user":"您已登出!!"})
+        return redirect('/explorer//')
     return render(request, "index.html", {"user":"您尚未登入!!"})
 
 def signup(request):
@@ -160,7 +160,7 @@ def signup(request):
 
         if not username or not fullname or not email or not password:
             return render(request, "signup.html", {"error": "All fields are required."})
-        
+
         if UserInfo.objects.filter(username=username).exists():
             return render(request, "signup.html", {"error": "Username already taken."})
         if UserInfo.objects.filter(email=email).exists():
