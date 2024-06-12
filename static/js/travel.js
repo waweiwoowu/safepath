@@ -54,7 +54,8 @@ $(document).ready(function() {
                 $.each(response.attractions, function(index, attraction) {
                     var disabled = isLocationSelected(attraction.title) ? 'disabled' : '';
                     attractionsHtml += '<div class="grid-item">';
-                    attractionsHtml += '<img src="' + attraction.image + '" alt="' + attraction.title + '" style="width:100%">';
+                    // attractionsHtml += '<img src="' + attraction.image + '" alt="' + attraction.title + '" style="width:100%">';
+                    attractionsHtml += '<img src="' + attraction.image + '" alt="' + attraction.title + '" style="width:100%" onerror="this.onerror=null; this.src=\'/static/images/Alternative_Pic.jpg\';">';
                     attractionsHtml += '<div class="data"><h3>' + attraction.title + '</h3>';
                     attractionsHtml += '<p>' + attraction.address + '</p></div>';
                     // David add address parameter
@@ -65,7 +66,8 @@ $(document).ready(function() {
                 $.each(response.food_places, function(index, food_place) {
                     var disabled = isLocationSelected(food_place.title) ? 'disabled' : '';
                     foodPlacesHtml += '<div class="grid-item">';
-                    foodPlacesHtml += '<img src="' + food_place.image + '" alt="' + food_place.title + '" style="width:100%">';
+                    // foodPlacesHtml += '<img src="' + food_place.image + '" alt="' + food_place.title + '" style="width:100%">';
+                    foodPlacesHtml += '<img src="' + food_place.image + '" alt="' + food_place.title + '" style="width:100%" onerror="this.onerror=null; this.src=\'/static/images/Alternative_Pic.jpg\';">';
                     foodPlacesHtml += '<div class="data"><h3>' + food_place.title + '</h3>';
                     foodPlacesHtml += '<p>Rating: ' + food_place.rating + '</p>';
                     foodPlacesHtml += '<p>Address: ' + food_place.address + '</p>';
@@ -81,7 +83,8 @@ $(document).ready(function() {
                 $('#foodspotContainer').html(foodPlacesHtml);
             },
             error: function() {
-                alert("Failed to get recommendations.");
+                // alert("Failed to get recommendations.");
+                alert("資料庫中無此處景點或美食資源");
             }
         });
     });
