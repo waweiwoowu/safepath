@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from explorer.database import AttractionSQLController, RestaurantSQLController
-from explorer.maps import Direction, DirectionAPI, Hotspot, Foodspot
+from explorer.maps import Direction, DirectionAPI, Hotspot, Foodspot, _get_google_maps_api_key
 from explorer.models import UserInfo
 import json
 import random
@@ -111,11 +111,13 @@ def travel_map(request):
     start = request.GET.get('start', '')
     end = request.GET.get('end', '')
     waypoints = request.GET.get('waypoints', '')
+    api_key = _get_google_maps_api_key()
 
     context = {
         'start': start,
         'end': end,
-        'waypoints': waypoints.split('|') if waypoints else []
+        'waypoints': waypoints.split('|') if waypoints else [],
+        'api_key': api_key
     }
 
     return render(request, 'travel_map.html', context)

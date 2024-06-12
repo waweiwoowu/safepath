@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Google Map with Route</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFzApqD1tGY615APaue-nIwjC6Lx5pOp0&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places"></script>
     <script>
         function initMap() {
             var directionsService = new google.maps.DirectionsService();
@@ -34,7 +34,7 @@
                     directionsRenderer.setDirections(result);
                 } else {
                     // window.alert('Directions request failed due to ' + status);
-                    window.alert('Directions request failed due to ' + status);
+                    window.alert('起點或終點格式輸入錯誤，請重新輸入並再次規劃路線');
                 }
             });
         }
