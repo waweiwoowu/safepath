@@ -1,6 +1,11 @@
-let map, directionsService, directionsRenderer;
-
+// let map, directionsService, directionsRenderer;
+document.addEventListener('DOMContentLoaded', (event) => {
+    if (typeof google !== 'undefined') {
+        initMap();
+    }
+});
 function initMap() {
+    let map, directionsService, directionsRenderer;
     map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 23.83876, lng: 120.9876 },
         zoom: 8
@@ -115,4 +120,4 @@ function calculateAndDisplayRoute(start, destination) {
     });
 }
 
-initMap();
+// initMap();
