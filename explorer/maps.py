@@ -188,51 +188,56 @@ class _DirectionTrafficAccidentData():
     @property
     def number(self):
         if self._number is None:
-            self._number = 0
-            for coord in self._coords:
-                number = coord.traffic_accident.number
-                if number:
-                    self._number += number
+            if not self.data:
+                return None
+            else:
+                self._number = 0
+                for data in self.data:
+                    self._number += data[3]
         return self._number
 
     @property
     def total_fatality(self):
         if self._total_fatality is None:
-            self._total_fatality = 0
-            for coord in self._coords:
-                fatality = coord.traffic_accident.total_fatality
-                if fatality:
-                    self._total_fatality += fatality
+            if not self.data:
+                return None
+            else:
+                self._total_fatality = 0
+                for data in self.data:
+                    self._total_fatality += data[4]
         return self._total_fatality
 
     @property
     def total_injury(self):
         if self._total_injury is None:
-            self._total_injury = 0
-            for coord in self._coords:
-                injury = coord.traffic_accident.total_injury
-                if injury:
-                    self._total_injury += injury
+            if not self.data:
+                return None
+            else:
+                self._total_injury = 0
+                for data in self.data:
+                    self._total_injury += data[5]
         return self._total_injury
 
     @property
     def pedestrian_fatality(self):
         if self._pedestrian_fatality is None:
-            self._pedestrian_fatality = 0
-            for coord in self._coords:
-                fatality = coord.traffic_accident.pedestrian_fatality
-                if fatality:
-                    self._pedestrian_fatality += fatality
+            if not self.data:
+                return None
+            else:
+                self._pedestrian_fatality = 0
+                for data in self.data:
+                    self._pedestrian_fatality += data[6]
         return self._pedestrian_fatality
 
     @property
     def pedestrian_injury(self):
         if self._pedestrian_injury is None:
-            self._pedestrian_injury = 0
-            for coord in self._coords:
-                injury = coord.traffic_accident.pedestrian_injury
-                if injury:
-                    self._pedestrian_injury += injury
+            if not self.data:
+                return None
+            else:
+                self._pedestrian_injury = 0
+                for data in self.data:
+                    self._pedestrian_injury += data[7]
         return self._pedestrian_injury
 
 class _DirectionEarthquakeData():
