@@ -24,6 +24,11 @@ You may copy and paste the file to any location outside of the project on your l
 And then add the file location to the list of the json file in '.\data\keys\paths.json'
 """
 
+import time
+start_time = time.time()
+end_time = time.time()
+
+
 def _get_google_maps_api_paths():
     KEY_PATH = r".\data\keys\paths.json"
     try:
@@ -89,19 +94,18 @@ class DirectionAPI():
     """
     def __init__(self, origin=None, destination=None, waypoints=None, optimize_waypoints=True):
         if origin and destination and GOOGLE_MAPS_API_KEY:
-            gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
-            self.data = gmaps.directions(origin=origin,
-                                         destination=destination,
-                                         waypoints=waypoints,
-                                         optimize_waypoints=optimize_waypoints)
-        if origin and destination and GOOGLE_MAPS_API_KEY:
+            global start_time, end_time
+            start_time = time.time()
             gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
             self.data = gmaps.directions(origin=origin,
                                          destination=destination,
                                          waypoints=waypoints,
                                          optimize_waypoints=optimize_waypoints, )[0]
+            end_time = time.time()
+            print(f"gmaps: {end_time-start_time:.4f}")
         else:
             self.data = DIRECTIONS[0]
+        self._coordinates = None
         self._traffic_accident = None
         self._earthquake = None
 
@@ -113,12 +117,17 @@ class DirectionAPI():
 
     @property
     def coordinates(self):
-        route_coordinates = []
-        for step in self.data['legs'][0]['steps']:
-            polyline = step['polyline']['points']
-            decoded_polyline = googlemaps.convert.decode_polyline(polyline)
-            route_coordinates += [(point['lat'], point['lng']) for point in decoded_polyline]
-        return route_coordinates
+        global start_time, end_time
+        start_time = time.time()
+        if self._coordinates is None:
+            self._coordinates = []
+            for step in self.data['legs'][0]['steps']:
+                polyline = step['polyline']['points']
+                decoded_polyline = googlemaps.convert.decode_polyline(polyline)
+                self._coordinates += [(point['lat'], point['lng']) for point in decoded_polyline]
+        end_time = time.time()
+        print(f"coordinates: {end_time-start_time:.4f}")
+        return self._coordinates
 
     @property
     def instructions(self):
@@ -129,14 +138,22 @@ class DirectionAPI():
 
     @property
     def traffic_accident(self):
+        global start_time, end_time
+        start_time = time.time()
         if self._traffic_accident is None:
             self._traffic_accident = _DirectionTrafficAccidentData(self.coordinates)
+        end_time = time.time()
+        print(f"traffic_accident: {end_time-start_time:.4f}")
         return self._traffic_accident
 
     @property
     def earthquake(self):
+        global start_time, end_time
+        start_time = time.time()
         if self._earthquake is None:
             self._earthquake = _DirectionEarthquakeData(self.coordinates)
+        end_time = time.time()
+        print(f"earthquake: {end_time-start_time:.4f}")
         return self._earthquake
 
 class Direction():
@@ -161,6 +178,8 @@ class Direction():
 
 class _DirectionTrafficAccidentData():
     def __init__(self, coordinates):
+        global start_time, end_time
+        start_time = time.time()
         self._coords = []
         for coordinate in coordinates:
             self._coords.append(Coordinate(coordinate))
@@ -170,15 +189,21 @@ class _DirectionTrafficAccidentData():
         self._total_injury = None
         self._pedestrian_fatality = None
         self._pedestrian_injury = None
+        end_time = time.time()
+        print(f"_TrafficAccidentData: {end_time-start_time:.4f}")
 
     @property
     def data(self):
+        global start_time, end_time
+        start_time = time.time()
         if self._data is None:
             self._data = []
             for coord in self._coords:
                 data = coord.traffic_accident.data
                 if data:
                     self._data.append(data)
+        end_time = time.time()
+        print(f"traffic_data: {end_time-start_time:.4f}")
         return self._data
 
     @property
@@ -233,6 +258,8 @@ class _DirectionTrafficAccidentData():
 
 class _DirectionEarthquakeData():
     def __init__(self, coordinates):
+        global start_time, end_time
+        start_time = time.time()
         self._coords = []
         for coordinate in coordinates:
             self._coords.append(Coordinate(coordinate))
@@ -246,9 +273,13 @@ class _DirectionEarthquakeData():
         self._depth = None
         self._avg_magnitude = None
         self._avg_depth = None
+        end_time = time.time()
+        print(f"EarthquakeData: {end_time-start_time:.4f}")
 
     @property
     def data(self):
+        global start_time, end_time
+        start_time = time.time()
         if self._data is None:
             data = []
             for coord in self._coords:
@@ -261,6 +292,8 @@ class _DirectionEarthquakeData():
             else:
                 self._data = list(set(data))
                 self.number = len(self._data)
+        end_time = time.time()
+        print(f"earthquake_data: {end_time-start_time:.4f}")
         return self._data
 
     @property
@@ -623,11 +656,12 @@ class GetSQLData:
 
 def test_DirectionAPI():
     start = "台北車站"
-    destination = "台灣大學"
+    destination = "高雄愛河"
     waypoints = ["桃園國際機場", "板橋捷運站"]
+    waypoints = None
     optimize_waypoints = True
     direction = DirectionAPI(start, destination, waypoints, optimize_waypoints)
-    print(direction.data)
+    # print(direction.data)
 
 def test_Direction():
     # direction = Direction()

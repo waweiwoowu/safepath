@@ -73,7 +73,7 @@ def updata_hotspot_data():
 if __name__ == "__main__":
     # update_traffic_accident_data()
     # print()
-    # update_earthquake_data()
+    update_earthquake_data()
     # updata_hotspot_data()
     # updata_restaurant_data()
     pass
