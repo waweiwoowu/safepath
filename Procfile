@@ -1,1 +1,1 @@
-web: gunicorn safepath.wsgi
+web: gunicorn safepath.wsgi --log-file - -t 60

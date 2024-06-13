@@ -789,7 +789,8 @@ class Restaurant:
 class SQLController:
     """This class is used to control 'db.sqlites' by using sqlite3 module."""
 
-    PATH = r"..\.\db.sqlite3"
+    # PATH = r"..\.\db.sqlite3"
+    PATH = os.path.join("..", "db.sqlite3")
     def __init__(self, table_name):
         self.table_name = table_name
         self.conn = sqlite3.connect(SQLController.PATH)
@@ -836,16 +837,16 @@ class SQLController:
             return data
         else:
             return None
-        
+
     def get_data_from_columns(self, *columns):
         """This method is used to get data from database with specific columns
-        
+
         :param *columns: a set of column name and column value
         :type *columns: tuple
-        
+
         e.g. *columns = ("area_1", "new taipei city"), ("area_2", "yonghe")
         """
-        
+
         sqls = []
         if type(columns[0]) == list:
             columns = columns[0]
