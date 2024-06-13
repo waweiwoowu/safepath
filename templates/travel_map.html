@@ -4,7 +4,7 @@
     <title>Google Map with Route</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/travel_map.css' %}">
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFzApqD1tGY615APaue-nIwjC6Lx5pOp0&callback=initMap" async defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function initMap() {
@@ -119,14 +119,15 @@
     <div class="container">
         <div id="map"></div>
         <a class="homelink" href="/explorer//">回首頁</a>
-        <div class="risk-info">
-            <h2>本此路線行經的風險</h2>
+        <div class="risk-info"  style = "background-image: url('/static/images/index/welcom_to_hell.jpg">
+            <h2 style="color:#fff;">本此路線行經的風險 </h2>
             <div class="section-title">交通事故紀錄 (平均一年發生次數)</div>
-            <div id="display-info-traffic-accident"></div>
+            <div id="display-info-traffic-accident" style="background-color: rgba(255, 255, 255, 0.5); width: 104%;"></div>
             <div class="section-title">地震紀錄 (1995年至今的震央位置)</div>
-            <div id="display-info-earthquake"></div>
-            <div class="earthquake-container" id="display-info-earthquake-list" style="display: none;"></div>
-            <div class="loading-message" id="loading-message">Calculating risks, please wait...<br>Don't refresh the screen!!!!!!!!!!!!</div>
+            <div id="display-info-earthquake" style="background-color: rgba(255, 255, 255, 0.5); width: 103%;"> </div>
+            <div class="earthquake-container" id="display-info-earthquake-list" style="background-color: rgba(255, 255, 255, 0.5); width: 100%;"></div>
+            <div class="loading-message" id="loading-message" style="display: none;">Calculating risks, please wait...Don't refresh the screen!!!!!!!!!!!!</div>
+        </div>
         </div>
     </div>
 </body>
