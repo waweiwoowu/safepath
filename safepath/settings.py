@@ -19,8 +19,11 @@ import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+<<<<<<< HEAD
 PATH = os.getenv('DATABASE_PATH', os.path.join(BASE_DIR, "db.sqlite3"))
 
+=======
+>>>>>>> 43649cb88fb751b22f18f0579880af7f90e10f2c
 # heroku資料庫串聯
 DATABASES = {
     'default': dj_database_url.config(

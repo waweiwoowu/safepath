@@ -786,12 +786,14 @@ class Restaurant:
 
 
 ### SQLController ###
+from pathlib import Path
 
 class SQLController:
     """This class is used to control 'db.sqlites' by using sqlite3 module."""
 
     # PATH = r"..\.\db.sqlite3"
-    PATH = os.path.join("..", "db.sqlite3")
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    PATH = os.getenv('DATABASE_PATH', os.path.join(BASE_DIR, "db.sqlite3"))
     def __init__(self, table_name):
         self.table_name = table_name
         self.conn = sqlite3.connect(SQLController.PATH)
