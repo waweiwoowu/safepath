@@ -34,7 +34,8 @@ def map(request):
             # print('Parsed coordinates:', coordinates)
         except (json.JSONDecodeError, ValueError) as e:
             print('Error:', str(e))
-            return JsonResponse({'error': 'Invalid coordinates format or no coordinates provided'}, status=400)
+            # return JsonResponse({'error': 'Invalid coordinates format or no coordinates provided'}, status=400)
+            return redirect('/explorer/index')
 
         direction = Direction(coordinates)
 

@@ -25,7 +25,7 @@ function initMap() {
         $('#display-info-traffic-accident').hide();
         $('#display-info-earthquake').hide();
         $('#display-info-earthquake-list').hide();
-        $('#loading-message').html('Calculating risks, please wait...\nDon\'t refresh the screen!!!!!!!!!!!!').show();
+        $('#loading-message').html('<h1>RISKS CALCULATING...</h1><h2>DO NOT REFRESH THE SCREEN!!!</h2>').show();
 
         // Calculate and display the route and then send the AJAX request
         calculateAndDisplayRoute(start, destination);

@@ -1,6 +1,6 @@
 $(document).ready(function() {
     var selectedLocations = [];
-
+    $('.containers').toggle();
     // Fetch and populate the city dropdown
     $.ajax({
         url: '/static/json/travel.json',
@@ -78,7 +78,7 @@ $(document).ready(function() {
                     foodPlacesHtml += '<button class="select" onclick="addToRoute(\'foodspot\', \'' + food_place.title + '\', \'' + food_place.address + '\')" ' + disabled + '>select</button>';
                     foodPlacesHtml += '</div>';
                 });
-
+                $('.containers').toggle();
                 $('#hotspotContainer').html(attractionsHtml);
                 $('#foodspotContainer').html(foodPlacesHtml);
             },

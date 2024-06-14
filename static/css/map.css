@@ -64,8 +64,8 @@ body {
 }
 .loading-message {
     width: 100%;
-    background-color: #eb382f;
-    color: #fff;
+    background-color: rgba(255, 193, 0, 0.9);
+    color: #000;
     text-align: center;
     padding: 10px;
     margin-top: 10px;

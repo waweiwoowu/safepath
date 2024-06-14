@@ -32,8 +32,8 @@ body {
     position: absolute;
     top: 10px;
     right: 10px;
-    background-color: #A91D3A;
-    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
     padding: 14px 25px;
     text-align: center;
     text-decoration: none;
@@ -41,7 +41,8 @@ body {
     z-index: 1000; /* Ensure the button is on top */
 }
 .homelink:hover {
-    background-color: #C73659;
+    background-color: rgba(255, 255, 255, 0.5);
+    color: rgba(0, 0, 0);
 }
 .main-title {
     width: 100%;
@@ -52,20 +53,19 @@ body {
 }
 .section-title {
     width: 100%;
-    background-color: #000;
-    color: #ffc100;
+    background-color: rgba(196, 12, 12, 0.8);
+    color: #fff;
     text-align: center;
     padding: 10px;
     margin-top: 10px;
 }
 .loading-message {
     width: 100%;
-    background-color: #eb382f;
-    color: #fff;
+    background-color: rgba(255, 193, 0, 0.9);
+    color: #000;
     text-align: center;
     padding: 10px;
     margin-top: 10px;
-    display: none; /* Initially hidden */
 }
 .earthquake-container {
     width: 100%;
