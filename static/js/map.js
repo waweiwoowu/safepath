@@ -120,4 +120,4 @@ function calculateAndDisplayRoute(start, destination) {
     });
 }
 
-// initMap();
+initMap();
