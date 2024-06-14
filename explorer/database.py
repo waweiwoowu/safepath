@@ -5,6 +5,7 @@ import math
 import sqlite3
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)

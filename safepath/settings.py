@@ -16,12 +16,17 @@ import django_heroku
 import dj_database_url
 
 
-# heroku資料庫串聯
-DATABASES = {
-    'default': dj_database_url.config(env='JAWSDB_URL', default='sqlite:///db.sqlite3'),
-}
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+PATH = os.getenv('DATABASE_PATH', os.path.join(BASE_DIR, "db.sqlite3"))
+
+# heroku資料庫串聯
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}"
+    )
+}
 
 STATIC_URL = '/static/'
 
