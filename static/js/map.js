@@ -97,7 +97,7 @@ function calculateAndDisplayRoute(start, destination) {
                                 '<p>日期: ' + data.date + '</p>' +
                                 '<p>位置: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
                                 '<p>芮氏規模: ' + data.magnitude + '</p>' +
-                                '<p>深度: ' + data.depth + 'km</p>' +
+                                '<p>深度: ' + data.depth + ' km</p>' +
                                 '</div>'
                             );
                             // Add marker for the earthquake location on the map
