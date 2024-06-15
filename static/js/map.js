@@ -96,7 +96,7 @@ function calculateAndDisplayRoute(start, destination) {
                                 '<p>Date: ' + data.date + '</p>' +
                                 '<p>Coordinate: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
                                 '<p>Magnitude: ' + data.magnitude + '</p>' +
-                                '<p>Depth: ' + data.depth + '< km/p>' +
+                                '<p>Depth: ' + data.depth + 'km</p>' +
                                 '</div>'
                             );
                         });
