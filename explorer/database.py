@@ -389,7 +389,6 @@ class Earthquake:
         }
         self._df = pd.read_csv(path, engine='python', encoding="big5", dtype=dtype_mapping)
 
-
     def _get_data(self):
         self._dates = [datetime.strptime(d, "%Y-%m-%d") for d in self._df["Date"]]
         self.starting_index = self.ending_index = 0

@@ -81,12 +81,12 @@ class DirectionAPI():
         by putting 'place_id:' as a prefix in the passing parameter.
     :type destination: string, dict, list, or tuple
 
-    Direction(origin, destination) would determine the direction from origin to
+    DirectionAPI(origin, destination) would determine the direction from origin to
         destination. Note that this method would spend the quotas of
         the Directions API you use.
 
     If you want to determine direction without spending the quotas, please
-        use Direction() without arguments. This is a default object which
+        use DirectionAPI() without arguments. This is a default object which
         returns the direction from '台北101' to '台北市立動物園'. Please
         check 'constants.py' for more information.
     """
@@ -181,7 +181,7 @@ class _DirectionTrafficAccidentData():
                     if data:
                         self._data.append(data)
         return self._data
-    
+
     def _get_traffic_data(self, coord):
         return coord.traffic_accident.data
 
@@ -272,7 +272,7 @@ class _DirectionEarthquakeData():
                 self._data = list(set(data))
                 self.number = len(self._data)
         return self._data
-    
+
     def _get_earthquake_data(self, coord):
         return coord.earthquake.data
 
