@@ -91,14 +91,22 @@ function calculateAndDisplayRoute(start, destination) {
                         $('#display-info-earthquake').append('<p>平均深度: ' + response.earthquake_average_depth + ' 公里</p>');
                         $('#display-info-earthquake-list').show();
                         response.earthquake_data.forEach(data => {
+                            if (data.magnitude >= 5){
                             $('#display-info-earthquake-list').append(
                                 '<div class="earthquake-item">' +
-                                '<p>Date: ' + data.date + '</p>' +
-                                '<p>Coordinate: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
-                                '<p>Magnitude: ' + data.magnitude + '</p>' +
-                                '<p>Depth: ' + data.depth + '< km/p>' +
+                                '<p>日期: ' + data.date + '</p>' +
+                                '<p>位置: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
+                                '<p>芮氏規模: ' + data.magnitude + '</p>' +
+                                '<p>深度: ' + data.depth + ' km</p>' +
                                 '</div>'
                             );
+                            // Add marker for the earthquake location on the map
+                            // new google.maps.Marker({
+                            //     position: { lat: data.coordinate[0], lng: data.coordinate[1] },
+                            //     map: map,
+                            //     title: `Magnitude: ${data.magnitude}, Depth: ${data.depth} km`
+                            // });
+                            }
                         });
                     } else {
                         $('#display-info-earthquake').show();
