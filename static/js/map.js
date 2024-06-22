@@ -129,3 +129,4 @@ function calculateAndDisplayRoute(start, destination) {
 }
 
 initMap();
+console.log("123")

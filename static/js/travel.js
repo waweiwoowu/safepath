@@ -149,8 +149,8 @@ $(document).ready(function() {
         // alert("start: " + encodeURIComponent(startPoint))
         var url = '/explorer/travel_map/?start=' + encodeURIComponent(startPoint) + '&end=' + encodeURIComponent(destination) + '&waypoints=' + encodeURIComponent(waypoints) + '&optimize_waypoints=True';
         // alert("url: \n" + url)
-        window.location.href = url; // 直接跳轉
-        // window.open(url, '_blank'); // 在新分頁中打開 URL
+        // window.location.href = url; // 直接跳轉
+        window.open(url, '_blank'); // 在新分頁中打開 URL
     });
 
 
