@@ -6,11 +6,11 @@
     <title>Map Project</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}">
-    <script src="{% static 'js/map.js' %}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap" async defer></script>
+    {% comment %} <script src="{% static 'js/map.js' %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap" async defer></script> {% endcomment %}
 
-    {% comment %} <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap" async defer></script>
-    <script src="{% static 'js/map.js' %}"></script> {% endcomment %}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap" async defer></script>
+    <script src="{% static 'js/map.js' %}"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
