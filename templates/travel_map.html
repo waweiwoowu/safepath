@@ -4,7 +4,7 @@
     <title>Google Map with Route</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/travel_map.css' %}">
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap" async defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function initMap() {

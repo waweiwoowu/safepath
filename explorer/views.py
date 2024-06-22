@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from explorer.database import AttractionSQLController, RestaurantSQLController
-from explorer.maps import Direction, DirectionAPI, Hotspot, Foodspot, _get_google_maps_api_key
+from explorer.maps import Direction, DirectionAPI, Hotspot, Foodspot, GOOGLE_MAPS_API_KEY
 from explorer.models import UserInfo
 import json
 import random
@@ -26,7 +26,7 @@ def map(request):
         start = request.POST.get('start', '')
         destination = request.POST.get('destination', '')
         coordinates = request.POST.get('coordinates', '')
-
+        api_key = GOOGLE_MAPS_API_KEY
         try:
             if not coordinates:
                 raise ValueError('No coordinates provided')
@@ -70,7 +70,8 @@ def map(request):
             "earthquake_data": earthquake_data
     })
     else:
-        return render(request, 'map.html', {})
+        context = {'api_key': GOOGLE_MAPS_API_KEY}
+        return render(request, 'map.html', context)
 
 @csrf_exempt
 def travel(request):
@@ -157,13 +158,12 @@ def travel_map(request):
         start = request.GET.get('start', '')
         end = request.GET.get('end', '')
         waypoints = request.GET.get('waypoints', '')
-        api_key = _get_google_maps_api_key()
 
         context = {
             'start': start,
             'end': end,
             'waypoints': waypoints.split('|') if waypoints else [],
-            'api_key': api_key
+            'api_key': GOOGLE_MAPS_API_KEY
         }
 
         return render(request, 'travel_map.html', context)

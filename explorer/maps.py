@@ -733,7 +733,8 @@ def test_foodspot():
     print(foodspot.longitude)
 
 if __name__ == "__main__":
-    test_DirectionAPI()
+    # test_DirectionAPI()
+    print(GOOGLE_MAPS_API_KEY)
     # test_Direction()
     # test_Geocode()
     # test_Taiwan()
