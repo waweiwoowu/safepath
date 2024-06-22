@@ -1,9 +1,9 @@
 let map, directionsService, directionsRenderer;
-// document.addEventListener('DOMContentLoaded', (event) => {
-//     if (typeof google !== 'undefined') {
-//         initMap();
-//     }
-// });
+document.addEventListener('DOMContentLoaded', (event) => {
+    if (typeof google !== 'undefined') {
+        initMap();
+    }
+});
 function initMap() {
     // let map, directionsService, directionsRenderer;
     map = new google.maps.Map(document.getElementById('map'), {
@@ -129,4 +129,4 @@ function calculateAndDisplayRoute(start, destination) {
 }
 
 initMap();
-console.log("123")
+
