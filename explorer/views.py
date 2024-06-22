@@ -243,29 +243,7 @@ def signup(request):
             return render(request, "signup.html", {"error": "Error sending verification email. Please try again."})
 
         return render(request, "verification_code.html", {"username": username})
-# def signup(request):
-#     if request.method == "GET":
-#         return render(request, "signup.html", {})
-#     else:
-#         username = request.POST.get("username")
-#         fullname = request.POST.get("fullname")
-#         email = request.POST.get("email")
-#         password = request.POST.get("password")
-#         verification_code = verification_code_generator()
 
-#         user_info = UserInfo(
-#             username = username,
-#             fullname = fullname,
-#             email = email,
-#             password = password,
-#             verification_code = verification_code
-#         )
-
-#         user_info.save()
-
-#         send_mail(f"Verify", f"hello {username},\nYour verification code is {verification_code}", "f37854979@gmail.com", [email])
-
-#         return render(request, "verification_code.html", {"username": username})
 
 def verification_code_generator():
     code = ""
