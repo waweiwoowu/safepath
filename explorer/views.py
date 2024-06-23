@@ -23,22 +23,19 @@ def index(request):
 def home(request):
     return redirect('/explorer/index')
 
-def coordinate_set(coordinates, difference):
-    coords = []
-    for coordinate in coordinates:
-        latitude = rounding(coordinate["lat"], difference)
-        longitude = rounding(coordinate["lng"], difference)
-        coords.append((latitude, longitude))
-    return list(set(coords))
-
-RISK_LOADING_NUMBER = 100
-
 def map(request):
+    def coordinate_set(coordinates, difference):
+        coords = []
+        for coordinate in coordinates:
+            latitude = rounding(coordinate["lat"], difference)
+            longitude = rounding(coordinate["lng"], difference)
+            coords.append((latitude, longitude))
+        return list(set(coords))
+
+    RISK_LOADING_NUMBER = 100
+
     if request.method == 'POST':
-        # start = request.POST.get('start', '')
-        # destination = request.POST.get('destination', '')
         coordinates = request.POST.get('coordinates', '')
-        api_key = GOOGLE_MAPS_API_KEY
         try:
             if not coordinates:
                 raise ValueError('No coordinates provided')
@@ -60,8 +57,8 @@ def map(request):
         earthquake_magnitudes = []
         earthquake_depths = []
         earthquake_data = []
-
         earthquake_flag = True
+
         for loading_index in range(0, len(traffic_accident_coordinates_set), RISK_LOADING_NUMBER):
             try:
                 traffic_accident_coordinates = traffic_accident_coordinates_set[loading_index: loading_index + RISK_LOADING_NUMBER]
@@ -110,22 +107,12 @@ def map(request):
                 "earthquake_average_depth": earthquake_average_depth,
                 "earthquake_data": earthquake_data
             }
+
         return JsonResponse(data)
 
     else:
         context = {'api_key': GOOGLE_MAPS_API_KEY}
         return render(request, 'map.html', context)
-
-# def risk_loading(request):
-#     return JsonResponse({
-#                 "traffic_accident_number": traffic_accident_number,
-#                 "traffic_accident_fatality": traffic_accident_fatality,
-#                 "traffic_accident_injury": traffic_accident_injury,
-#                 "earthquake_number": earthquake_number,
-#                 "earthquake_average_magnitude": earthquake_average_magnitude,
-#                 "earthquake_average_depth": earthquake_average_depth,
-#                 "earthquake_data": earthquake_data
-#             })
 
 @csrf_exempt
 def travel(request):

@@ -53,6 +53,7 @@ body {
     color: #FFC100;
     text-align: center;
     padding: 10px;
+    font-weight: bold;
 }
 .section-title {
     width: 100%;
@@ -65,7 +66,7 @@ body {
 .section-earthquake-title {
     width: 100%;
     background-color: rgba(255, 193, 0, 0.9);
-    color: #fff;
+    color: #000;
     text-align: center;
     padding: 10px;
     margin-top: 10px;

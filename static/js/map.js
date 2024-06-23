@@ -14,6 +14,8 @@ function initMap() {
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map);
+    $('#section-earthquake-title').hide();
+    $('#display-info-earthquake-list').hide();
 
     $('#route-form').on('submit', function(event) {
         event.preventDefault();
@@ -24,6 +26,7 @@ function initMap() {
         $('#display-info').html('');
         $('#display-info-traffic-accident').hide();
         $('#display-info-earthquake').hide();
+        $('#section-earthquake-title').hide();
         $('#display-info-earthquake-list').hide();
         $('#loading-message').html('<h1>RISKS CALCULATING...</h1><h2>DO NOT REFRESH THE SCREEN!!!</h2>').show();
 
@@ -89,15 +92,16 @@ function calculateAndDisplayRoute(start, destination) {
                         $('#display-info-earthquake').append('<p>地震次數: ' + response.earthquake_number + ' 次</p>');
                         $('#display-info-earthquake').append('<p>平均規模: ' + response.earthquake_average_magnitude + '</p>');
                         $('#display-info-earthquake').append('<p>平均深度: ' + response.earthquake_average_depth + ' 公里</p>');
+                        $('#section-earthquake-title').show();
                         $('#display-info-earthquake-list').show();
                         response.earthquake_data.forEach(data => {
-                            if (data.magnitude >= 5){
+                            if (data.magnitude >= 4){
                             $('#display-info-earthquake-list').append(
                                 '<div class="earthquake-item">' +
                                 '<p>日期: ' + data.date + '</p>' +
                                 '<p>位置: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
                                 '<p>芮氏規模: ' + data.magnitude + '</p>' +
-                                '<p>深度: ' + data.depth + ' km</p>' +
+                                '<p>深度: ' + data.depth + ' 公里</p>' +
                                 '</div>'
                             );
                             // Add marker for the earthquake location on the map
