@@ -138,11 +138,15 @@ class DirectionAPI():
             self._earthquake = _DirectionEarthquakeData(self.coordinates)
         return self._earthquake
 
+
 class Direction():
     def __init__(self, coordinates):
         self.coordinates = []
-        for coordinate in coordinates:
-            self.coordinates.append((coordinate["lat"], coordinate["lng"]))
+        try:
+            for coordinate in coordinates:
+                self.coordinates.append((coordinate["lat"], coordinate["lng"]))
+        except:
+            self.coordinates = coordinates
         self._traffic_accident = None
         self._earthquake = None
 
@@ -189,7 +193,7 @@ class _DirectionTrafficAccidentData():
     def number(self):
         if self._number is None:
             if not self.data:
-                return None
+                return 0
             else:
                 self._number = 0
                 for data in self.data:
@@ -200,7 +204,7 @@ class _DirectionTrafficAccidentData():
     def total_fatality(self):
         if self._total_fatality is None:
             if not self.data:
-                return None
+                return 0
             else:
                 self._total_fatality = 0
                 for data in self.data:
@@ -211,7 +215,7 @@ class _DirectionTrafficAccidentData():
     def total_injury(self):
         if self._total_injury is None:
             if not self.data:
-                return None
+                return 0
             else:
                 self._total_injury = 0
                 for data in self.data:
@@ -246,6 +250,7 @@ class _DirectionEarthquakeData():
         for coordinate in coordinates:
             self._coords.append(Coordinate(coordinate))
         self._data = None
+        self._number = None
         self._date = None
         self._time = None
         self._latitude = None
@@ -270,11 +275,19 @@ class _DirectionEarthquakeData():
                 return None
             else:
                 self._data = list(set(data))
-                self.number = len(self._data)
         return self._data
 
     def _get_earthquake_data(self, coord):
         return coord.earthquake.data
+
+    @property
+    def number(self):
+        if self._number is None:
+            if not self.data:
+                return 0
+            else:
+                self._number = len(self.data)
+        return self._number
 
     @property
     def date(self):
