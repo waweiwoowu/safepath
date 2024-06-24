@@ -25,34 +25,49 @@ In order to prevent your GOOGLE_MAPS_API_KEY from being stolen on GitHub
 You may copy and paste the file to any location outside of the project on your local device
 And then add the file location to the list of the json file in '.\data\keys\paths.json'
 """
+from dotenv import load_dotenv
 
-
-def _get_google_maps_api_paths():
-    KEY_PATH = r".\data\keys\paths.json"
-    try:
-        with open(KEY_PATH) as file:
-            data = json.load(file)
-        paths = data["GOOGLE_MAPS_API_KEY"]
-        return paths
-    except:
-        return
+load_dotenv()
 
 def _get_google_maps_api_key():
-    paths = _get_google_maps_api_paths()
-    if not paths:
-        return
-    file_name = "\\safepath.json"
-    for path in paths:
-        try:
-            with open(path+file_name) as file:
-                data = json.load(file)
-            key = data["GOOGLE_MAPS_API_KEY"]
-            if key == "YOUR_API_KEY":
-                continue
-            return key
-        except:
-            continue
-    return
+
+    try:
+        api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+        if api_key:
+            return api_key
+        else:
+            raise ValueError("API key not found in environment variables")
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+# def _get_google_maps_api_paths():
+#     KEY_PATH = r".\data\keys\paths.json"
+#     try:
+#         with open(KEY_PATH) as file:
+#             data = json.load(file)
+#         paths = data["GOOGLE_MAPS_API_KEY"]
+#         return paths
+#     except:
+#         return
+
+# def _get_google_maps_api_key():
+#     paths = _get_google_maps_api_paths()
+#     if not paths:
+#         return
+#     file_name = "\\safepath.json"
+#     for path in paths:
+#         try:
+#             with open(path+file_name) as file:
+#                 data = json.load(file)
+#             key = data["GOOGLE_MAPS_API_KEY"]
+#             if key == "YOUR_API_KEY":
+#                 continue
+#             return key
+#         except:
+#             continue
+#     return
 
 GOOGLE_MAPS_API_KEY = _get_google_maps_api_key()
 
