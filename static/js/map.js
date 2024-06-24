@@ -16,6 +16,7 @@ function initMap() {
     directionsRenderer.setMap(map);
     $('#section-earthquake-title').hide();
     $('#display-info-earthquake-list').hide();
+    $('#display-info-earthquake-none-list').hide()
 
     $('#route-form').on('submit', function(event) {
         event.preventDefault();
@@ -28,6 +29,7 @@ function initMap() {
         $('#display-info-earthquake').hide();
         $('#section-earthquake-title').hide();
         $('#display-info-earthquake-list').hide();
+        $('#display-info-earthquake-none-list').hide()
         $('#loading-message').html('<h1>RISKS CALCULATING...</h1><h2>DO NOT REFRESH THE SCREEN!!!</h2>').show();
 
         // Calculate and display the route and then send the AJAX request
@@ -93,30 +95,35 @@ function calculateAndDisplayRoute(start, destination) {
                         $('#display-info-earthquake').append('<p>平均規模: ' + response.earthquake_average_magnitude + '</p>');
                         $('#display-info-earthquake').append('<p>平均深度: ' + response.earthquake_average_depth + ' 公里</p>');
                         $('#section-earthquake-title').show();
-                        $('#display-info-earthquake-list').show();
+                        let hasMajorEarthquake = false;
                         response.earthquake_data.forEach(data => {
-                            if (data.magnitude >= 4){
+                        if (data.magnitude >= 4){
                             $('#display-info-earthquake-list').append(
-                                '<div class="earthquake-item">' +
+                                '<div class="earthquake-item"' +
                                 '<p>日期: ' + data.date + '</p>' +
                                 '<p>位置: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
                                 '<p>芮氏規模: ' + data.magnitude + '</p>' +
-                                '<p>深度: ' + data.depth + ' 公里</p>' +
+                                '<p>深度: ' + data.depth + ' 公里</p>'+
                                 '</div>'
                             );
-                            // Add marker for the earthquake location on the map
-                            // new google.maps.Marker({
-                            //     position: { lat: data.coordinate[0], lng: data.coordinate[1] },
-                            //     map: map,
-                            //     title: `Magnitude: ${data.magnitude}, Depth: ${data.depth} km`
-                            // });
-                            }
-                        });
+                            $('#display-info-earthquake-list').show();
+                            hasMajorEarthquake = true;
+                        }
+                    });
+
+                    if(!hasMajorEarthquake){
+                        // console.log("nonelist")
+                        $('#display-info-earthquake-none-list').append(
+                            '<div class="earthquake-item"' +
+                            '<p>該路段無四級以上地震</p>' +
+                            '</div>'
+                        );
+                        $('#display-info-earthquake-none-list').show();
+                    }
                     } else {
-                        $('#display-info-earthquake').show();
+                        // $('#display-info-earthquake').show();
                         $('#display-info-earthquake').append('<p>無地震紀錄</p>');
                     }
-
                     $('#loading-message').hide();
                 },
                 error: function(xhr, status, error) {
