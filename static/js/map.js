@@ -115,7 +115,7 @@ function calculateAndDisplayRoute(start, destination) {
                         // console.log("nonelist")
                         $('#display-info-earthquake-none-list').append(
                             '<div class="earthquake-item"' +
-                            '<p>該路段無四級以上地震</p>' +
+                            '<p>該路段無規模4.0以上地震</p>' +
                             '</div>'
                         );
                         $('#display-info-earthquake-none-list').show();
