@@ -29,8 +29,34 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def _get_google_maps_api_key():
+def _get_google_maps_api_paths():
+    KEY_PATH = r".\data\keys\paths.json"
+    try:
+        with open(KEY_PATH) as file:
+            data = json.load(file)
+        paths = data["GOOGLE_MAPS_API_KEY"]
+        return paths
+    except:
+        return
 
+def _get_google_maps_api_key_from_path():
+    paths = _get_google_maps_api_paths()
+    if not paths:
+        return
+    file_name = "\\safepath.json"
+    for path in paths:
+        try:
+            with open(path+file_name) as file:
+                data = json.load(file)
+            key = data["GOOGLE_MAPS_API_KEY"]
+            if key == "YOUR_API_KEY":
+                continue
+            return key
+        except:
+            continue
+    return
+
+def _get_google_maps_api_key_from_dotenv():
     try:
         api_key = os.getenv("GOOGLE_MAPS_API_KEY")
         if api_key:
@@ -39,35 +65,14 @@ def _get_google_maps_api_key():
             raise ValueError("API key not found in environment variables")
     except Exception as e:
         print(f"Error: {e}")
-        return None
+        return None    
 
-
-# def _get_google_maps_api_paths():
-#     KEY_PATH = r".\data\keys\paths.json"
-#     try:
-#         with open(KEY_PATH) as file:
-#             data = json.load(file)
-#         paths = data["GOOGLE_MAPS_API_KEY"]
-#         return paths
-#     except:
-#         return
-
-# def _get_google_maps_api_key():
-#     paths = _get_google_maps_api_paths()
-#     if not paths:
-#         return
-#     file_name = "\\safepath.json"
-#     for path in paths:
-#         try:
-#             with open(path+file_name) as file:
-#                 data = json.load(file)
-#             key = data["GOOGLE_MAPS_API_KEY"]
-#             if key == "YOUR_API_KEY":
-#                 continue
-#             return key
-#         except:
-#             continue
-#     return
+def _get_google_maps_api_key():
+    key = _get_google_maps_api_key_from_path()
+    if key:
+        return key
+    key = _get_google_maps_api_key_from_dotenv()
+    return key
 
 GOOGLE_MAPS_API_KEY = _get_google_maps_api_key()
 
@@ -762,10 +767,10 @@ def test_foodspot():
 
 if __name__ == "__main__":
     # test_DirectionAPI()
-    print(GOOGLE_MAPS_API_KEY)
     # test_Direction()
     # test_Geocode()
     # test_Taiwan()
     # test_hotspot()
     # test_foodspot()
+    print(GOOGLE_MAPS_API_KEY)
     pass
