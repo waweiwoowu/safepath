@@ -39,14 +39,13 @@ def years_range(input_year):
 # 爬取地震網站
 def scrape_data(year, existing_data=None):
     Date, Time, Latitude, Longitude, Depth, Magnitude, Area, Intensity = [], [], [], [], [], [], [], []
-    
+
     try:
         driver = webdriver.Chrome()
         url = "https://scweb.cwa.gov.tw/zh-tw/earthquake/data"
         driver.get(url)
         driver.maximize_window()
         untilLocation(driver)
-        
         driver.find_element(By.ID, "Search").click()
         year_text = driver.find_element(By.CSS_SELECTOR, "div.datepicker-months th.datepicker-switch").text
         while year_text != str(year):
@@ -67,7 +66,7 @@ def scrape_data(year, existing_data=None):
                 print("c")
                 sleep(3)
             print(f"Scraping {year} month {i + 1}")
-            
+
             while True:
                 try:
                     table = driver.find_element(By.ID, "table").text
@@ -83,7 +82,7 @@ def scrape_data(year, existing_data=None):
                         new_url = driver.current_url
                     else:
                         new_url = link.get_attribute("href")
-                    # 開始爬取資料 
+                    # 開始爬取資料
                     r = requests.get(new_url)
                     soup = BeautifulSoup(r.text, "html.parser")
                     li_first = soup.select_one("ul.eqResultBoxRight.BulSet.BkeyinList > li")
@@ -94,7 +93,7 @@ def scrape_data(year, existing_data=None):
 
                     location = date.find_next_sibling("li")
                     deep = location.find_next_sibling("li")
-                    scale = deep.find_next_sibling("li")             
+                    scale = deep.find_next_sibling("li")
                     latitude = location.text.split("北緯 ")[1].split("°")[0].strip(" ")
                     longitude = location.text.split("東經 ")[1].split("°")[0].strip(" ")
                     depth = deep.text.split("地震深度：")[1].split(" 公里")[0].replace("\n", "")
@@ -120,7 +119,7 @@ def scrape_data(year, existing_data=None):
                 else:
                     next_button.click()
                 sleep(3)
-                
+
         # 按照年份，存成新的data
         new_data = {"Date": Date, "Time": Time, "北緯": Latitude, "東經": Longitude, "深度": Depth, "芮氏規模": Magnitude, "城市": Area, "震度": Intensity}
         new_df = pd.DataFrame(new_data)
@@ -135,14 +134,14 @@ def scrape_data(year, existing_data=None):
         print("捕獲到異常:", e)
     except Exception as e:
         print("發生其他異常:", e)
-    
-# 若有最新年度的csv檔，就讀取舊的csv檔，否則回傳None給main()
+
+# 讀取指定年份的地震資料的 CSV 檔案，如果檔案存在就讀取，否則返回 None
 def read_csv(year):
     if os.path.exists(f".\data\earthquakes\earthquake_{year}年.csv"):
         return pd.read_csv(f"earthquake_{year}年.csv")
     else:
         return None
-    
+
 # 進入點,使用threading多工同時爬取每一年份之數據
 def earthquake_crawling():
     years = years_range(input(eval("請輸入年份:")))
@@ -156,7 +155,7 @@ def earthquake_crawling():
             thread = threading.Thread(target=scrape_data, args=(year,))
         thread.start()
         threads.append(thread)
-    
+
     for thread in threads:
         thread.join()
 
