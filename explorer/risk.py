@@ -83,6 +83,16 @@ def average_magnitude(magnitudes):
     else:
         return None
 
+def average_depth(depths):
+    if depths:
+        avg = 0
+        for depth in depths:
+            avg += depth
+        avg /= len(depths)
+        return avg
+    else:
+        return None
+
 
 def test_intensity():
     # intensity = "5級"

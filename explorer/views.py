@@ -1,14 +1,16 @@
 from django.contrib import auth
 from django.core.mail import send_mail
+from django.db import IntegrityError
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from explorer.database import AttractionSQLController, RestaurantSQLController
-from explorer.maps import Direction, DirectionAPI, Hotspot, Foodspot, _get_google_maps_api_key
+from explorer.database import AttractionSQLController, RestaurantSQLController, rounding
+from explorer.maps import Direction, DirectionAPI, Hotspot, Foodspot, GOOGLE_MAPS_API_KEY
 from explorer.models import UserInfo
+from explorer.risk import average_magnitude, average_depth
 import json
 import random
-from django.db import IntegrityError
+import time
 
 
 def index(request):
@@ -22,11 +24,18 @@ def home(request):
     return redirect('/explorer/index')
 
 def map(request):
-    if request.method == 'POST':
-        start = request.POST.get('start', '')
-        destination = request.POST.get('destination', '')
-        coordinates = request.POST.get('coordinates', '')
+    def coordinate_set(coordinates, difference):
+        coords = []
+        for coordinate in coordinates:
+            latitude = rounding(coordinate["lat"], difference)
+            longitude = rounding(coordinate["lng"], difference)
+            coords.append((latitude, longitude))
+        return list(set(coords))
 
+    RISK_LOADING_NUMBER = 100
+
+    if request.method == 'POST':
+        coordinates = request.POST.get('coordinates', '')
         try:
             if not coordinates:
                 raise ValueError('No coordinates provided')
@@ -37,40 +46,73 @@ def map(request):
             # return JsonResponse({'error': 'Invalid coordinates format or no coordinates provided'}, status=400)
             return redirect('/explorer/index')
 
-        direction = Direction(coordinates)
+        traffic_accident_coordinates_set = coordinate_set(coordinates, 0.0001)
+        earthquake_coordinates_set = coordinate_set(coordinates, 0.01)
 
-        traffic_accident_number = direction.traffic_accident.number
-        traffic_accident_fatality = direction.traffic_accident.total_fatality
-        traffic_accident_injury = direction.traffic_accident.total_injury
+        # Initialize risk counts
+        traffic_accident_number = 0
+        traffic_accident_fatality = 0
+        traffic_accident_injury = 0
+        earthquake_number = 0
+        earthquake_magnitudes = []
+        earthquake_depths = []
+        earthquake_data = []
+        earthquake_flag = True
 
-        if direction.earthquake.data:
-            earthquake_number = direction.earthquake.number
-            earthquake_average_magnitude = f"{direction.earthquake.average_magnitude:.2f}"
-            earthquake_average_depth = f"{direction.earthquake.average_depth:.1f}"
-        else:
-            earthquake_number = 0
-            earthquake_average_magnitude = None
-            earthquake_average_depth = None
-        earthquake_data = [{
-            "date": direction.earthquake.date[i],
-            "coordinate": direction.earthquake.coordinate[i],
-            "magnitude": direction.earthquake.magnitude[i],
-            "depth": direction.earthquake.depth[i],
-            "date": direction.earthquake.date[i],
-            "date": direction.earthquake.date[i],
-        } for i in range(earthquake_number)]
+        for loading_index in range(0, len(traffic_accident_coordinates_set), RISK_LOADING_NUMBER):
+            try:
+                traffic_accident_coordinates = traffic_accident_coordinates_set[loading_index: loading_index + RISK_LOADING_NUMBER]
+            except:
+                traffic_accident_coordinates = traffic_accident_coordinates_set[loading_index:]
 
-        return JsonResponse({
-            "traffic_accident_number": traffic_accident_number,
-            "traffic_accident_fatality": traffic_accident_fatality,
-            "traffic_accident_injury": traffic_accident_injury,
-            "earthquake_number": earthquake_number,
-            "earthquake_average_magnitude": earthquake_average_magnitude,
-            "earthquake_average_depth": earthquake_average_depth,
-            "earthquake_data": earthquake_data
-    })
+            direction = Direction(traffic_accident_coordinates)
+            traffic_accident_number += direction.traffic_accident.number
+            traffic_accident_fatality += direction.traffic_accident.total_fatality
+            traffic_accident_injury += direction.traffic_accident.total_injury
+
+            if earthquake_flag:
+                try:
+                    earthquake_coordinates = earthquake_coordinates_set[loading_index: loading_index + RISK_LOADING_NUMBER]
+                except:
+                    earthquake_coordinates = earthquake_coordinates_set[loading_index:]
+                    earthquake_flag = False
+
+                direction = Direction(earthquake_coordinates)
+
+                if direction.earthquake.data:
+                    earthquake_number += direction.earthquake.number
+                    earthquake_magnitudes += direction.earthquake.magnitude
+                    earthquake_depths += direction.earthquake.depth
+                for i in range(direction.earthquake.number):
+                    earthquake_data.append({
+                        "date": direction.earthquake.date[i],
+                        "coordinate": direction.earthquake.coordinate[i],
+                        "magnitude": direction.earthquake.magnitude[i],
+                        "depth": direction.earthquake.depth[i],
+                    })
+
+                try:
+                    earthquake_average_magnitude = f"{average_magnitude(earthquake_magnitudes):.2f}"
+                    earthquake_average_depth = f"{average_depth(earthquake_depths):.2f}"
+                except:
+                    earthquake_average_magnitude = None
+                    earthquake_average_depth = None
+
+            data = {
+                "traffic_accident_number": traffic_accident_number,
+                "traffic_accident_fatality": traffic_accident_fatality,
+                "traffic_accident_injury": traffic_accident_injury,
+                "earthquake_number": earthquake_number,
+                "earthquake_average_magnitude": earthquake_average_magnitude,
+                "earthquake_average_depth": earthquake_average_depth,
+                "earthquake_data": earthquake_data
+            }
+
+        return JsonResponse(data)
+
     else:
-        return render(request, 'map.html', {})
+        context = {'api_key': GOOGLE_MAPS_API_KEY}
+        return render(request, 'map.html', context)
 
 @csrf_exempt
 def travel(request):
@@ -157,13 +199,12 @@ def travel_map(request):
         start = request.GET.get('start', '')
         end = request.GET.get('end', '')
         waypoints = request.GET.get('waypoints', '')
-        api_key = _get_google_maps_api_key()
 
         context = {
             'start': start,
             'end': end,
             'waypoints': waypoints.split('|') if waypoints else [],
-            'api_key': api_key
+            'api_key': GOOGLE_MAPS_API_KEY
         }
 
         return render(request, 'travel_map.html', context)
@@ -243,29 +284,7 @@ def signup(request):
             return render(request, "signup.html", {"error": "Error sending verification email. Please try again."})
 
         return render(request, "verification_code.html", {"username": username})
-# def signup(request):
-#     if request.method == "GET":
-#         return render(request, "signup.html", {})
-#     else:
-#         username = request.POST.get("username")
-#         fullname = request.POST.get("fullname")
-#         email = request.POST.get("email")
-#         password = request.POST.get("password")
-#         verification_code = verification_code_generator()
 
-#         user_info = UserInfo(
-#             username = username,
-#             fullname = fullname,
-#             email = email,
-#             password = password,
-#             verification_code = verification_code
-#         )
-
-#         user_info.save()
-
-#         send_mail(f"Verify", f"hello {username},\nYour verification code is {verification_code}", "f37854979@gmail.com", [email])
-
-#         return render(request, "verification_code.html", {"username": username})
 
 def verification_code_generator():
     code = ""

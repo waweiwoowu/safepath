@@ -1,9 +1,9 @@
 let map, directionsService, directionsRenderer;
-// document.addEventListener('DOMContentLoaded', (event) => {
-//     if (typeof google !== 'undefined') {
-//         initMap();
-//     }
-// });
+document.addEventListener('DOMContentLoaded', (event) => {
+    if (typeof google !== 'undefined') {
+        initMap();
+    }
+});
 function initMap() {
     // let map, directionsService, directionsRenderer;
     map = new google.maps.Map(document.getElementById('map'), {
@@ -14,6 +14,9 @@ function initMap() {
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map);
+    $('#section-earthquake-title').hide();
+    $('#display-info-earthquake-list').hide();
+    $('#display-info-earthquake-none-list').hide()
 
     $('#route-form').on('submit', function(event) {
         event.preventDefault();
@@ -24,7 +27,9 @@ function initMap() {
         $('#display-info').html('');
         $('#display-info-traffic-accident').hide();
         $('#display-info-earthquake').hide();
+        $('#section-earthquake-title').hide();
         $('#display-info-earthquake-list').hide();
+        $('#display-info-earthquake-none-list').hide()
         $('#loading-message').html('<h1>RISKS CALCULATING...</h1><h2>DO NOT REFRESH THE SCREEN!!!</h2>').show();
 
         // Calculate and display the route and then send the AJAX request
@@ -89,22 +94,36 @@ function calculateAndDisplayRoute(start, destination) {
                         $('#display-info-earthquake').append('<p>地震次數: ' + response.earthquake_number + ' 次</p>');
                         $('#display-info-earthquake').append('<p>平均規模: ' + response.earthquake_average_magnitude + '</p>');
                         $('#display-info-earthquake').append('<p>平均深度: ' + response.earthquake_average_depth + ' 公里</p>');
-                        $('#display-info-earthquake-list').show();
+                        $('#section-earthquake-title').show();
+                        let hasMajorEarthquake = false;
                         response.earthquake_data.forEach(data => {
+                        if (data.magnitude >= 4){
                             $('#display-info-earthquake-list').append(
-                                '<div class="earthquake-item">' +
-                                '<p>Date: ' + data.date + '</p>' +
-                                '<p>Coordinate: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
-                                '<p>Magnitude: ' + data.magnitude + '</p>' +
-                                '<p>Depth: ' + data.depth + '< km/p>' +
+                                '<div class="earthquake-item"' +
+                                '<p>日期: ' + data.date + '</p>' +
+                                '<p>位置: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
+                                '<p>芮氏規模: ' + data.magnitude + '</p>' +
+                                '<p>深度: ' + data.depth + ' 公里</p>'+
                                 '</div>'
                             );
-                        });
+                            $('#display-info-earthquake-list').show();
+                            hasMajorEarthquake = true;
+                        }
+                    });
+
+                    if(!hasMajorEarthquake){
+                        // console.log("nonelist")
+                        $('#display-info-earthquake-none-list').append(
+                            '<div class="earthquake-item"' +
+                            '<p>該路段無規模4.0以上地震</p>' +
+                            '</div>'
+                        );
+                        $('#display-info-earthquake-none-list').show();
+                    }
                     } else {
-                        $('#display-info-earthquake').show();
+                        // $('#display-info-earthquake').show();
                         $('#display-info-earthquake').append('<p>無地震紀錄</p>');
                     }
-
                     $('#loading-message').hide();
                 },
                 error: function(xhr, status, error) {

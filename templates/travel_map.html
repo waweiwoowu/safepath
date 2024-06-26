@@ -4,7 +4,7 @@
     <title>Google Map with Route</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/travel_map.css' %}">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFzApqD1tGY615APaue-nIwjC6Lx5pOp0&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap" async defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function initMap() {
@@ -86,10 +86,10 @@
                                 response.earthquake_data.forEach(data => {
                                     $('#display-info-earthquake-list').append(
                                         '<div class="earthquake-item">' +
-                                        '<p>Date: ' + data.date + '</p>' +
-                                        '<p>Coordinate: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
-                                        '<p>Magnitude: ' + data.magnitude + '</p>' +
-                                        '<p>Depth: ' + data.depth + ' km</p>' +
+                                        '<p>日期: ' + data.date + '</p>' +
+                                        '<p>位置: (' + data.coordinate[0] + ', ' + data.coordinate[1] + ')</p>' +
+                                        '<p>芮氏規模: ' + data.magnitude + '</p>' +
+                                        '<p>深度: ' + data.depth + ' km</p>' +
                                         '</div>'
                                     );
                                 });

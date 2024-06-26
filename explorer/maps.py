@@ -25,34 +25,49 @@ In order to prevent your GOOGLE_MAPS_API_KEY from being stolen on GitHub
 You may copy and paste the file to any location outside of the project on your local device
 And then add the file location to the list of the json file in '.\data\keys\paths.json'
 """
+from dotenv import load_dotenv
 
-
-def _get_google_maps_api_paths():
-    KEY_PATH = r".\data\keys\paths.json"
-    try:
-        with open(KEY_PATH) as file:
-            data = json.load(file)
-        paths = data["GOOGLE_MAPS_API_KEY"]
-        return paths
-    except:
-        return
+load_dotenv()
 
 def _get_google_maps_api_key():
-    paths = _get_google_maps_api_paths()
-    if not paths:
-        return
-    file_name = "\\safepath.json"
-    for path in paths:
-        try:
-            with open(path+file_name) as file:
-                data = json.load(file)
-            key = data["GOOGLE_MAPS_API_KEY"]
-            if key == "YOUR_API_KEY":
-                continue
-            return key
-        except:
-            continue
-    return
+
+    try:
+        api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+        if api_key:
+            return api_key
+        else:
+            raise ValueError("API key not found in environment variables")
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+# def _get_google_maps_api_paths():
+#     KEY_PATH = r".\data\keys\paths.json"
+#     try:
+#         with open(KEY_PATH) as file:
+#             data = json.load(file)
+#         paths = data["GOOGLE_MAPS_API_KEY"]
+#         return paths
+#     except:
+#         return
+
+# def _get_google_maps_api_key():
+#     paths = _get_google_maps_api_paths()
+#     if not paths:
+#         return
+#     file_name = "\\safepath.json"
+#     for path in paths:
+#         try:
+#             with open(path+file_name) as file:
+#                 data = json.load(file)
+#             key = data["GOOGLE_MAPS_API_KEY"]
+#             if key == "YOUR_API_KEY":
+#                 continue
+#             return key
+#         except:
+#             continue
+#     return
 
 GOOGLE_MAPS_API_KEY = _get_google_maps_api_key()
 
@@ -81,12 +96,12 @@ class DirectionAPI():
         by putting 'place_id:' as a prefix in the passing parameter.
     :type destination: string, dict, list, or tuple
 
-    Direction(origin, destination) would determine the direction from origin to
+    DirectionAPI(origin, destination) would determine the direction from origin to
         destination. Note that this method would spend the quotas of
         the Directions API you use.
 
     If you want to determine direction without spending the quotas, please
-        use Direction() without arguments. This is a default object which
+        use DirectionAPI() without arguments. This is a default object which
         returns the direction from '台北101' to '台北市立動物園'. Please
         check 'constants.py' for more information.
     """
@@ -138,11 +153,15 @@ class DirectionAPI():
             self._earthquake = _DirectionEarthquakeData(self.coordinates)
         return self._earthquake
 
+
 class Direction():
     def __init__(self, coordinates):
         self.coordinates = []
-        for coordinate in coordinates:
-            self.coordinates.append((coordinate["lat"], coordinate["lng"]))
+        try:
+            for coordinate in coordinates:
+                self.coordinates.append((coordinate["lat"], coordinate["lng"]))
+        except:
+            self.coordinates = coordinates
         self._traffic_accident = None
         self._earthquake = None
 
@@ -181,7 +200,7 @@ class _DirectionTrafficAccidentData():
                     if data:
                         self._data.append(data)
         return self._data
-    
+
     def _get_traffic_data(self, coord):
         return coord.traffic_accident.data
 
@@ -189,7 +208,7 @@ class _DirectionTrafficAccidentData():
     def number(self):
         if self._number is None:
             if not self.data:
-                return None
+                return 0
             else:
                 self._number = 0
                 for data in self.data:
@@ -200,7 +219,7 @@ class _DirectionTrafficAccidentData():
     def total_fatality(self):
         if self._total_fatality is None:
             if not self.data:
-                return None
+                return 0
             else:
                 self._total_fatality = 0
                 for data in self.data:
@@ -211,7 +230,7 @@ class _DirectionTrafficAccidentData():
     def total_injury(self):
         if self._total_injury is None:
             if not self.data:
-                return None
+                return 0
             else:
                 self._total_injury = 0
                 for data in self.data:
@@ -246,6 +265,7 @@ class _DirectionEarthquakeData():
         for coordinate in coordinates:
             self._coords.append(Coordinate(coordinate))
         self._data = None
+        self._number = None
         self._date = None
         self._time = None
         self._latitude = None
@@ -270,11 +290,19 @@ class _DirectionEarthquakeData():
                 return None
             else:
                 self._data = list(set(data))
-                self.number = len(self._data)
         return self._data
-    
+
     def _get_earthquake_data(self, coord):
         return coord.earthquake.data
+
+    @property
+    def number(self):
+        if self._number is None:
+            if not self.data:
+                return 0
+            else:
+                self._number = len(self.data)
+        return self._number
 
     @property
     def date(self):
@@ -733,7 +761,8 @@ def test_foodspot():
     print(foodspot.longitude)
 
 if __name__ == "__main__":
-    test_DirectionAPI()
+    # test_DirectionAPI()
+    print(GOOGLE_MAPS_API_KEY)
     # test_Direction()
     # test_Geocode()
     # test_Taiwan()
